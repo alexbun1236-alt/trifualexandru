@@ -1,0 +1,3222 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Merchandiser Pro - Planificator Rută & Verificare Teren</title>
+
+  <!-- PWA & iOS Safari Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Merchandiser Pro" />
+  <meta name="theme-color" content="#2563eb" />
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #dbeafe;
+      --success: #10b981;
+      --success-dark: #059669;
+      --success-light: #d1fae5;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --purple: #8b5cf6;
+      --purple-light: #ede9fe;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --gray-50: #1e293b;
+      --gray-100: #334155;
+      --gray-200: #475569;
+      --primary-light: #1e3a8a;
+      --success-light: #064e3b;
+      --danger-light: #7f1d1d;
+      --purple-light: #4c1d95;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* Top Navigation Bar - Guaranteed iPhone Notch / Dynamic Island Safe */
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding-top: max(52px, calc(env(safe-area-inset-top) + 8px));
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+      flex-shrink: 0;
+      gap: 8px;
+      position: relative;
+    }
+
+    @media (min-width: 769px) {
+      header {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(37,99,235,0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-info h1 {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .brand-info span {
+      font-size: 10px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    /* Week 1 Dropdown Selector in Header */
+    .week-dropdown-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .week-dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--gray-100);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .week-dropdown-btn:hover {
+      background-color: var(--gray-200);
+      border-color: var(--primary);
+    }
+
+    .active-day-pill {
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .week-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      width: 240px;
+      padding: 6px;
+      z-index: 2500;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .week-dropdown-menu.show {
+      display: flex;
+    }
+
+    .dropdown-header {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 8px;
+    }
+
+    .week-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .week-menu-item:hover {
+      background: var(--gray-100);
+      color: var(--primary);
+    }
+
+    .week-menu-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* Desktop header actions (hidden on mobile, moved to bottom swipe dock) */
+    .desktop-header-tools {
+      display: none;
+    }
+
+    @media (min-width: 769px) {
+      .desktop-header-tools {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 3px;
+      background-color: var(--gray-100);
+      padding: 3px;
+      border-radius: 10px;
+    }
+
+    .nav-tab {
+      padding: 6px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      background-color: var(--card-bg);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--card-bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { background-color: var(--gray-100); }
+    .icon-btn.active-btn { background-color: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+    .icon-btn.unlocked-btn { background-color: var(--warning-light); color: #d97706; border-color: var(--warning); }
+
+    /* Bottom Swipeable Dock Bar (For Mobile - Solves Notch & Screen Real Estate) */
+    .bottom-dock-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1500;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      padding-left: 10px;
+      padding-right: 10px;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    @media (min-width: 769px) {
+      .bottom-dock-bar {
+        display: none;
+      }
+    }
+
+    .bottom-dock-scroll {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+    .bottom-dock-scroll::-webkit-scrollbar { display: none; }
+
+    .dock-pill-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--gray-100);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .dock-pill-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+    }
+
+    .dock-pill-btn.unlocked-pill {
+      background: var(--warning-light);
+      color: #d97706;
+      border-color: var(--warning);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-primary { background: var(--primary-light); color: var(--primary); }
+    .badge-success { background: var(--success-light); color: var(--success); }
+    .badge-danger { background: var(--danger-light); color: var(--danger); }
+    .badge-gray { background: var(--gray-100); color: var(--text-muted); }
+
+    /* Filter Bar */
+    .filter-scroll-row {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      padding: 6px 0;
+      scrollbar-width: none;
+    }
+    .filter-scroll-row::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .filter-chip.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .view-panel {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* Map View Layout */
+    #mapView {
+      flex-direction: row;
+    }
+
+    #map {
+      flex: 1;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+    }
+
+    /* Desktop Sidebar for Map */
+    .map-sidebar {
+      width: 380px;
+      height: 100%;
+      background-color: var(--card-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .route-info-box {
+      background: var(--gray-50);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.4;
+      margin-top: 6px;
+    }
+
+    .route-stats-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border);
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .store-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .store-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    .store-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .store-card.active {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .store-card.completed {
+      border-color: var(--success);
+      background-color: #f0fdf4;
+    }
+    [data-theme="dark"] .store-card.completed {
+      background-color: #064e3b33;
+    }
+
+    .store-card.unresolved {
+      border-color: var(--danger);
+      background-color: #fef2f2;
+    }
+    [data-theme="dark"] .store-card.unresolved {
+      background-color: #7f1d1d33;
+    }
+
+    .store-card-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--gray-100);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .store-card.completed .store-card-num {
+      background: var(--success) !important;
+      color: white !important;
+    }
+
+    .store-card.unresolved .store-card-num {
+      background: var(--danger) !important;
+      color: white !important;
+    }
+
+    .store-card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .store-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .store-card-address {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    /* Map floating control overlay stack */
+    .map-fab-stack {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-action-bubble {
+      width: 42px;
+      height: 42px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .map-action-bubble:hover { transform: scale(1.06); }
+    .map-action-bubble.active-btn { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Drag notification toast */
+    .map-toast-alert {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 2000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      display: none;
+      align-items: center;
+      gap: 6px;
+      animation: fadeInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translate(-50%, -10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* Mobile Quick Card */
+    .mobile-quick-card {
+      position: absolute;
+      bottom: 85px;
+      left: 12px;
+      right: 12px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      z-index: 1400;
+      display: none;
+      animation: slideUpQuick 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUpQuick {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Bottom Action Sheet / Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .action-sheet {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 500px;
+      border-radius: 20px 20px 0 0;
+      padding: 18px 20px 28px 20px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 5px;
+      background: var(--gray-300);
+      border-radius: 3px;
+      margin: 0 auto 14px auto;
+    }
+
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .sheet-title {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .sheet-address {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-group-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn-group-horizontal {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Common Buttons */
+    .btn {
+      min-height: 46px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-waze {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(0, 198, 255, 0.3);
+    }
+    .btn-waze:hover { opacity: 0.95; }
+
+    .btn-gmaps { background: #34a853; color: white; font-size: 13px; font-weight: 600; }
+    .btn-apple { background: #1e293b; color: white; font-size: 13px; font-weight: 600; }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--gray-200); }
+
+    .btn-success { background: var(--success); color: white; flex: 1; }
+    .btn-success:hover { background: var(--success-dark); }
+
+    .btn-danger { background: var(--danger); color: white; flex: 1; }
+    .btn-danger:hover { background: var(--danger-dark); }
+
+    .btn-sm {
+      min-height: 36px;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    /* Draggable Messenger FAB */
+    .floating-fab {
+      position: fixed;
+      bottom: 85px;
+      right: 18px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(37,99,235,0.45);
+      cursor: grab;
+      z-index: 1450;
+      border: 2.5px solid white;
+      user-select: none;
+      touch-action: none;
+      transition: transform 0.15s ease-out, box-shadow 0.15s;
+    }
+
+    .floating-fab:active {
+      cursor: grabbing;
+      transform: scale(1.08);
+      box-shadow: 0 12px 30px rgba(37,99,235,0.6);
+    }
+
+    .fab-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+      pointer-events: none;
+    }
+
+    /* Dynamic Product List Form Window */
+    .fab-window {
+      position: fixed;
+      bottom: 85px;
+      right: 16px;
+      width: 410px;
+      max-width: calc(100vw - 24px);
+      max-height: 580px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      z-index: 2500;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fab-window.active { display: flex; }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .fab-window-header {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .fab-window-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fab-close-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      opacity: 0.8;
+    }
+    .fab-close-btn:hover { opacity: 1; }
+
+    .fab-window-body {
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .form-control {
+      min-height: 38px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus { border-color: var(--primary); }
+
+    /* Dynamic Products List Container */
+    .products-dynamic-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .product-row-item {
+      background: var(--gray-50);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .product-row-item:hover {
+      border-color: var(--primary);
+    }
+
+    .product-index-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .product-thumb-container {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      border: 1px dashed var(--gray-300);
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .product-thumb-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-thumb-container .thumb-placeholder {
+      font-size: 18px;
+      color: var(--gray-400);
+    }
+
+    .product-fields-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .product-input-name {
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      background: var(--card-bg);
+      color: var(--text);
+      outline: none;
+      width: 100%;
+    }
+
+    .product-input-price {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      background: var(--card-bg);
+      outline: none;
+      width: 100%;
+    }
+
+    .product-actions-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .action-icon-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .action-icon-btn:hover { background: var(--gray-200); color: var(--text); }
+    .action-icon-btn.delete-btn:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+
+    /* Tab: Raport Verificare Teren */
+    #reportView {
+      background-color: var(--bg);
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px;
+      padding-bottom: 90px;
+      display: none;
+    }
+    #reportView.active { display: flex; }
+
+    .report-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .report-header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .report-title-box h2 {
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .report-title-box p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .report-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .stat-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .stat-icon-blue { background: var(--primary-light); color: var(--primary); }
+    .stat-icon-green { background: var(--success-light); color: var(--success); }
+    .stat-icon-red { background: var(--danger-light); color: var(--danger); }
+    .stat-icon-amber { background: var(--warning-light); color: var(--warning); }
+
+    .stat-info h4 {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-info span {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .report-table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table.report-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    table.report-table th {
+      background-color: var(--gray-50);
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    table.report-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    table.report-table tr:last-child td { border-bottom: none; }
+    table.report-table tr:hover td { background-color: var(--gray-50); }
+
+    /* Modal Chooser on First Run */
+    .mode-picker-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .mode-picker-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      max-width: 460px;
+      width: 100%;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+    }
+
+    .mode-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 24px 0 16px 0;
+    }
+
+    .mode-btn {
+      border: 2px solid var(--border);
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: translateY(-2px);
+    }
+    .mode-btn-icon { font-size: 32px; }
+    .mode-btn-title { font-size: 14px; font-weight: 700; }
+    .mode-btn-desc { font-size: 11px; color: var(--text-muted); }
+
+    /* Custom Leaflet Pin Markers */
+    .custom-marker-pin {
+      width: 32px;
+      height: 32px;
+      border-radius: 50% 50% 50% 0;
+      position: absolute;
+      transform: rotate(-45deg);
+      left: 50%;
+      top: 50%;
+      margin: -20px 0 0 -16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      border: 2px solid #ffffff;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .custom-marker-pin span {
+      transform: rotate(45deg);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .pin-pending { background: #64748b; }
+    .pin-completed { background: #10b981 !important; }
+    .pin-unresolved { background: #ef4444 !important; }
+    .pin-active-pending { background: #2563eb; }
+
+    .custom-marker-pin.is-active {
+      box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #2563eb, 0 6px 14px rgba(0,0,0,0.4);
+      transform: rotate(-45deg) scale(1.18);
+      z-index: 1000 !important;
+    }
+
+    .custom-marker-pin.is-active.pin-completed {
+      box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #059669, 0 6px 14px rgba(16,185,129,0.5);
+    }
+
+    .custom-marker-pin.is-active.pin-unresolved {
+      box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #dc2626, 0 6px 14px rgba(239,68,68,0.5);
+    }
+
+    /* Pulsing user GPS dot */
+    .user-gps-dot {
+      width: 18px;
+      height: 18px;
+      background: #2563eb;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.8);
+      animation: pulseGps 1.8s infinite;
+    }
+
+    @keyframes pulseGps {
+      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+      70% { box-shadow: 0 0 0 14px rgba(37, 99, 235, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .map-sidebar { display: none; }
+      .brand-info span { display: none; }
+    }
+
+    /* Reason Modal */
+    .reason-dialog {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .reason-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .reason-chip {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+    .reason-chip:hover {
+      border-color: var(--danger);
+      background: var(--danger-light);
+    }
+
+    /* Print Styles */
+    @media print {
+      header, .floating-fab, .fab-window, .modal-overlay, .mode-picker-modal, .map-fab-stack, .bottom-dock-bar {
+        display: none !important;
+      }
+      body, main, #reportView {
+        height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+        background: white !important;
+        color: black !important;
+      }
+      .report-container { max-width: 100% !important; }
+      .report-header, .stat-card, .report-table-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mode Selector Modal (Initial Launch) -->
+  <div id="modePickerModal" class="mode-picker-modal" style="display: none;">
+    <div class="mode-picker-card">
+      <div style="font-size: 40px; margin-bottom: 8px;">🚗</div>
+      <h2 style="font-size: 20px; font-weight: 800;">Merchandiser Pro</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Alege modul de afișare optim pentru ecranul tău:</p>
+      
+      <div class="mode-options-grid">
+        <div class="mode-btn" onclick="app.setDeviceMode('mobile')">
+          <div class="mode-btn-icon">📱</div>
+          <div class="mode-btn-title">Mod Telefon</div>
+          <div class="mode-btn-desc">iPhone 15 Pro Max & Mobil</div>
+        </div>
+        <div class="mode-btn" onclick="app.setDeviceMode('desktop')">
+          <div class="mode-btn-icon">💻</div>
+          <div class="mode-btn-title">Mod Desktop</div>
+          <div class="mode-btn-desc">Laptop & Ecran Mare</div>
+        </div>
+      </div>
+
+      <p style="font-size: 11px; color: var(--text-muted);">Punct de plecare configurat: <strong>Brănești (A2)</strong></p>
+    </div>
+  </div>
+
+  <!-- Top Header - Perfectly Safe from Notch & Dynamic Island -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">M</div>
+      <div class="brand-info">
+        <h1>Merchandiser Pro</h1>
+        <span id="routeOriginStatus">Start: Brănești (A2)</span>
+      </div>
+    </div>
+
+    <!-- Week 1 Dropdown Selector in Header -->
+    <div class="week-dropdown-container">
+      <button class="week-dropdown-btn" id="weekDropdownTriggerBtn" onclick="app.toggleWeekDropdown(event)">
+        <span>📅 Săptămâna 1</span>
+        <span class="active-day-pill" id="activeDayHeaderLabel">Ziua 1 (20)</span>
+        <span style="font-size: 10px; color: var(--text-muted);">▼</span>
+      </button>
+
+      <div class="week-dropdown-menu" id="weekDropdownMenu">
+        <div class="dropdown-header">Alege Ziua de Lucru:</div>
+        <button class="week-menu-item active" id="btnDay1" onclick="app.selectDayFromMenu('day1')">
+          <span>📅 Ziua 1</span> <span class="badge badge-primary">20 Magazine</span>
+        </button>
+        <button class="week-menu-item" id="btnDay2" onclick="app.selectDayFromMenu('day2')">
+          <span>📅 Ziua 2</span> <span class="badge badge-primary">19 Magazine</span>
+        </button>
+        <button class="week-menu-item" id="btnDay3" onclick="app.selectDayFromMenu('day3')">
+          <span>📅 Ziua 3</span> <span class="badge badge-primary">20 Magazine</span>
+        </button>
+        <button class="week-menu-item" id="btnDay4" onclick="app.selectDayFromMenu('day4')">
+          <span>📅 Ziua 4</span> <span class="badge badge-primary">14 Magazine</span>
+        </button>
+        <button class="week-menu-item" id="btnDay5" onclick="app.selectDayFromMenu('day5')">
+          <span>📅 Ziua 5</span> <span class="badge badge-primary">19 Magazine</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Desktop Toolbar (Shown on Desktop only) -->
+    <div class="desktop-header-tools">
+      <div class="nav-tabs">
+        <button class="nav-tab active" id="tabMapBtnDesk" onclick="app.switchTab('map')">🗺️ Hartă</button>
+        <button class="nav-tab" id="tabReportBtnDesk" onclick="app.switchTab('report')">📋 Raport</button>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="headerLockBtnDesk" title="Pini Blocați (Apasă pt deblocare)" onclick="app.togglePinLock()">🔒</button>
+        <button class="icon-btn" id="headerGpsBtnDesk" title="Localizare GPS live" onclick="app.toggleGpsTracking()">📍</button>
+        <button class="icon-btn" title="Backup / Restaurare Date" onclick="app.openBackupModal()">💾</button>
+        <button class="icon-btn" title="Schimbă mod Telefon / Desktop" onclick="app.showModePicker()">📱</button>
+        <button class="icon-btn" id="themeToggleBtnDesk" title="Temă Luminoasă / Întunecată" onclick="app.toggleTheme()">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main>
+    <!-- View 1: Map & Route View -->
+    <section id="mapView" class="view-panel active">
+      <!-- Desktop Sidebar -->
+      <aside class="map-sidebar" id="mapSidebar">
+        <div class="sidebar-header">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 id="sidebarTitle">Magazine Săptămâna 1 - Ziua 1</h2>
+            <span class="badge badge-primary" id="sidebarProgressBadge">0/20 Vizitate</span>
+          </div>
+
+          <!-- Filter chips row -->
+          <div class="filter-scroll-row">
+            <button class="filter-chip active" onclick="app.setStoreFilter('all', this)">Toate</button>
+            <button class="filter-chip" onclick="app.setStoreFilter('Mega Image', this)">Mega Image</button>
+            <button class="filter-chip" onclick="app.setStoreFilter('Penny', this)">Penny</button>
+            <button class="filter-chip" onclick="app.setStoreFilter('Profi', this)">Profi</button>
+            <button class="filter-chip" onclick="app.setStoreFilter('pending', this)">⏳ Rămase</button>
+            <button class="filter-chip" onclick="app.setStoreFilter('completed', this)">✅ Rezolvate</button>
+          </div>
+
+          <div class="route-info-box" id="sidebarRouteDesc">
+            <!-- Injected dynamically -->
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('tur')">
+              🔄 Tur (A2)
+            </button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('retur')">
+              🔄 Retur
+            </button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" title="Găsește cel mai apropiat magazin de GPS-ul tău" onclick="app.findNearestStoreToGps()">
+              🎯 Cel mai aproape
+            </button>
+          </div>
+        </div>
+
+        <div class="store-list-container" id="storeListContainer">
+          <!-- Populated dynamically -->
+        </div>
+      </aside>
+
+      <!-- Leaflet Map Canvas with Google Maps Tiles + Non-Overlapping Controls -->
+      <div id="map"></div>
+
+      <!-- Drag Notification Toast -->
+      <div class="map-toast-alert" id="mapDragToast">
+        <span>📍</span> <span id="mapDragToastText">Poziția magazinului a fost actualizată!</span>
+      </div>
+
+      <!-- Floating map stack tools (Top Right, Clean separation from layer control in Top Left) -->
+      <div class="map-fab-stack">
+        <button class="map-action-bubble" id="mapGpsBtn" title="Activează/Dezactivează GPS" onclick="app.toggleGpsTracking()">📍</button>
+        <button class="map-action-bubble" title="Focalizează pe cel mai apropiat magazin" onclick="app.findNearestStoreToGps()">🎯</button>
+      </div>
+
+      <!-- Mobile Quick Card (Floating safely ABOVE the Bottom Dock) -->
+      <div class="mobile-quick-card" id="mobileQuickCard">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--primary);" id="mqcOrder">OPRIREA 1</div>
+            <div style="font-size: 15px; font-weight: 800;" id="mqcName">Nume Magazin</div>
+            <div style="font-size: 12px; color: var(--text-muted);" id="mqcAddress">Adresă magazin</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="badge badge-gray" id="mqcStatusBadge">Neînceput</span>
+            <button class="icon-btn" style="width:28px; height:28px; border-radius:50%; font-size:12px; font-weight:bold;" onclick="app.closeQuickCard()" title="Închide">✕</button>
+          </div>
+        </div>
+
+        <!-- Action buttons container (visible only when store is active) -->
+        <div id="mqcActionsWrapper">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-top: 8px;">
+            <button class="btn btn-waze" id="mqcWazeBtn" onclick="app.openActiveInWaze()">
+              🚗 Deschide în Waze
+            </button>
+            <button class="btn btn-secondary" onclick="app.goToNextStore()">
+              Următorul ➡️
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button class="btn btn-success" onclick="app.markActiveAsResolved()">
+              ✓ Rezolvat
+            </button>
+            <button class="btn btn-danger" onclick="app.promptUnresolved()">
+              ✕ Nerezolvat
+            </button>
+            <button class="btn btn-secondary" style="flex:0.8;" onclick="app.openActiveStoreModal()">
+              ⚙️ Opțiuni
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 2: Raport Verificare Teren Tab -->
+    <section id="reportView" class="view-panel">
+      <div class="report-container">
+        <div class="report-header">
+          <div class="report-title-box">
+            <h2 id="reportMainHeading">📋 Raport Verificare Teren - Săptămâna 1</h2>
+            <p id="reportSubHeading">Monitorizare status vizite, produse, prețuri și fotografii pe teren.</p>
+          </div>
+          <div class="report-actions">
+            <button class="btn btn-primary" onclick="app.copyWhatsAppReport()">
+              💬 Copiază pentru WhatsApp
+            </button>
+            <button class="btn btn-secondary" onclick="app.exportCSV()">
+              📊 Export CSV / Excel
+            </button>
+            <button class="btn btn-secondary" onclick="window.print()">
+              🖨️ Tipărește Raport
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="app.resetDayProgress()">
+              🔄 Resetează Ziua Curentă
+            </button>
+          </div>
+        </div>
+
+        <!-- Summary KPI Cards -->
+        <div class="stat-cards-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">🏪</div>
+            <div class="stat-info">
+              <h4 id="statTotalStores">20</h4>
+              <span>Total Magazine</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green">✅</div>
+            <div class="stat-info">
+              <h4 id="statResolvedStores">0</h4>
+              <span>Vizite Rezolvate</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-red">❌</div>
+            <div class="stat-info">
+              <h4 id="statUnresolvedStores">0</h4>
+              <span>Nerezolvate / Probleme</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber">⏳</div>
+            <div class="stat-info">
+              <h4 id="statPendingStores">20</h4>
+              <span>Rămase de Vizitat</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Table -->
+        <div class="report-table-card">
+          <div class="table-responsive">
+            <table class="report-table" id="reportDataTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px;">Nr.</th>
+                  <th>Magazin & Adresă</th>
+                  <th>Ora Vizitei</th>
+                  <th>Status</th>
+                  <th>Secțiune Raft</th>
+                  <th>Produse Înregistrate (Poză, Denumire, Preț)</th>
+                </tr>
+              </thead>
+              <tbody id="reportBodyRows">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Swipeable Dock Bar (Mobile Navigation & Toolbar) -->
+  <nav class="bottom-dock-bar" id="mobileBottomDock">
+    <div class="bottom-dock-scroll">
+      <button class="dock-pill-btn active" id="tabMapBtnMob" onclick="app.switchTab('map')">
+        <span>🗺️</span> <span>Hartă</span>
+      </button>
+      <button class="dock-pill-btn" id="tabReportBtnMob" onclick="app.switchTab('report')">
+        <span>📋</span> <span>Raport</span>
+      </button>
+      <button class="dock-pill-btn" id="dockLockBtnMob" onclick="app.togglePinLock()">
+        <span id="dockLockIcon">🔒</span> <span id="dockLockText">Pini Blocați</span>
+      </button>
+      <button class="dock-pill-btn" id="dockGpsBtnMob" onclick="app.toggleGpsTracking()">
+        <span>📍</span> <span>GPS Live</span>
+      </button>
+      <button class="dock-pill-btn" onclick="app.findNearestStoreToGps()">
+        <span>🎯</span> <span>Cel mai aproape</span>
+      </button>
+      <button class="dock-pill-btn" onclick="app.openBackupModal()">
+        <span>💾</span> <span>Backup</span>
+      </button>
+      <button class="dock-pill-btn" onclick="app.showModePicker()">
+        <span>📱</span> <span>Mod Afișare</span>
+      </button>
+      <button class="dock-pill-btn" onclick="app.toggleTheme()">
+        <span id="dockThemeIcon">🌙</span> <span>Temă</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Floating Messenger Bubble FAB (Draggable Anywhere) -->
+  <div class="floating-fab" id="floatingFab" title="Trage oriunde sau apasă pentru Secțiune, Produse & Poze">
+    <div style="font-size: 24px; pointer-events: none;">📸</div>
+    <div class="fab-badge" id="fabPhotosBadge" style="display: none;">0</div>
+  </div>
+
+  <!-- Dynamic Product List & Photos Form Window (Messenger Style) -->
+  <div class="fab-window" id="fabWindow">
+    <div class="fab-window-header" id="fabWindowHeader">
+      <h3><span>📝</span> Secțiune Nume & Listă Produse</h3>
+      <button class="fab-close-btn" onclick="app.closeFabWindow()">&times;</button>
+    </div>
+    <div class="fab-window-body">
+      <!-- Store Selector -->
+      <div class="form-group">
+        <label class="form-label">Magazin Curent:</label>
+        <select class="form-control" id="fabStoreSelect" onchange="app.onFabStoreChange()">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <!-- Section Name Input -->
+      <div class="form-group">
+        <label class="form-label">Nume Secțiune / Categorie Raft:</label>
+        <input type="text" class="form-control" id="fabSectionName" placeholder="Ex: Raft 1, Băuturi Răcoritoare, Promoție Capăt Raft" oninput="app.onSectionNameChange()" />
+      </div>
+
+      <!-- Dynamic Numbered Products List -->
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+          <label class="form-label">Listă Produse & Poze (Numerotate 1, 2, 3...):</label>
+          <span style="font-size: 11px; color: var(--text-muted);" id="fabProductCountLabel">0 produse</span>
+        </div>
+
+        <div class="products-dynamic-list" id="fabProductsList">
+          <!-- Injected dynamically via JS -->
+        </div>
+
+        <button class="btn btn-secondary btn-sm" style="margin-top: 8px; width: 100%; font-weight: 700;" onclick="app.addNewProductRow()">
+          ➕ Adaugă Produs Nou
+        </button>
+      </div>
+
+      <!-- Hidden Input for camera / photo upload -->
+      <input type="file" id="fabProductPhotoInput" accept="image/*" capture="environment" style="display: none;" onchange="app.handleProductPhotoSelected(event)" />
+    </div>
+  </div>
+
+  <!-- Action Sheet / Store Details Modal -->
+  <div class="modal-overlay" id="storeModalOverlay" onclick="if(event.target === this) app.closeStoreModal()">
+    <div class="action-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div>
+          <span class="badge badge-primary" id="modalOrderBadge">Oprirea 1</span>
+          <h3 class="sheet-title" id="modalStoreTitle" style="margin-top: 6px;">Nume Magazin</h3>
+          <div class="sheet-address" id="modalStoreAddress">📍 Adresă magazin</div>
+        </div>
+        <span class="badge badge-gray" id="modalStatusBadge">Neînceput</span>
+      </div>
+
+      <div class="btn-group-vertical">
+        <!-- Multi Navigation Switcher -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px;">
+          <button class="btn btn-waze" onclick="app.openActiveInWaze()">🚗 Waze</button>
+          <button class="btn btn-gmaps" onclick="app.openActiveInGoogleMaps()">Google</button>
+          <button class="btn btn-apple" onclick="app.openActiveInAppleMaps()">Apple</button>
+        </div>
+
+        <button class="btn btn-secondary" onclick="app.goToNextStore(); app.closeStoreModal();">
+          ➡️ Treci la următorul magazin
+        </button>
+        <div class="btn-group-horizontal">
+          <button class="btn btn-success" onclick="app.markActiveAsResolved(); app.closeStoreModal();">
+            ✓ Rezolvat
+          </button>
+          <button class="btn btn-danger" onclick="app.promptUnresolved(); app.closeStoreModal();">
+            ✕ Nerezolvat
+          </button>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="app.openFabForStore(app.activeStoreId); app.closeStoreModal();">
+          📸 Deschide Listă Produse & Poze
+        </button>
+        <button class="btn btn-secondary btn-sm" style="color: var(--text-muted); font-size: 11px;" onclick="app.resetStoreCoordinates(app.activeStoreId)">
+          🔄 Resetare Pin la Coordonatele Inițiale
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backup & Restore Modal -->
+  <div class="modal-overlay" id="backupModalOverlay" style="align-items: center;" onclick="if(event.target === this) app.closeBackupModal()">
+    <div class="reason-dialog" style="max-width: 420px;">
+      <h3 style="font-size: 16px; font-weight: 700;">💾 Backup & Restaurare Date</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Salvează un fișier JSON cu toate datele, coordonatele modificate ale pinurilor, pozele și prețurile culese.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px; margin: 18px 0;">
+        <button class="btn btn-primary" onclick="app.exportFullBackup()">
+          📥 Descarcă Fișier Salvare (Backup JSON)
+        </button>
+        <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
+        <button class="btn btn-secondary" onclick="document.getElementById('backupFileInput').click()">
+          📤 Restaurează din Fișier Backup
+        </button>
+        <input type="file" id="backupFileInput" accept=".json" style="display:none;" onchange="app.importBackupFile(event)" />
+      </div>
+      <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="app.closeBackupModal()">Închide</button>
+    </div>
+  </div>
+
+  <!-- Reason Prompt Modal for Unresolved Status -->
+  <div class="modal-overlay" id="reasonModalOverlay" style="align-items: center;" onclick="if(event.target === this) document.getElementById('reasonModalOverlay').classList.remove('active')">
+    <div class="reason-dialog">
+      <h3 style="font-size: 16px; font-weight: 700;">Motiv Nerezolvare</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">De ce nu s-a finalizat vizita la acest magazin?</p>
+      
+      <div class="reason-options">
+        <button class="reason-chip" onclick="app.confirmUnresolved('Lipsă stoc produs')">📦 Lipsă stoc produs</button>
+        <button class="reason-chip" onclick="app.confirmUnresolved('Magazin închis / În renovare')">🔒 Magazin închis / În renovare</button>
+        <button class="reason-chip" onclick="app.confirmUnresolved('Fără acces șef raion / Refuz')">⛔ Fără acces / Refuz magazin</button>
+        <button class="reason-chip" onclick="app.confirmUnresolved('Preț greșit în sistem')">🏷️ Preț incorect în sistem</button>
+        <button class="reason-chip" onclick="app.confirmUnresolved('Alt motiv')">✍️ Alt motiv</button>
+      </div>
+      <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="document.getElementById('reasonModalOverlay').classList.remove('active')">Anulează</button>
+    </div>
+  </div>
+
+  <!-- Photo Full Preview Modal -->
+  <div class="modal-overlay" id="photoZoomModal" style="align-items: center;" onclick="this.classList.remove('active')">
+    <div style="max-width: 90vw; max-height: 90vh; text-align: center;">
+      <img id="zoomImg" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+      <div style="color: white; margin-top: 10px; font-size: 13px;">Apasă oriunde pentru a închide</div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    /**
+     * MERCHANDISER PRO APPLICATION - WEEK 1 (DAYS 1-5)
+     * Features:
+     * - Top Header is clean and notch-proof on iPhone 15 Pro Max.
+     * - Bottom Swipeable Dock Bar houses tabs and action tools.
+     * - Pin Lock / Unlock prevents accidental moving during pan/zoom.
+     * - Dynamic Numbered Product List (Thumbnail, Name, Price, Reorder, Delete).
+     */
+    
+    // CANONICAL INITIAL DATASETS FOR WEEK 1 (DAYS 1-5)
+    const INITIAL_DATA_WEEK_1 = {
+      day1: [
+        { id: "d1_1", name: "Mega Image Popești-Leordeni", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Șos. Olteniței 51A-55, Popești-Leordeni", lat: 44.3802, lng: 26.1685, order: 1 },
+        { id: "d1_2", name: "Mega Image Popești-Leordeni 2", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Șos. Olteniței 18-20, Popești-Leordeni", lat: 44.3887, lng: 26.1542, order: 2 },
+        { id: "d1_3", name: "Mega Image Drumul Binelui", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Str. Drumul Fermei 35, Popești-Leordeni", lat: 44.3739, lng: 26.1498, order: 3 },
+        { id: "d1_4", name: "Mega Image Biruinței 3", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Str. Biruinței 47, Popești-Leordeni", lat: 44.3688, lng: 26.1472, order: 4 },
+        { id: "d1_5", name: "Mega Image Amurgului", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Str. Oituz 46, Popești-Leordeni", lat: 44.3724, lng: 26.1420, order: 5 },
+        { id: "d1_6", name: "Mega Image Monaco Towers", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Berceni 96, Sector 4", lat: 44.3765, lng: 26.1394, order: 6 },
+        { id: "d1_7", name: "Penny Leonida", chain: "Penny", city: "Popești-Leordeni", county: "Ilfov", address: "Șos. Berceni 9, Popești-Leordeni", lat: 44.3708, lng: 26.1354, order: 7 },
+        { id: "d1_8", name: "Mega Image Berceni", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Berceni 41, Sector 4", lat: 44.3872, lng: 26.1298, order: 8 },
+        { id: "d1_9", name: "Mega Image Obregia", chain: "Mega Image", city: "Sector 4", county: "București", address: "Bd. Alexandru Obregia 25, Sector 4", lat: 44.3842, lng: 26.1176, order: 9 },
+        { id: "d1_10", name: "Penny Nițu Vasile", chain: "Penny", city: "Sector 4", county: "București", address: "Str. Nițu Vasile 9, Sector 4", lat: 44.3922, lng: 26.1172, order: 10 },
+        { id: "d1_11", name: "Mega Image Piața Sudului", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Olteniței 208, Sector 4", lat: 44.3929, lng: 26.1235, order: 11 },
+        { id: "d1_12", name: "Mega Image Brâncoveanu", chain: "Mega Image", city: "Sector 4", county: "București", address: "Bd. Constantin Brâncoveanu 45, Sector 4", lat: 44.3934, lng: 26.1025, order: 12 },
+        { id: "d1_13", name: "Mega Image Huedin", chain: "Mega Image", city: "Sector 4", county: "București", address: "Str. Grădiștea 8, Sector 4", lat: 44.3846, lng: 26.1038, order: 13 },
+        { id: "d1_14", name: "Penny Luică", chain: "Penny", city: "Sector 4", county: "București", address: "Str. Luică 23, Sector 4", lat: 44.3828, lng: 26.0954, order: 14 },
+        { id: "d1_15", name: "Mega Image Progresului", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Giurgiului 113-115, Sector 4", lat: 44.3882, lng: 26.0862, order: 15 },
+        { id: "d1_16", name: "Mega Image Giurgiului 2", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Giurgiului 54, Sector 4", lat: 44.3985, lng: 26.0888, order: 16 },
+        { id: "d1_17", name: "Mega Image City Mall", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Olteniței 2, Sector 4", lat: 44.4048, lng: 26.0962, order: 17 },
+        { id: "d1_18", name: "Mega Image Împăratul Traian", chain: "Mega Image", city: "Sector 4", county: "București", address: "Str. Împăratul Traian 32, Sector 4", lat: 44.4172, lng: 26.0965, order: 18 },
+        { id: "d1_19", name: "Mega Image Tineretului", chain: "Mega Image", city: "Sector 4", county: "București", address: "Bd. Tineretului 1, Sector 4", lat: 44.4140, lng: 26.1072, order: 19 },
+        { id: "d1_20", name: "Penny Timpuri Noi", chain: "Penny", city: "Sector 4", county: "București", address: "Str. V.V. Stanciu 213, Sector 4", lat: 44.4152, lng: 26.1152, order: 20 }
+      ],
+      day2: [
+        { id: "d2_1", name: "Mega Image Comuna Berceni", chain: "Mega Image", city: "Berceni", county: "Ilfov", address: "Bd. 1 Mai 66, Berceni", lat: 44.3168, lng: 26.1795, order: 1 },
+        { id: "d2_2", name: "Penny Berceni", chain: "Penny", city: "Berceni", county: "Ilfov", address: "Str. Luica 62-64 / Bd. 1 Mai, Berceni", lat: 44.3125, lng: 26.1830, order: 2 },
+        { id: "d2_3", name: "Penny Vidra", chain: "Penny", city: "Vidra", county: "Ilfov", address: "Str. Principală 91, Vidra", lat: 44.2755, lng: 26.1550, order: 3 },
+        { id: "d2_4", name: "Mega Image Jilava", chain: "Mega Image", city: "Jilava", county: "Ilfov", address: "Șos. Giurgiului 288, Jilava", lat: 44.3335, lng: 26.0795, order: 4 },
+        { id: "d2_5", name: "Penny Măgurele", chain: "Penny", city: "Măgurele", county: "Ilfov", address: "Str. Atomiștilor 373, Măgurele", lat: 44.3485, lng: 26.0335, order: 5 },
+        { id: "d2_6", name: "Mega Image Atomiștilor", chain: "Mega Image", city: "Măgurele", county: "Ilfov", address: "Str. Atomiștilor 411, Măgurele", lat: 44.3460, lng: 26.0290, order: 6 },
+        { id: "d2_7", name: "Penny Bragadiru", chain: "Penny", city: "Bragadiru", county: "Ilfov", address: "Șos. Alexandriei 112, Bragadiru", lat: 44.3685, lng: 25.9960, order: 7 },
+        { id: "d2_8", name: "Mega Image Bragadiru", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Șos. Alexandriei 44, Bragadiru", lat: 44.3780, lng: 26.0125, order: 8 },
+        { id: "d2_9", name: "Penny Plevnei", chain: "Penny", city: "Bragadiru", county: "Ilfov", address: "Str. Plevnei 11, Bragadiru", lat: 44.3820, lng: 26.0090, order: 9 },
+        { id: "d2_10", name: "Mega Image Bragadiru 2 (Speranței)", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Str. Speranței 77, Bragadiru", lat: 44.3835, lng: 26.0195, order: 10 },
+        { id: "d2_11", name: "Mega Image Mărgelelor 2", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Str. Mărgelelor 23, Bragadiru", lat: 44.3875, lng: 26.0260, order: 11 },
+        { id: "d2_12", name: "Mega Image Cartierul Latin", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Prelungirea Ghencea 53, Bragadiru", lat: 44.4055, lng: 26.0045, order: 12 },
+        { id: "d2_13", name: "PENNY GHENCEA", chain: "Penny", city: "Bragadiru", county: "Ilfov", address: "Prelungirea Ghencea 14, Bragadiru", lat: 44.4072, lng: 26.0160, order: 13 },
+        { id: "d2_14", name: "Mega Image Pucheni", chain: "Mega Image", city: "Sector 5", county: "București", address: "Str. Pucheni 42, Sector 5", lat: 44.3970, lng: 26.0680, order: 14 },
+        { id: "d2_15", name: "Penny Sălaj", chain: "Penny", city: "Sector 5", county: "București", address: "Șos. Sălaj 269, Sector 5", lat: 44.3910, lng: 26.0740, order: 15 },
+        { id: "d2_16", name: "Penny Garun (Năsăud)", chain: "Penny", city: "Sector 5", county: "București", address: "Str. Năsăud 97, Sector 5", lat: 44.4095, lng: 26.0845, order: 16 },
+        { id: "d2_17", name: "Mega Image Sebastian", chain: "Mega Image", city: "Sector 5", county: "București", address: "Str. Mihail Sebastian 22, Sector 5", lat: 44.4215, lng: 26.0780, order: 17 },
+        { id: "d2_18", name: "Mega Image 13 Septembrie", chain: "Mega Image", city: "Sector 5", county: "București", address: "Calea 13 Septembrie 13, Sector 5", lat: 44.4265, lng: 26.0865, order: 18 },
+        { id: "d2_19", name: "Mega Image Regina Maria", chain: "Mega Image", city: "Sector 5", county: "București", address: "Bd. Regina Maria 23-25, Sector 5", lat: 44.4248, lng: 26.1025, order: 19 }
+      ],
+      day3: [
+        { id: "d3_1", name: "Mega Image Autogara Chitila", chain: "Mega Image", city: "Chitila", county: "Ilfov", address: "Șos. Chitilei 18, Chitila", lat: 44.4782, lng: 26.0275, order: 1 },
+        { id: "d3_2", name: "Mega Image Chitila 2", chain: "Mega Image", city: "Chitila", county: "Ilfov", address: "Șos. Banatului 68A, Chitila", lat: 44.5098, lng: 25.9752, order: 2 },
+        { id: "d3_3", name: "Penny Chiajna", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Str. I.L. Caragiale 11B, Chiajna", lat: 44.4602, lng: 25.9798, order: 3 },
+        { id: "d3_4", name: "Mega Image Chiajna", chain: "Mega Image", city: "Chiajna", county: "Ilfov", address: "Str. Preot Sebe Costin 1A, Chiajna", lat: 44.4585, lng: 25.9745, order: 4 },
+        { id: "d3_5", name: "Penny Dudu", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Str. Soarelui 4, Chiajna (Dudu)", lat: 44.4532, lng: 25.9868, order: 5 },
+        { id: "d3_6", name: "Mega Image Drumul Bacriului", chain: "Mega Image", city: "Chiajna", county: "Ilfov", address: "Str. Drumul Bacriului 36, Chiajna", lat: 44.4445, lng: 25.9922, order: 6 },
+        { id: "d3_7", name: "Penny Apeductului", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Str. Apeductului 9, Chiajna", lat: 44.4402, lng: 25.9880, order: 7 },
+        { id: "d3_8", name: "Penny Chiajna Center", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Strada Serg. Ilie Petre 87, Chiajna", lat: 44.4348, lng: 25.9825, order: 8 },
+        { id: "d3_9", name: "Mega Image Rezervelor 3", chain: "Mega Image", city: "Chiajna", county: "Ilfov", address: "Str. Tineretului 85, Chiajna", lat: 44.4312, lng: 25.9785, order: 9 },
+        { id: "d3_10", name: "Mega Image Ciorogârla", chain: "Mega Image", city: "Ciorogârla", county: "Ilfov", address: "Calea București 136E, Ciorogârla", lat: 44.4452, lng: 25.8825, order: 10 },
+        { id: "d3_11", name: "Mega Image Domnești 2", chain: "Mega Image", city: "Domnești", county: "Ilfov", address: "Tudor Vladimirescu 307, Domnești", lat: 44.4015, lng: 25.9180, order: 11 },
+        { id: "d3_12", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 6", county: "București", address: "Prelungirea Ghencea 32, Sector 6", lat: 44.4125, lng: 26.0210, order: 12 },
+        { id: "d3_13", name: "Profi Valea Oltului", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Valea Oltului 12, Sector 6", lat: 44.4188, lng: 26.0235, order: 13 },
+        { id: "d3_14", name: "Profi Valea Doftanei", chain: "Profi", city: "Sector 6", county: "București", address: "Drumul Valea Doftanei 77, Sector 6", lat: 44.4208, lng: 26.0152, order: 14 },
+        { id: "d3_15", name: "Profi Timișoara 101", chain: "Profi", city: "Sector 6", county: "București", address: "Bld. Timișoara 101, Sector 6", lat: 44.4245, lng: 26.0020, order: 15 },
+        { id: "d3_16", name: "Profi Timișoara 73", chain: "Profi", city: "Sector 6", county: "București", address: "Bld. Timișoara 73, Sector 6", lat: 44.4248, lng: 26.0185, order: 16 },
+        { id: "d3_17", name: "Profi Valea Lungă", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Valea Lungă 7, Sector 6", lat: 44.4282, lng: 26.0120, order: 17 },
+        { id: "d3_18", name: "Profi Iuliu Maniu", chain: "Profi", city: "Sector 6", county: "București", address: "Bld. Iuliu Maniu 109, Sector 6", lat: 44.4342, lng: 26.0145, order: 18 },
+        { id: "d3_19", name: "Profi Bârsănești", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Bărbătești 2, Sector 6", lat: 44.4308, lng: 26.0215, order: 19 },
+        { id: "d3_20", name: "Profi Brașov", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Brașov 24, Sector 6", lat: 44.4230, lng: 26.0355, order: 20 }
+      ],
+      day4: [
+        { id: "d4_1", name: "Mega Image Giulești", chain: "Mega Image", city: "Sector 6", county: "București", address: "Calea Giulești 38-40, Sector 6", lat: 44.4532, lng: 26.0578, order: 1 },
+        { id: "d4_2", name: "Mega Image Piața Crângași", chain: "Mega Image", city: "Sector 6", county: "București", address: "Calea Crângași 29, Sector 6", lat: 44.4520, lng: 26.0465, order: 2 },
+        { id: "d4_3", name: "Penny Crângași (Virtuții)", chain: "Penny", city: "Sector 6", county: "București", address: "Șos. Virtuții 148, Sector 6", lat: 44.4468, lng: 26.0375, order: 3 },
+        { id: "d4_4", name: "Mega Image Uverturii", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Uverturii 83, Sector 6", lat: 44.4398, lng: 26.0175, order: 4 },
+        { id: "d4_5", name: "Mega Image Apusului", chain: "Mega Image", city: "Sector 6", county: "București", address: "Str. Apusului 50, Sector 6", lat: 44.4365, lng: 26.0078, order: 5 },
+        { id: "d4_6", name: "Penny Păcii", chain: "Penny", city: "Sector 6", county: "București", address: "Bd. Iuliu Maniu 220C, Sector 6", lat: 44.4338, lng: 25.9925, order: 6 },
+        { id: "d4_7", name: "Mega Image Mărgelelor", chain: "Mega Image", city: "Sector 6", county: "București", address: "Str. Mărgelelor 6, Sector 6", lat: 44.4305, lng: 25.9865, order: 7 },
+        { id: "d4_8", name: "Mega Image Prelungirea Ghencea 89", chain: "Mega Image", city: "Sector 6", county: "București", address: "Prelungirea Ghencea 89, Sector 6", lat: 44.4098, lng: 26.0025, order: 8 },
+        { id: "d4_9", name: "Mega Image Valea Oltului", chain: "Mega Image", city: "Sector 6", county: "București", address: "Str. Valea Oltului 131-137, Sector 6", lat: 44.4128, lng: 26.0225, order: 9 },
+        { id: "d4_10", name: "Mega Image Bd. Timișoara 56", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Timișoara 56, Sector 6", lat: 44.4252, lng: 26.0125, order: 10 },
+        { id: "d4_11", name: "Mega Image Compozitorilor", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. 1 Mai 28, Sector 6", lat: 44.4238, lng: 26.0385, order: 11 },
+        { id: "d4_12", name: "Mega Image Compozitorilor - Sibiu", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. 1 Mai 18, Sector 6", lat: 44.4248, lng: 26.0465, order: 12 },
+        { id: "d4_13", name: "Mega Image Timișoara Plaza", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Timișoara 26, Sector 6", lat: 44.4285, lng: 26.0360, order: 13 },
+        { id: "d4_14", name: "Mega Image Timișoara 18", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Timișoara 18, Sector 6", lat: 44.4298, lng: 26.0535, order: 14 }
+      ],
+      day5: [
+        { id: "d5_1", name: "Profi Chiajna Tineretului", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Tineretului 40, Chiajna", lat: 44.4465, lng: 25.9755, order: 1 },
+        { id: "d5_2", name: "Profi Weiner Palada", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Weiner Palada 8, Chiajna", lat: 44.4415, lng: 25.9860, order: 2 },
+        { id: "d5_3", name: "Profi Chiajna (Ilie Petre)", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Sergent Ilie Petre 51, Chiajna", lat: 44.4390, lng: 25.9815, order: 3 },
+        { id: "d5_4", name: "Profi Rezervelor", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Rezervelor 99, Chiajna", lat: 44.4372, lng: 25.9790, order: 4 },
+        { id: "d5_5", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 5", county: "București", address: "Prelungirea Ghencea 47-49, Sector 5", lat: 44.4085, lng: 26.0085, order: 5 },
+        { id: "d5_6", name: "Profi Mărgelelor", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Mărgelelor 32, Bragadiru", lat: 44.3865, lng: 26.0245, order: 6 },
+        { id: "d5_7", name: "Profi Speranței", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Speranței 69, Bragadiru", lat: 44.3830, lng: 26.0185, order: 7 },
+        { id: "d5_8", name: "Profi Bragadiru (Speranței 6-8)", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Speranței 6-8, Bragadiru", lat: 44.3795, lng: 26.0150, order: 8 },
+        { id: "d5_9", name: "Profi Coralului", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Coralului 4, Bragadiru", lat: 44.3755, lng: 26.0095, order: 9 },
+        { id: "d5_10", name: "Profi Mărgeanului 62", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Mărgeanului 62, Sector 5", lat: 44.4035, lng: 26.0595, order: 10 },
+        { id: "d5_11", name: "Profi Mărgeanului 16", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Mărgeanului 16, Sector 5", lat: 44.4065, lng: 26.0685, order: 11 },
+        { id: "d5_12", name: "Profi Mărgeanului", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Mărgeanului 12, Sector 5", lat: 44.4070, lng: 26.0695, order: 12 },
+        { id: "d5_13", name: "Profi Bârcă", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Bârcă 2, Sector 5", lat: 44.4105, lng: 26.0650, order: 13 },
+        { id: "d5_14", name: "Profi Sălaj", chain: "Profi", city: "Sector 5", county: "București", address: "Șos. Sălaj 133, Sector 5", lat: 44.4030, lng: 26.0790, order: 14 },
+        { id: "d5_15", name: "Profi Ferentari", chain: "Profi", city: "Sector 5", county: "București", address: "Calea Ferentari 20, Sector 5", lat: 44.4080, lng: 26.0890, order: 15 },
+        { id: "d5_16", name: "Profi Rahova", chain: "Profi", city: "Sector 5", county: "București", address: "Calea Rahovei 22, Sector 5", lat: 44.4185, lng: 26.0875, order: 16 },
+        { id: "d5_17", name: "Profi Ion Urdăreanu", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Ion Urdăreanu 7, Sector 5", lat: 44.4235, lng: 26.0745, order: 17 },
+        { id: "d5_18", name: "Profi 13 Septembrie", chain: "Profi", city: "Sector 5", county: "București", address: "Calea 13 Septembrie 111, Sector 5", lat: 44.4245, lng: 26.0795, order: 18 },
+        { id: "d5_19", name: "Profi Libertății", chain: "Profi", city: "Sector 5", county: "București", address: "B-dul Libertății 2, Sector 5", lat: 44.4278, lng: 26.0915, order: 19 }
+      ]
+    };
+
+    class MerchandiserApp {
+      constructor() {
+        this.currentWeek = "week1";
+        this.currentDay = localStorage.getItem("merch_active_day") || "day1";
+        this.stores = [];
+        this.activeStoreId = null;
+        this.currentFilter = "all";
+        this.map = null;
+        this.markers = {};
+        this.routePolyline = null;
+        this.tileLayers = {};
+        this.userGpsMarker = null;
+        this.userGpsCircle = null;
+        this.userGpsWatchId = null;
+        this.userCoords = null;
+        this.isPinsLocked = localStorage.getItem("merch_pins_locked") !== "false"; // Default: true (Locked for safety)
+        this.deviceMode = localStorage.getItem("merch_device_mode") || null;
+        this.theme = localStorage.getItem("merch_theme") || "light";
+        
+        // Dynamic product data per day: { [storeId]: { sectionName: string, items: [ { id, name, price, photoUrl } ] } }
+        this.storeProductsData = {};
+        this.storeLogs = {};
+        this.activePhotoUploadTarget = null;
+      }
+
+      init() {
+        this.applyTheme(this.theme);
+        this.loadDayData(this.currentDay);
+        this.initMap();
+        this.updateDayUI();
+        this.updatePinLockUI();
+        this.renderSidebarList();
+        this.renderReport();
+        this.populateFabDropdown();
+        this.checkDeviceMode();
+        this.setupDraggableFab();
+        this.setupClickOutsideHandlers();
+        
+        // Hide quick card on initial launch
+        this.closeQuickCard();
+      }
+
+      loadDayData(dayKey) {
+        this.currentDay = dayKey;
+        localStorage.setItem("merch_active_day", dayKey);
+
+        const initialList = INITIAL_DATA_WEEK_1[dayKey] || INITIAL_DATA_WEEK_1.day1;
+        const savedStores = localStorage.getItem(`merch_stores_${dayKey}`);
+        if (savedStores) {
+          try {
+            this.stores = JSON.parse(savedStores);
+          } catch(e) {
+            this.stores = [...initialList];
+          }
+        } else {
+          this.stores = [...initialList];
+          this.saveStores();
+        }
+
+        this.storeLogs = JSON.parse(localStorage.getItem(`merch_logs_${dayKey}`) || "{}");
+        this.storeProductsData = JSON.parse(localStorage.getItem(`merch_products_v2_${dayKey}`) || "{}");
+      }
+
+      saveStores() {
+        localStorage.setItem(`merch_stores_${this.currentDay}`, JSON.stringify(this.stores));
+      }
+
+      saveLogs() {
+        localStorage.setItem(`merch_logs_${this.currentDay}`, JSON.stringify(this.storeLogs));
+      }
+
+      saveProductsData() {
+        try {
+          localStorage.setItem(`merch_products_v2_${this.currentDay}`, JSON.stringify(this.storeProductsData));
+        } catch(e) {
+          console.warn("Storage quota warning, keeping in memory.");
+        }
+      }
+
+      /* WEEK 1 DROPDOWN TOGGLE & SELECT */
+      toggleWeekDropdown(event) {
+        if (event) event.stopPropagation();
+        const menu = document.getElementById("weekDropdownMenu");
+        if (menu) menu.classList.toggle("show");
+      }
+
+      closeWeekDropdown() {
+        const menu = document.getElementById("weekDropdownMenu");
+        if (menu) menu.classList.remove("show");
+      }
+
+      selectDayFromMenu(dayKey) {
+        this.closeWeekDropdown();
+        if (this.currentDay === dayKey) return;
+        this.switchDay(dayKey);
+      }
+
+      setupClickOutsideHandlers() {
+        document.addEventListener("click", (e) => {
+          const container = document.querySelector(".week-dropdown-container");
+          if (container && !container.contains(e.target)) {
+            this.closeWeekDropdown();
+          }
+        });
+      }
+
+      switchDay(dayKey) {
+        this.loadDayData(dayKey);
+        this.updateDayUI();
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+        this.renderSidebarList();
+        this.renderReport();
+        this.populateFabDropdown();
+        this.closeQuickCard();
+      }
+
+      updateDayUI() {
+        const d = this.currentDay;
+        const dayMap = {
+          day1: { label: "Ziua 1 (20)", title: "Săptămâna 1 - Ziua 1 (20 Magazine)", desc: "Popești & Sector 4", dist: "~19.2 km", time: "~40-50 min" },
+          day2: { label: "Ziua 2 (19)", title: "Săptămâna 1 - Ziua 2 (19 Magazine)", desc: "Ilfov Sud-Vest & Sector 5", dist: "~40.3 km", time: "~60-75 min" },
+          day3: { label: "Ziua 3 (20)", title: "Săptămâna 1 - Ziua 3 (20 Magazine)", desc: "Chitila / Chiajna / Domnești / Sector 6", dist: "~44.4 km", time: "~65-80 min" },
+          day4: { label: "Ziua 4 (14)", title: "Săptămâna 1 - Ziua 4 (14 Magazine)", desc: "Giulești / Crângași / Militari / Drumul Taberei", dist: "~17.2 km", time: "~35-45 min" },
+          day5: { label: "Ziua 5 (19)", title: "Săptămâna 1 - Ziua 5 (19 Magazine)", desc: "Chiajna / Bragadiru / Sector 5 (Rahova)", dist: "~22.8 km", time: "~45-55 min" }
+        };
+
+        const info = dayMap[d] || dayMap.day1;
+        const activePill = document.getElementById("activeDayHeaderLabel");
+        if (activePill) activePill.textContent = info.label;
+
+        // Update menu items active class
+        ["day1", "day2", "day3", "day4", "day5"].forEach(k => {
+          const item = document.getElementById(`btn${k.charAt(0).toUpperCase() + k.slice(1)}`);
+          if (item) item.classList.toggle("active", d === k);
+        });
+
+        const sidebarTitle = document.getElementById("sidebarTitle");
+        const sidebarDesc = document.getElementById("sidebarRouteDesc");
+        const repHeading = document.getElementById("reportMainHeading");
+        const repSub = document.getElementById("reportSubHeading");
+
+        if (sidebarTitle) sidebarTitle.textContent = info.title;
+        if (sidebarDesc) {
+          sidebarDesc.innerHTML = `
+            <div>🛣️ <strong>Ruta Optimizată:</strong> Plecare din <strong>Brănești pe A2</strong>, vizitare ${info.desc} și finalizare la punctul cel mai rapid de retur spre casă.</div>
+            <div class="route-stats-row"><span>Distanță: ${info.dist}</span><span>Timp condus: ${info.time}</span></div>
+          `;
+        }
+        if (repHeading) repHeading.textContent = `📋 Raport Verificare Teren - ${info.title}`;
+        if (repSub) repSub.textContent = `Monitorizare status vizite, produse, prețuri și fotografii pentru magazinele alocate.`;
+      }
+
+      /* PIN LOCK & UNLOCK SYSTEM */
+      togglePinLock() {
+        this.isPinsLocked = !this.isPinsLocked;
+        localStorage.setItem("merch_pins_locked", this.isPinsLocked);
+        this.updatePinLockUI();
+
+        // Update draggable property on all active markers immediately
+        Object.values(this.markers).forEach(marker => {
+          if (marker.dragging) {
+            if (this.isPinsLocked) {
+              marker.dragging.disable();
+            } else {
+              marker.dragging.enable();
+            }
+          }
+        });
+
+        if (this.isPinsLocked) {
+          this.showDragToast("🔒 Pinii au fost BLOCAȚI (nu se pot muta accidental la zoom/pan).");
+        } else {
+          this.showDragToast("🔓 Pinii au fost DEBLOCAȚI! Poți trage acum markerul pentru a-i fixa poziția.");
+        }
+      }
+
+      updatePinLockUI() {
+        const btnDesk = document.getElementById("headerLockBtnDesk");
+        const iconMob = document.getElementById("dockLockIcon");
+        const textMob = document.getElementById("dockLockText");
+        const pillMob = document.getElementById("dockLockBtnMob");
+
+        if (this.isPinsLocked) {
+          if (btnDesk) {
+            btnDesk.innerHTML = "🔒";
+            btnDesk.title = "Pini Blocați (Apasă pt deblocare)";
+            btnDesk.classList.remove("unlocked-btn");
+          }
+          if (iconMob) iconMob.textContent = "🔒";
+          if (textMob) textMob.textContent = "Pini Blocați";
+          if (pillMob) pillMob.classList.remove("unlocked-pill");
+        } else {
+          if (btnDesk) {
+            btnDesk.innerHTML = "🔓";
+            btnDesk.title = "Pini Deblocați (Mod editare activ - apasă pt blocare)";
+            btnDesk.classList.add("unlocked-btn");
+          }
+          if (iconMob) iconMob.textContent = "🔓";
+          if (textMob) textMob.textContent = "Pini Deblocați";
+          if (pillMob) pillMob.classList.add("unlocked-pill");
+        }
+      }
+
+      checkDeviceMode() {
+        if (!this.deviceMode) {
+          document.getElementById("modePickerModal").style.display = "flex";
+        } else {
+          this.applyDeviceMode(this.deviceMode);
+        }
+      }
+
+      setDeviceMode(mode) {
+        this.deviceMode = mode;
+        localStorage.setItem("merch_device_mode", mode);
+        document.getElementById("modePickerModal").style.display = "none";
+        this.applyDeviceMode(mode);
+      }
+
+      showModePicker() {
+        document.getElementById("modePickerModal").style.display = "flex";
+      }
+
+      applyDeviceMode(mode) {
+        const sidebar = document.getElementById("mapSidebar");
+        if (mode === "desktop") {
+          if (sidebar) sidebar.style.display = "flex";
+        } else {
+          if (sidebar) sidebar.style.display = "none";
+        }
+        if (this.map) {
+          setTimeout(() => this.map.invalidateSize(), 200);
+        }
+      }
+
+      toggleTheme() {
+        this.theme = this.theme === "light" ? "dark" : "light";
+        localStorage.setItem("merch_theme", this.theme);
+        this.applyTheme(this.theme);
+      }
+
+      applyTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        const btnDesk = document.getElementById("themeToggleBtnDesk");
+        const iconMob = document.getElementById("dockThemeIcon");
+        if (btnDesk) btnDesk.innerHTML = t === "dark" ? "☀️" : "🌙";
+        if (iconMob) iconMob.textContent = t === "dark" ? "☀️" : "🌙";
+      }
+
+      switchTab(tab) {
+        const isMap = tab === "map";
+        
+        // Update Desktop buttons
+        const deskMap = document.getElementById("tabMapBtnDesk");
+        const deskRep = document.getElementById("tabReportBtnDesk");
+        if (deskMap) deskMap.classList.toggle("active", isMap);
+        if (deskRep) deskRep.classList.toggle("active", !isMap);
+
+        // Update Mobile bottom dock buttons
+        const mobMap = document.getElementById("tabMapBtnMob");
+        const mobRep = document.getElementById("tabReportBtnMob");
+        if (mobMap) mobMap.classList.toggle("active", isMap);
+        if (mobRep) mobRep.classList.toggle("active", !isMap);
+
+        document.getElementById("mapView").classList.toggle("active", isMap);
+        document.getElementById("reportView").classList.toggle("active", !isMap);
+
+        if (isMap && this.map) {
+          setTimeout(() => this.map.invalidateSize(), 200);
+        }
+        if (!isMap) {
+          this.renderReport();
+        }
+      }
+
+      /* GOOGLE MAPS TILES + NON-OVERLAPPING CONTROLS */
+      initMap() {
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+          maxZoom: 20,
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps (Satelit + Străzi)'
+        });
+
+        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+          maxZoom: 20,
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps (Străzi)'
+        });
+
+        const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        });
+
+        this.map = L.map('map', { 
+          zoomControl: false,
+          layers: [googleHybrid] 
+        }).setView([44.420, 26.040], 12);
+
+        // Zoom Control placed on bottom-left, safely above the bottom dock
+        L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
+
+        // Map Layers Control placed on TOP-LEFT (Top-Right is for GPS/Target)
+        const baseMaps = {
+          "🛰️ Google Satelit": googleHybrid,
+          "🗺️ Google Străzi": googleStreets,
+          "🌍 OpenStreetMap": osmStandard
+        };
+        L.control.layers(baseMaps, null, { position: 'topleft' }).addTo(this.map);
+
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+      }
+
+      createPinIcon(store, index) {
+        const log = this.storeLogs[store.id];
+        const isActive = this.activeStoreId === store.id;
+
+        let colorClass = "pin-pending";
+        if (log && log.status === "completed") {
+          colorClass = "pin-completed"; // Green
+        } else if (log && log.status === "unresolved") {
+          colorClass = "pin-unresolved"; // Red
+        } else if (isActive) {
+          colorClass = "pin-active-pending"; // Blue when selected
+        }
+
+        const activeClass = isActive ? "is-active" : "";
+
+        return L.divIcon({
+          className: 'custom-leaflet-marker',
+          html: `<div class="custom-marker-pin ${colorClass} ${activeClass}"><span>${index + 1}</span></div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32]
+        });
+      }
+
+      /* RENDER PINS WITH DRAG & DROP LOCK/UNLOCK LOGIC */
+      renderMapMarkers() {
+        Object.values(this.markers).forEach(m => this.map.removeLayer(m));
+        this.markers = {};
+
+        const filtered = this.getFilteredStores();
+
+        filtered.forEach((store) => {
+          const originalIndex = this.stores.findIndex(s => s.id === store.id);
+          const icon = this.createPinIcon(store, originalIndex);
+          
+          // Marker draggable state obeys this.isPinsLocked
+          const marker = L.marker([store.lat, store.lng], { 
+            icon: icon,
+            draggable: !this.isPinsLocked 
+          }).addTo(this.map);
+
+          // Click opens store details & quick card cleanly
+          marker.on('click', () => this.setActiveStore(store.id, false));
+
+          // Dragend saves exact new coordinates to localStorage
+          marker.on('dragend', (e) => {
+            const newPos = e.target.getLatLng();
+            store.lat = parseFloat(newPos.lat.toFixed(6));
+            store.lng = parseFloat(newPos.lng.toFixed(6));
+            this.saveStores();
+            this.drawRoutePolyline();
+            this.showDragToast(`📍 Poziția magazinului "${store.name}" a fost actualizată și fixată!`);
+          });
+
+          this.markers[store.id] = marker;
+        });
+
+        if (filtered.length > 0) {
+          const group = new L.featureGroup(Object.values(this.markers));
+          this.map.fitBounds(group.getBounds().pad(0.1));
+        }
+      }
+
+      showDragToast(msg) {
+        const toast = document.getElementById("mapDragToast");
+        const toastText = document.getElementById("mapDragToastText");
+        if (!toast) return;
+        toastText.textContent = msg;
+        toast.style.display = "flex";
+        setTimeout(() => { toast.style.display = "none"; }, 3500);
+      }
+
+      resetStoreCoordinates(storeId) {
+        const initialList = INITIAL_DATA_WEEK_1[this.currentDay] || [];
+        const canonical = initialList.find(s => s.id === storeId);
+        const current = this.stores.find(s => s.id === storeId);
+        if (canonical && current) {
+          current.lat = canonical.lat;
+          current.lng = canonical.lng;
+          this.saveStores();
+          this.renderMapMarkers();
+          this.drawRoutePolyline();
+          this.setActiveStore(storeId, false);
+          alert(`✓ Pinul magazinului "${current.name}" a fost readus la coordonatele inițiale.`);
+        }
+      }
+
+      drawRoutePolyline() {
+        if (this.routePolyline) {
+          this.map.removeLayer(this.routePolyline);
+        }
+        const latLngs = this.stores.map(s => [s.lat, s.lng]);
+        this.routePolyline = L.polyline(latLngs, {
+          color: '#2563eb',
+          weight: 4,
+          opacity: 0.75,
+          dashArray: '8, 8'
+        }).addTo(this.map);
+      }
+
+      /* STORE FILTERS */
+      setStoreFilter(filterType, element) {
+        this.currentFilter = filterType;
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        if (element) element.classList.add('active');
+        this.renderSidebarList();
+        this.renderMapMarkers();
+      }
+
+      getFilteredStores() {
+        return this.stores.filter(store => {
+          const log = this.storeLogs[store.id];
+          if (this.currentFilter === "all") return true;
+          if (this.currentFilter === "pending") return !log || (log.status !== "completed" && log.status !== "unresolved");
+          if (this.currentFilter === "completed") return log && log.status === "completed";
+          if (store.chain && store.chain.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
+          if (store.name.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
+          return false;
+        });
+      }
+
+      /* SELECT STORE & DISPLAY QUICK CARD ONLY UPON CLICK */
+      setActiveStore(id, openSheet = false) {
+        this.activeStoreId = id;
+        const store = this.stores.find(s => s.id === id);
+        if (!store) return;
+
+        const index = this.stores.findIndex(s => s.id === id);
+        const log = this.storeLogs[id] || { status: "pending" };
+
+        this.stores.forEach((s, idx) => {
+          if (this.markers[s.id]) {
+            this.markers[s.id].setIcon(this.createPinIcon(s, idx));
+          }
+        });
+
+        this.map.panTo([store.lat, store.lng], { animate: true, duration: 0.4 });
+
+        // Update & Show Mobile Quick Card smoothly above the dock
+        const quickCard = document.getElementById("mobileQuickCard");
+        const mqcOrder = document.getElementById("mqcOrder");
+        const mqcName = document.getElementById("mqcName");
+        const mqcAddress = document.getElementById("mqcAddress");
+        const mqcStatusBadge = document.getElementById("mqcStatusBadge");
+
+        if (mqcOrder) mqcOrder.textContent = `OPRIREA ${index + 1} DIN ${this.stores.length}`;
+        if (mqcName) mqcName.textContent = store.name;
+        if (mqcAddress) mqcAddress.textContent = store.address;
+        
+        if (mqcStatusBadge) {
+          if (log.status === "completed") {
+            mqcStatusBadge.className = "badge badge-success";
+            mqcStatusBadge.textContent = `Rezolvat (${log.time || 'OK'})`;
+          } else if (log.status === "unresolved") {
+            mqcStatusBadge.className = "badge badge-danger";
+            mqcStatusBadge.textContent = "Nerezolvat";
+          } else {
+            mqcStatusBadge.className = "badge badge-gray";
+            mqcStatusBadge.textContent = "Neînceput";
+          }
+        }
+
+        // Make quick card visible when a store is active
+        if (quickCard) {
+          quickCard.style.display = "block";
+        }
+
+        document.querySelectorAll('.store-card').forEach(card => {
+          card.classList.toggle('active', card.dataset.id === id);
+        });
+
+        const fabSelect = document.getElementById("fabStoreSelect");
+        if (fabSelect) fabSelect.value = id;
+        this.renderFabProductsForm();
+
+        // If explicit modal open requested (e.g. from Options button)
+        if (openSheet) {
+          this.openStoreModal(store, index, log);
+        }
+      }
+
+      closeQuickCard() {
+        const quickCard = document.getElementById("mobileQuickCard");
+        if (quickCard) quickCard.style.display = "none";
+      }
+
+      openActiveStoreModal() {
+        if (!this.activeStoreId) return;
+        const store = this.stores.find(s => s.id === this.activeStoreId);
+        const idx = this.stores.findIndex(s => s.id === this.activeStoreId);
+        const log = this.storeLogs[this.activeStoreId] || { status: "pending" };
+        this.openStoreModal(store, idx, log);
+      }
+
+      openStoreModal(store, index, log) {
+        document.getElementById("modalOrderBadge").textContent = `Oprirea ${index + 1} din ${this.stores.length}`;
+        document.getElementById("modalStoreTitle").textContent = store.name;
+        document.getElementById("modalStoreAddress").textContent = store.address;
+        
+        const badge = document.getElementById("modalStatusBadge");
+        if (log.status === "completed") {
+          badge.className = "badge badge-success";
+          badge.textContent = `Rezolvat la ${log.time}`;
+        } else if (log.status === "unresolved") {
+          badge.className = "badge badge-danger";
+          badge.textContent = `Nerezolvat (${log.reason || 'Problemă'})`;
+        } else {
+          badge.className = "badge badge-gray";
+          badge.textContent = "Neînceput";
+        }
+
+        document.getElementById("storeModalOverlay").classList.add("active");
+      }
+
+      closeStoreModal() {
+        document.getElementById("storeModalOverlay").classList.remove("active");
+      }
+
+      /* LIVE GPS TRACKING & NEAREST STORE FINDER */
+      toggleGpsTracking() {
+        const headerBtn = document.getElementById("headerGpsBtnDesk");
+        const mapBtn = document.getElementById("mapGpsBtn");
+        const dockBtn = document.getElementById("dockGpsBtnMob");
+
+        if (this.userGpsWatchId) {
+          navigator.geolocation.clearWatch(this.userGpsWatchId);
+          this.userGpsWatchId = null;
+          if (this.userGpsMarker) this.map.removeLayer(this.userGpsMarker);
+          if (this.userGpsCircle) this.map.removeLayer(this.userGpsCircle);
+          this.userGpsMarker = null;
+          this.userGpsCircle = null;
+          if (headerBtn) headerBtn.classList.remove("active-btn");
+          if (mapBtn) mapBtn.classList.remove("active-btn");
+          if (dockBtn) dockBtn.classList.remove("active");
+          alert("📍 Urmărire GPS dezactivată.");
+          return;
+        }
+
+        if (!navigator.geolocation) {
+          alert("Dispozitivul tău nu suportă localizarea GPS.");
+          return;
+        }
+
+        if (headerBtn) headerBtn.classList.add("active-btn");
+        if (mapBtn) mapBtn.classList.add("active-btn");
+        if (dockBtn) dockBtn.classList.add("active");
+
+        this.userGpsWatchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const { latitude, longitude, accuracy } = pos.coords;
+            this.userCoords = { lat: latitude, lng: longitude };
+
+            if (!this.userGpsMarker) {
+              const dotIcon = L.divIcon({
+                className: 'custom-gps-icon',
+                html: '<div class="user-gps-dot"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+              });
+              this.userGpsMarker = L.marker([latitude, longitude], { icon: dotIcon, zIndexOffset: 2000 }).addTo(this.map);
+              this.userGpsCircle = L.circle([latitude, longitude], { radius: accuracy, color: '#2563eb', weight: 1, fillOpacity: 0.15 }).addTo(this.map);
+              this.map.panTo([latitude, longitude]);
+            } else {
+              this.userGpsMarker.setLatLng([latitude, longitude]);
+              this.userGpsCircle.setLatLng([latitude, longitude]);
+              this.userGpsCircle.setRadius(accuracy);
+            }
+          },
+          (err) => {
+            console.warn("GPS error:", err);
+            alert("Nu am putut obține locația GPS. Te rugăm să permiți accesul la locație în Safari / Browser.");
+            if (headerBtn) headerBtn.classList.remove("active-btn");
+            if (mapBtn) mapBtn.classList.remove("active-btn");
+            if (dockBtn) dockBtn.classList.remove("active");
+          },
+          { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+        );
+      }
+
+      findNearestStoreToGps() {
+        if (!this.userCoords) {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                this.userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                this.locateClosestUnvisitedStore();
+              },
+              () => alert("Activează mai întâi butonul 📍 GPS pentru a găsi magazinul cel mai apropiat!")
+            );
+          } else {
+            alert("Localizarea GPS nu este disponibilă.");
+          }
+          return;
+        }
+        this.locateClosestUnvisitedStore();
+      }
+
+      locateClosestUnvisitedStore() {
+        const unvisited = this.stores.filter(s => {
+          const log = this.storeLogs[s.id];
+          return !log || (log.status !== "completed" && log.status !== "unresolved");
+        });
+
+        if (unvisited.length === 0) {
+          alert("🎉 Toate magazinele din această zi au fost deja vizitate!");
+          return;
+        }
+
+        const haversineDist = (p1, p2) => {
+          const R = 6371;
+          const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+          const dLng = (p2.lng - p1.lng) * Math.PI / 180;
+          const a = Math.sin(dLat/2)**2 + Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) * Math.sin(dLng/2)**2;
+          return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        };
+
+        let closest = null;
+        let minDist = Infinity;
+
+        unvisited.forEach(s => {
+          const d = haversineDist(this.userCoords, s);
+          if (d < minDist) {
+            minDist = d;
+            closest = s;
+          }
+        });
+
+        if (closest) {
+          this.setActiveStore(closest.id, false);
+          alert(`🎯 Cel mai apropiat magazin rămas:\n*${closest.name}*\nDistanță directă: ~${minDist.toFixed(2)} km`);
+        }
+      }
+
+      /* DRAGGABLE FLOATING ACTION BUBBLE */
+      setupDraggableFab() {
+        const fab = document.getElementById("floatingFab");
+        if (!fab) return;
+
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let initialLeft = 0, initialTop = 0;
+        let dragDistance = 0;
+
+        const savedPos = localStorage.getItem("merch_fab_pos");
+        if (savedPos) {
+          try {
+            const { x, y } = JSON.parse(savedPos);
+            const maxX = window.innerWidth - 70;
+            const maxY = window.innerHeight - 140;
+            const boundedX = Math.max(10, Math.min(x, maxX));
+            const boundedY = Math.max(90, Math.min(y, maxY));
+            fab.style.left = `${boundedX}px`;
+            fab.style.top = `${boundedY}px`;
+            fab.style.bottom = "auto";
+            fab.style.right = "auto";
+          } catch(e) {}
+        }
+
+        const onStart = (e) => {
+          isDragging = true;
+          dragDistance = 0;
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          startX = clientX;
+          startY = clientY;
+
+          const rect = fab.getBoundingClientRect();
+          initialLeft = rect.left;
+          initialTop = rect.top;
+
+          fab.style.transition = "none";
+          document.addEventListener(e.touches ? 'touchmove' : 'mousemove', onMove, { passive: false });
+          document.addEventListener(e.touches ? 'touchend' : 'mouseup', onEnd);
+        };
+
+        const onMove = (e) => {
+          if (!isDragging) return;
+          e.preventDefault();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const deltaX = clientX - startX;
+          const deltaY = clientY - startY;
+          dragDistance = Math.hypot(deltaX, deltaY);
+
+          let newLeft = initialLeft + deltaX;
+          let newTop = initialTop + deltaY;
+
+          const maxX = window.innerWidth - fab.offsetWidth - 10;
+          const maxY = window.innerHeight - fab.offsetHeight - 85;
+          newLeft = Math.max(10, Math.min(newLeft, maxX));
+          newTop = Math.max(90, Math.min(newTop, maxY));
+
+          fab.style.left = `${newLeft}px`;
+          fab.style.top = `${newTop}px`;
+          fab.style.bottom = "auto";
+          fab.style.right = "auto";
+        };
+
+        const onEnd = () => {
+          if (!isDragging) return;
+          isDragging = false;
+          fab.style.transition = "transform 0.15s ease-out, box-shadow 0.15s";
+
+          document.removeEventListener('touchmove', onMove);
+          document.removeEventListener('touchend', onEnd);
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onEnd);
+
+          const rect = fab.getBoundingClientRect();
+          localStorage.setItem("merch_fab_pos", JSON.stringify({ x: rect.left, y: rect.top }));
+
+          if (dragDistance < 8) {
+            this.toggleFabWindow();
+          }
+        };
+
+        fab.addEventListener('touchstart', onStart, { passive: false });
+        fab.addEventListener('mousedown', onStart);
+      }
+
+      /* NAVIGATION SHORTCUTS */
+      openActiveInWaze() {
+        const store = this.stores.find(s => s.id === this.activeStoreId);
+        if (!store) return;
+        window.open(`https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`, "_blank");
+      }
+
+      openActiveInGoogleMaps() {
+        const store = this.stores.find(s => s.id === this.activeStoreId);
+        if (!store) return;
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`, "_blank");
+      }
+
+      openActiveInAppleMaps() {
+        const store = this.stores.find(s => s.id === this.activeStoreId);
+        if (!store) return;
+        window.open(`maps://?daddr=${store.lat},${store.lng}`, "_blank");
+      }
+
+      goToNextStore() {
+        const currentIndex = this.stores.findIndex(s => s.id === this.activeStoreId);
+        if (currentIndex < this.stores.length - 1) {
+          const nextStore = this.stores[currentIndex + 1];
+          this.setActiveStore(nextStore.id, false);
+        } else {
+          let exitPoint = "Timpuri Noi / Splai / A2";
+          if (this.currentDay === "day2") exitPoint = "Regina Maria / B-dul Unirii / A2";
+          if (this.currentDay === "day3") exitPoint = "Str. Brașov / Răzoare / Splai / A2";
+          if (this.currentDay === "day4") exitPoint = "Bd. Timișoara 18 / Răzoare / Splai / A2";
+          if (this.currentDay === "day5") exitPoint = "B-dul Libertății / Piața Constituției / Splai / A2";
+          alert(`🎉 Felicitări! Ai finalizat toate cele ${this.stores.length} magazine din traseu! Drum bun spre casă spre Brănești via ${exitPoint}!`);
+        }
+      }
+
+      markActiveAsResolved() {
+        if (!this.activeStoreId) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+
+        this.storeLogs[this.activeStoreId] = {
+          status: "completed",
+          time: timeStr,
+          timestamp: Date.now()
+        };
+        this.saveLogs();
+        this.updateUIAfterStatusChange();
+      }
+
+      promptUnresolved() {
+        if (!this.activeStoreId) return;
+        document.getElementById("reasonModalOverlay").classList.add("active");
+      }
+
+      confirmUnresolved(reason) {
+        if (!this.activeStoreId) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+
+        this.storeLogs[this.activeStoreId] = {
+          status: "unresolved",
+          reason: reason,
+          time: timeStr,
+          timestamp: Date.now()
+        };
+        this.saveLogs();
+        document.getElementById("reasonModalOverlay").classList.remove("active");
+        this.updateUIAfterStatusChange();
+      }
+
+      updateUIAfterStatusChange() {
+        this.stores.forEach((s, idx) => {
+          if (this.markers[s.id]) {
+            this.markers[s.id].setIcon(this.createPinIcon(s, idx));
+          }
+        });
+        this.renderSidebarList();
+        this.setActiveStore(this.activeStoreId, false);
+        this.renderReport();
+      }
+
+      /* ROUTE RE-ORDERING */
+      reorderRoute(strategy) {
+        const initialList = INITIAL_DATA_WEEK_1[this.currentDay] || [];
+        if (strategy === "tur") {
+          this.stores = [...initialList];
+        } else if (strategy === "retur") {
+          this.stores = [...initialList].reverse().map((s, idx) => ({ ...s, order: idx + 1 }));
+        }
+        this.saveStores();
+        this.renderSidebarList();
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+        this.setActiveStore(this.stores[0].id, false);
+        alert(`Traseu reordonat: ${strategy === 'tur' ? 'Ordine Tur (Optimizată A2)' : 'Ordine Inversată (Retur)'}`);
+      }
+
+      /* SIDEBAR RENDERING */
+      renderSidebarList() {
+        const container = document.getElementById("storeListContainer");
+        if (!container) return;
+        container.innerHTML = "";
+
+        let resolvedCount = 0;
+        const filtered = this.getFilteredStores();
+
+        filtered.forEach((store) => {
+          const originalIndex = this.stores.findIndex(s => s.id === store.id);
+          const log = this.storeLogs[store.id];
+          const isResolved = log && log.status === "completed";
+          const isUnresolved = log && log.status === "unresolved";
+          if (isResolved) resolvedCount++;
+
+          const card = document.createElement("div");
+          card.className = `store-card ${isResolved ? 'completed' : ''} ${isUnresolved ? 'unresolved' : ''} ${this.activeStoreId === store.id ? 'active' : ''}`;
+          card.dataset.id = store.id;
+
+          let statusBadge = `<span class="badge badge-gray">Neînceput</span>`;
+          if (isResolved) statusBadge = `<span class="badge badge-success">✓ ${log.time}</span>`;
+          if (isUnresolved) statusBadge = `<span class="badge badge-danger">✕ Problemă</span>`;
+
+          card.innerHTML = `
+            <div class="store-card-num">${originalIndex + 1}</div>
+            <div class="store-card-content">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="store-card-title">${store.name}</div>
+                ${statusBadge}
+              </div>
+              <div class="store-card-address">${store.address}</div>
+            </div>
+          `;
+
+          card.onclick = () => this.setActiveStore(store.id, false);
+          container.appendChild(card);
+        });
+
+        const totalResolved = this.stores.filter(s => this.storeLogs[s.id] && this.storeLogs[s.id].status === "completed").length;
+        const badge = document.getElementById("sidebarProgressBadge");
+        if (badge) badge.textContent = `${totalResolved}/${this.stores.length} Vizitate`;
+      }
+
+      /* DYNAMIC PRODUCTS LIST & PHOTO FORM */
+      toggleFabWindow() {
+        const win = document.getElementById("fabWindow");
+        win.classList.toggle("active");
+        if (win.classList.contains("active")) {
+          this.populateFabDropdown();
+          if (this.activeStoreId) {
+            document.getElementById("fabStoreSelect").value = this.activeStoreId;
+          }
+          this.renderFabProductsForm();
+        }
+      }
+
+      closeFabWindow() {
+        document.getElementById("fabWindow").classList.remove("active");
+      }
+
+      openFabForStore(storeId) {
+        this.activeStoreId = storeId;
+        const win = document.getElementById("fabWindow");
+        win.classList.add("active");
+        this.populateFabDropdown();
+        document.getElementById("fabStoreSelect").value = storeId;
+        this.renderFabProductsForm();
+      }
+
+      populateFabDropdown() {
+        const select = document.getElementById("fabStoreSelect");
+        if (!select) return;
+        select.innerHTML = "";
+        this.stores.forEach((store, idx) => {
+          const opt = document.createElement("option");
+          opt.value = store.id;
+          opt.textContent = `${idx + 1}. ${store.name}`;
+          select.appendChild(opt);
+        });
+      }
+
+      onFabStoreChange() {
+        const selId = document.getElementById("fabStoreSelect").value;
+        this.setActiveStore(selId, false);
+        this.renderFabProductsForm();
+      }
+
+      getOrCreateStoreData(storeId) {
+        if (!this.storeProductsData[storeId]) {
+          this.storeProductsData[storeId] = {
+            sectionName: "Raft Principal",
+            items: [
+              { id: "p_" + Date.now() + "_1", name: "", price: "", photoUrl: "" }
+            ]
+          };
+        }
+        return this.storeProductsData[storeId];
+      }
+
+      onSectionNameChange() {
+        const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
+        const data = this.getOrCreateStoreData(storeId);
+        data.sectionName = document.getElementById("fabSectionName").value;
+        this.saveProductsData();
+        this.renderReport();
+      }
+
+      renderFabProductsForm() {
+        const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
+        const data = this.getOrCreateStoreData(storeId);
+
+        document.getElementById("fabSectionName").value = data.sectionName || "";
+        const listContainer = document.getElementById("fabProductsList");
+        listContainer.innerHTML = "";
+
+        data.items.forEach((item, idx) => {
+          const row = document.createElement("div");
+          row.className = "product-row-item";
+          row.dataset.id = item.id;
+
+          const photoHtml = item.photoUrl 
+            ? `<img src="${item.photoUrl}" onclick="event.stopPropagation(); app.zoomPhoto('${item.photoUrl}')" />` 
+            : `<span class="thumb-placeholder">📷</span>`;
+
+          row.innerHTML = `
+            <div class="product-index-badge">${idx + 1}</div>
+            
+            <div class="product-thumb-container" onclick="app.triggerProductPhotoUpload('${storeId}', '${item.id}')" title="Fă o poză sau alege din galerie">
+              ${photoHtml}
+            </div>
+
+            <div class="product-fields-col">
+              <input type="text" class="product-input-name" placeholder="Denumire Produs (ex: Coca-Cola 2L)" value="${item.name || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'name', this.value)" />
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <input type="number" step="0.01" class="product-input-price" placeholder="Preț (RON)" value="${item.price || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'price', this.value)" />
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">RON</span>
+              </div>
+            </div>
+
+            <div class="product-actions-col">
+              <button class="action-icon-btn" title="Mută mai sus" onclick="app.moveProductRow('${storeId}', ${idx}, -1)">⬆️</button>
+              <button class="action-icon-btn" title="Mută mai jos" onclick="app.moveProductRow('${storeId}', ${idx}, 1)">⬇️</button>
+              <button class="action-icon-btn delete-btn" title="Șterge produs" onclick="app.deleteProductRow('${storeId}', '${item.id}')">🗑️</button>
+            </div>
+          `;
+
+          listContainer.appendChild(row);
+        });
+
+        document.getElementById("fabProductCountLabel").textContent = `${data.items.length} produs(e)`;
+        this.updateTotalPhotosBadge();
+      }
+
+      addNewProductRow() {
+        const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
+        const data = this.getOrCreateStoreData(storeId);
+        data.items.push({
+          id: "p_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+          name: "",
+          price: "",
+          photoUrl: ""
+        });
+        this.saveProductsData();
+        this.renderFabProductsForm();
+        this.renderReport();
+      }
+
+      updateProductField(storeId, itemId, field, value) {
+        const data = this.getOrCreateStoreData(storeId);
+        const item = data.items.find(it => it.id === itemId);
+        if (item) {
+          item[field] = value;
+          this.saveProductsData();
+          this.renderReport();
+        }
+      }
+
+      moveProductRow(storeId, fromIndex, direction) {
+        const data = this.getOrCreateStoreData(storeId);
+        const toIndex = fromIndex + direction;
+        if (toIndex < 0 || toIndex >= data.items.length) return;
+
+        const temp = data.items[fromIndex];
+        data.items[fromIndex] = data.items[toIndex];
+        data.items[toIndex] = temp;
+
+        this.saveProductsData();
+        this.renderFabProductsForm();
+        this.renderReport();
+      }
+
+      deleteProductRow(storeId, itemId) {
+        const data = this.getOrCreateStoreData(storeId);
+        if (data.items.length === 1 && !data.items[0].name && !data.items[0].photoUrl) {
+          return;
+        }
+        data.items = data.items.filter(it => it.id !== itemId);
+        if (data.items.length === 0) {
+          data.items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" });
+        }
+        this.saveProductsData();
+        this.renderFabProductsForm();
+        this.renderReport();
+      }
+
+      triggerProductPhotoUpload(storeId, productId) {
+        this.activePhotoUploadTarget = { storeId, productId };
+        document.getElementById("fabProductPhotoInput").click();
+      }
+
+      compressImageFile(file, maxWidth = 800, quality = 0.75) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              let width = img.width;
+              let height = img.height;
+
+              if (width > maxWidth || height > maxWidth) {
+                if (width > height) {
+                  height = Math.round((height * maxWidth) / width);
+                  width = maxWidth;
+                } else {
+                  width = Math.round((width * maxWidth) / height);
+                  height = maxWidth;
+                }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, width, height);
+
+              const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+              resolve(compressedBase64);
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async handleProductPhotoSelected(event) {
+        const file = event.target.files[0];
+        if (!file || !this.activePhotoUploadTarget) return;
+
+        const { storeId, productId } = this.activePhotoUploadTarget;
+        const compressedBase64 = await this.compressImageFile(file);
+
+        const data = this.getOrCreateStoreData(storeId);
+        const item = data.items.find(it => it.id === productId);
+        if (item) {
+          item.photoUrl = compressedBase64;
+          this.saveProductsData();
+          this.renderFabProductsForm();
+          this.renderReport();
+        }
+
+        event.target.value = "";
+      }
+
+      updateTotalPhotosBadge() {
+        let count = 0;
+        Object.values(this.storeProductsData).forEach(data => {
+          if (data && data.items) {
+            data.items.forEach(it => { if (it.photoUrl) count++; });
+          }
+        });
+        const badge = document.getElementById("fabPhotosBadge");
+        if (badge) {
+          badge.style.display = count > 0 ? "flex" : "none";
+          badge.textContent = count;
+        }
+      }
+
+      zoomPhoto(src) {
+        const modal = document.getElementById("photoZoomModal");
+        const img = document.getElementById("zoomImg");
+        img.src = src;
+        modal.classList.add("active");
+      }
+
+      /* RAPORT VERIFICARE TEREN TAB */
+      renderReport() {
+        const tbody = document.getElementById("reportBodyRows");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        let total = this.stores.length;
+        let resolved = 0;
+        let unresolved = 0;
+        let pending = 0;
+
+        this.stores.forEach((store, idx) => {
+          const log = this.storeLogs[store.id];
+          const data = this.storeProductsData[store.id] || { sectionName: "-", items: [] };
+
+          let statusText = `<span class="badge badge-gray">Neînceput</span>`;
+          let timeText = "-";
+
+          if (log) {
+            if (log.status === "completed") {
+              resolved++;
+              statusText = `<span class="badge badge-success">✓ Rezolvat</span>`;
+              timeText = log.time || "-";
+            } else if (log.status === "unresolved") {
+              unresolved++;
+              statusText = `<span class="badge badge-danger">✕ Nerezolvat</span>`;
+              timeText = log.time || "-";
+            }
+          } else {
+            pending++;
+          }
+
+          // Format items list
+          let productsHtml = "-";
+          const validItems = data.items.filter(it => it.name || it.price || it.photoUrl);
+          if (validItems.length > 0) {
+            productsHtml = `<div style="display:flex; flex-direction:column; gap:6px;">` + validItems.map((it, i) => `
+              <div style="display:flex; align-items:center; gap:8px; background:var(--gray-50); padding:4px 8px; border-radius:6px;">
+                <span style="font-weight:800; color:var(--primary); font-size:11px;">#${i+1}</span>
+                ${it.photoUrl ? `<img src="${it.photoUrl}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="app.zoomPhoto('${it.photoUrl}')" />` : ''}
+                <div style="flex:1;">
+                  <strong>${it.name || 'Produs fără nume'}</strong>
+                  ${it.price ? `<span style="color:var(--success); font-weight:700; margin-left:6px;">${it.price} RON</span>` : ''}
+                </div>
+              </div>
+            `).join("") + `</div>`;
+          }
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><strong>${idx + 1}</strong></td>
+            <td>
+              <strong>${store.name}</strong><br/>
+              <span style="font-size:11px; color:var(--text-muted);">${store.address}</span>
+            </td>
+            <td>${timeText}</td>
+            <td>${statusText}</td>
+            <td><strong>${data.sectionName || '-'}</strong></td>
+            <td>${productsHtml}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById("statTotalStores").textContent = total;
+        document.getElementById("statResolvedStores").textContent = resolved;
+        document.getElementById("statUnresolvedStores").textContent = unresolved;
+        document.getElementById("statPendingStores").textContent = pending;
+      }
+
+      copyWhatsAppReport() {
+        const dateStr = new Date().toLocaleDateString('ro-RO');
+        const dayMap = { day1: "Ziua 1", day2: "Ziua 2", day3: "Ziua 3", day4: "Ziua 4", day5: "Ziua 5" };
+        const dayLabel = `SĂPTĂMÂNA 1 - ${dayMap[this.currentDay] || this.currentDay.toUpperCase()}`;
+
+        let text = `📊 *RAPORT MERCHANDISER - ${dayLabel}*\n`;
+        text += `📅 Data: ${dateStr}\n`;
+        text += `🚗 Traseu: Plecare din Brănești (A2)\n\n`;
+
+        let resolved = 0;
+        let unresolved = 0;
+
+        this.stores.forEach((store, idx) => {
+          const log = this.storeLogs[store.id];
+          const data = this.storeProductsData[store.id] || { sectionName: "", items: [] };
+          const validItems = data.items.filter(it => it.name || it.price || it.photoUrl);
+
+          if (log && log.status === "completed") {
+            resolved++;
+            text += `✅ *${idx + 1}. ${store.name}* (Ora: ${log.time})\n`;
+          } else if (log && log.status === "unresolved") {
+            unresolved++;
+            text += `❌ *${idx + 1}. ${store.name}* - Motiv: ${log.reason || 'Nerezolvat'}\n`;
+          } else {
+            text += `⏳ *${idx + 1}. ${store.name}* - În așteptare\n`;
+          }
+
+          if (data.sectionName) {
+            text += `   📂 Secțiune: ${data.sectionName}\n`;
+          }
+
+          if (validItems.length > 0) {
+            validItems.forEach((it, i) => {
+              text += `   ${i+1}. ${it.name || 'Produs'} - ${it.price ? it.price + ' RON' : 'Fără preț'} ${it.photoUrl ? '📸 [Foto]' : ''}\n`;
+            });
+          }
+        });
+
+        text += `\n📈 *Sumar Zi:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.stores.length - resolved - unresolved} Rămase`;
+
+        navigator.clipboard.writeText(text.replace(/\\n/g, '\n')).then(() => {
+          alert(`✓ Raportul complet pentru ${dayLabel} a fost copiat în Clipboard! Îl poți trimite direct pe WhatsApp.`);
+        }).catch(() => {
+          alert("Nu s-a putut copia automat. Te rugăm să verifici permisiunile browserului.");
+        });
+      }
+
+      exportCSV() {
+        const dayTag = this.currentDay.toUpperCase();
+        let csv = "\uFEFFNr,Magazin,Oras,Adresa,Ora Vizita,Status,Sectiune,Produse Detaliate\n";
+        
+        this.stores.forEach((store, idx) => {
+          const log = this.storeLogs[store.id] || {};
+          const data = this.storeProductsData[store.id] || { sectionName: "", items: [] };
+          const validItems = data.items.filter(it => it.name || it.price);
+
+          let status = log.status === "completed" ? "Rezolvat" : (log.status === "unresolved" ? "Nerezolvat" : "Neinceput");
+          let productsStr = validItems.map((it, i) => `${i+1}. ${it.name} (${it.price} RON)`).join(" | ").replace(/"/g, '""');
+
+          csv += `"${idx + 1}","${store.name}","${store.city}","${store.address}","${log.time || ''}","${status}","${data.sectionName || ''}","${productsStr}"\n`;
+        });
+
+        const blob = new Blob([csv.replace(/\\n/g, '\n')], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Raport_Merchandiser_Saptamana1_${dayTag}_${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
+      }
+
+      /* BACKUP & RESTORE COMPLETE STATE */
+      openBackupModal() {
+        document.getElementById("backupModalOverlay").classList.add("active");
+      }
+
+      closeBackupModal() {
+        document.getElementById("backupModalOverlay").classList.remove("active");
+      }
+
+      exportFullBackup() {
+        const backupData = {
+          version: "3.2_week1",
+          exportDate: new Date().toISOString(),
+          day1_stores: localStorage.getItem("merch_stores_day1"),
+          day1_logs: localStorage.getItem("merch_logs_day1"),
+          day1_products: localStorage.getItem("merch_products_v2_day1"),
+          day2_stores: localStorage.getItem("merch_stores_day2"),
+          day2_logs: localStorage.getItem("merch_logs_day2"),
+          day2_products: localStorage.getItem("merch_products_v2_day2"),
+          day3_stores: localStorage.getItem("merch_stores_day3"),
+          day3_logs: localStorage.getItem("merch_logs_day3"),
+          day3_products: localStorage.getItem("merch_products_v2_day3"),
+          day4_stores: localStorage.getItem("merch_stores_day4"),
+          day4_logs: localStorage.getItem("merch_logs_day4"),
+          day4_products: localStorage.getItem("merch_products_v2_day4"),
+          day5_stores: localStorage.getItem("merch_stores_day5"),
+          day5_logs: localStorage.getItem("merch_logs_day5"),
+          day5_products: localStorage.getItem("merch_products_v2_day5"),
+        };
+
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Merchandiser_Backup_Saptamana1_${new Date().toISOString().slice(0,10)}.json`;
+        link.click();
+        alert("✓ Salvarea completă (Backup JSON Săptămâna 1) a fost descărcată!");
+      }
+
+      importBackupFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            ["day1", "day2", "day3", "day4", "day5"].forEach(k => {
+              if (data[`${k}_stores`]) localStorage.setItem(`merch_stores_${k}`, data[`${k}_stores`]);
+              if (data[`${k}_logs`]) localStorage.setItem(`merch_logs_${k}`, data[`${k}_logs`]);
+              if (data[`${k}_products`]) localStorage.setItem(`merch_products_v2_${k}`, data[`${k}_products`]);
+            });
+
+            alert("✓ Toate datele, coordonatele și pozele au fost restaurate cu succes!");
+            location.reload();
+          } catch(err) {
+            alert("Fișierul de backup este invalid.");
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      resetDayProgress() {
+        const dayMap = { day1: "Ziua 1", day2: "Ziua 2", day3: "Ziua 3", day4: "Ziua 4", day5: "Ziua 5" };
+        const dayName = dayMap[this.currentDay] || "Ziua Curentă";
+
+        if (confirm(`⚠️ Ești sigur că vrei să resetezi statusul și produsele pentru Săptămâna 1 - ${dayName}?`)) {
+          this.storeLogs = {};
+          this.storeProductsData = {};
+          this.saveLogs();
+          this.saveProductsData();
+          this.renderSidebarList();
+          this.renderMapMarkers();
+          this.renderReport();
+          this.renderFabProductsForm();
+          this.closeQuickCard();
+          alert(`✓ Progresul pentru ${dayName} a fost resetat cu succes!`);
+        }
+      }
+    }
+
+    let app;
+    window.addEventListener("DOMContentLoaded", () => {
+      app = new MerchandiserApp();
+      app.init();
+    });
+  </script>
+</body>
+</html>
