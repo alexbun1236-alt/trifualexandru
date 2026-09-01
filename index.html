@@ -2613,23 +2613,46 @@
         fab.addEventListener('mousedown', onStart);
       }
 
-      /* NAVIGATION SHORTCUTS */
+            /* NAVIGATION SHORTCUTS - FIXED FOR IOS SAFARI & PWA (NO BLANK SCREEN ON RETURN) */
+      launchNavigation(webUrl, nativeSchemeUrl) {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const targetUrl = (isIOS && nativeSchemeUrl) ? nativeSchemeUrl : webUrl;
+        
+        // Use an invisible <a> link without target="_blank" so Safari does NOT create a blank orphan tab
+        const link = document.createElement("a");
+        link.href = targetUrl;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          if (link.parentNode) {
+            link.parentNode.removeChild(link);
+          }
+        }, 400);
+      }
+
       openActiveInWaze() {
         const store = this.stores.find(s => s.id === this.activeStoreId);
         if (!store) return;
-        window.open(`https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`, "_blank");
+        const webUrl = `https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`;
+        const nativeUrl = `waze://?ll=${store.lat},${store.lng}&navigate=yes`;
+        this.launchNavigation(webUrl, nativeUrl);
       }
 
       openActiveInGoogleMaps() {
         const store = this.stores.find(s => s.id === this.activeStoreId);
         if (!store) return;
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`, "_blank");
+        const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`;
+        const nativeUrl = `comgooglemaps://?daddr=${store.lat},${store.lng}&directionsmode=driving`;
+        this.launchNavigation(webUrl, nativeUrl);
       }
 
       openActiveInAppleMaps() {
         const store = this.stores.find(s => s.id === this.activeStoreId);
         if (!store) return;
-        window.open(`maps://?daddr=${store.lat},${store.lng}`, "_blank");
+        const webUrl = `https://maps.apple.com/?daddr=${store.lat},${store.lng}`;
+        const nativeUrl = `maps://?daddr=${store.lat},${store.lng}&dirflg=d`;
+        this.launchNavigation(webUrl, nativeUrl);
       }
 
       goToNextStore() {
@@ -3216,6 +3239,37 @@
     window.addEventListener("DOMContentLoaded", () => {
       app = new MerchandiserApp();
       app.init();
+    });
+
+    /* iOS WebKit Lifecycle Event Listeners - Auto-Resume Map & UI upon returning from Waze/Background */
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && app && app.map) {
+        setTimeout(() => {
+          app.map.invalidateSize(true);
+          if (app.activeStoreId) {
+            const store = app.stores.find(s => s.id === app.activeStoreId);
+            if (store) {
+              app.map.panTo([store.lat, store.lng], { animate: false });
+            }
+          }
+        }, 150);
+      }
+    });
+
+    window.addEventListener("pageshow", () => {
+      if (app && app.map) {
+        setTimeout(() => {
+          app.map.invalidateSize(true);
+        }, 150);
+      }
+    });
+
+    window.addEventListener("focus", () => {
+      if (app && app.map) {
+        setTimeout(() => {
+          app.map.invalidateSize(true);
+        }, 100);
+      }
     });
   </script>
 </body>
