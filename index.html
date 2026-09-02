@@ -88,7 +88,7 @@
       overflow: hidden;
     }
 
-    /* Top Navigation Bar - Guaranteed iPhone Notch / Dynamic Island Safe */
+    /* Top Navigation Bar - Safe for iPhone Notch & Dynamic Island */
     header {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--border);
@@ -139,11 +139,27 @@
       line-height: 1.2;
     }
 
-    .brand-info span {
+    .brand-status-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 10px;
-      color: var(--text-muted);
-      display: block;
     }
+
+    .brand-info span {
+      color: var(--text-muted);
+    }
+
+    .cloud-badge {
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .cloud-synced { color: var(--success); }
+    .cloud-syncing { color: var(--warning); }
+    .cloud-offline { color: var(--text-muted); }
 
     /* Week 1 Dropdown Selector in Header */
     .week-dropdown-container {
@@ -237,7 +253,7 @@
       font-weight: 800;
     }
 
-    /* Desktop header actions (hidden on mobile, moved to bottom swipe dock) */
+    /* Desktop header actions */
     .desktop-header-tools {
       display: none;
     }
@@ -304,7 +320,7 @@
     .icon-btn.active-btn { background-color: var(--primary-light); color: var(--primary); border-color: var(--primary); }
     .icon-btn.unlocked-btn { background-color: var(--warning-light); color: #d97706; border-color: var(--warning); }
 
-    /* Bottom Swipeable Dock Bar (For Mobile - Solves Notch & Screen Real Estate) */
+    /* Bottom Swipeable Dock Bar (Mobile) */
     .bottom-dock-bar {
       position: fixed;
       bottom: 0;
@@ -411,7 +427,7 @@
       border-color: var(--primary);
     }
 
-    /* Main Container */
+    /* Main Layout */
     main {
       flex: 1;
       position: relative;
@@ -432,7 +448,6 @@
       display: flex;
     }
 
-    /* Map View Layout */
     #mapView {
       flex-direction: row;
     }
@@ -580,7 +595,7 @@
       line-height: 1.3;
     }
 
-    /* Map floating control overlay stack */
+    /* Map floating action tools */
     .map-fab-stack {
       position: absolute;
       top: 14px;
@@ -608,7 +623,6 @@
     .map-action-bubble:hover { transform: scale(1.06); }
     .map-action-bubble.active-btn { background: var(--primary); color: white; border-color: var(--primary); }
 
-    /* Drag notification toast */
     .map-toast-alert {
       position: absolute;
       top: 14px;
@@ -653,7 +667,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Bottom Action Sheet / Modal */
+    /* Modals & Action Sheet */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -728,7 +742,6 @@
       gap: 10px;
     }
 
-    /* Common Buttons */
     .btn {
       min-height: 46px;
       padding: 10px 16px;
@@ -780,7 +793,7 @@
       border-radius: 8px;
     }
 
-    /* Draggable Messenger FAB */
+    /* Messenger-style Draggable FAB */
     .floating-fab {
       position: fixed;
       bottom: 85px;
@@ -826,7 +839,7 @@
       pointer-events: none;
     }
 
-    /* Dynamic Product List Form Window */
+    /* Product Form Window */
     .fab-window {
       position: fixed;
       bottom: 85px;
@@ -913,7 +926,6 @@
     }
     .form-control:focus { border-color: var(--primary); }
 
-    /* Dynamic Products List Container */
     .products-dynamic-list {
       display: flex;
       flex-direction: column;
@@ -1033,7 +1045,7 @@
     .action-icon-btn:hover { background: var(--gray-200); color: var(--text); }
     .action-icon-btn.delete-btn:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
 
-    /* Tab: Raport Verificare Teren */
+    /* Raport Tab */
     #reportView {
       background-color: var(--bg);
       flex-direction: column;
@@ -1166,62 +1178,7 @@
     table.report-table tr:last-child td { border-bottom: none; }
     table.report-table tr:hover td { background-color: var(--gray-50); }
 
-    /* Modal Chooser on First Run */
-    .mode-picker-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(8px);
-      z-index: 3000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .mode-picker-card {
-      background: var(--card-bg);
-      border-radius: 20px;
-      max-width: 460px;
-      width: 100%;
-      padding: 28px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-    }
-
-    .mode-options-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin: 24px 0 16px 0;
-    }
-
-    .mode-btn {
-      border: 2px solid var(--border);
-      background: var(--bg);
-      border-radius: 14px;
-      padding: 20px 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .mode-btn:hover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      transform: translateY(-2px);
-    }
-    .mode-btn-icon { font-size: 32px; }
-    .mode-btn-title { font-size: 14px; font-weight: 700; }
-    .mode-btn-desc { font-size: 11px; color: var(--text-muted); }
-
-    /* Custom Leaflet Pin Markers */
+    /* Custom Leaflet Pins */
     .custom-marker-pin {
       width: 32px;
       height: 32px;
@@ -1265,7 +1222,6 @@
       box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #dc2626, 0 6px 14px rgba(239,68,68,0.5);
     }
 
-    /* Pulsing user GPS dot */
     .user-gps-dot {
       width: 18px;
       height: 18px;
@@ -1282,13 +1238,11 @@
       100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
       .map-sidebar { display: none; }
       .brand-info span { display: none; }
     }
 
-    /* Reason Modal */
     .reason-dialog {
       background: var(--card-bg);
       border-radius: 16px;
@@ -1319,9 +1273,8 @@
       background: var(--danger-light);
     }
 
-    /* Print Styles */
     @media print {
-      header, .floating-fab, .fab-window, .modal-overlay, .mode-picker-modal, .map-fab-stack, .bottom-dock-bar {
+      header, .floating-fab, .fab-window, .modal-overlay, .map-fab-stack, .bottom-dock-bar {
         display: none !important;
       }
       body, main, #reportView {
@@ -1341,41 +1294,20 @@
 </head>
 <body>
 
-  <!-- Mode Selector Modal (Initial Launch) -->
-  <div id="modePickerModal" class="mode-picker-modal" style="display: none;">
-    <div class="mode-picker-card">
-      <div style="font-size: 40px; margin-bottom: 8px;">🚗</div>
-      <h2 style="font-size: 20px; font-weight: 800;">Merchandiser Pro</h2>
-      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Alege modul de afișare optim pentru ecranul tău:</p>
-      
-      <div class="mode-options-grid">
-        <div class="mode-btn" onclick="app.setDeviceMode('mobile')">
-          <div class="mode-btn-icon">📱</div>
-          <div class="mode-btn-title">Mod Telefon</div>
-          <div class="mode-btn-desc">iPhone 15 Pro Max & Mobil</div>
-        </div>
-        <div class="mode-btn" onclick="app.setDeviceMode('desktop')">
-          <div class="mode-btn-icon">💻</div>
-          <div class="mode-btn-title">Mod Desktop</div>
-          <div class="mode-btn-desc">Laptop & Ecran Mare</div>
-        </div>
-      </div>
-
-      <p style="font-size: 11px; color: var(--text-muted);">Punct de plecare configurat: <strong>Brănești (A2)</strong></p>
-    </div>
-  </div>
-
-  <!-- Top Header - Perfectly Safe from Notch & Dynamic Island -->
+  <!-- Top Header Safe Area -->
   <header>
     <div class="brand">
       <div class="brand-logo">M</div>
       <div class="brand-info">
         <h1>Merchandiser Pro</h1>
-        <span id="routeOriginStatus">Start: Brănești (A2)</span>
+        <div class="brand-status-line">
+          <span id="routeOriginStatus">Start: Brănești (A2)</span>
+          <span id="cloudSyncStatus" class="cloud-badge cloud-offline">☁️ Inițializare Firebase...</span>
+        </div>
       </div>
     </div>
 
-    <!-- Week 1 Dropdown Selector in Header -->
+    <!-- Week 1 Dropdown Selector -->
     <div class="week-dropdown-container">
       <button class="week-dropdown-btn" id="weekDropdownTriggerBtn" onclick="app.toggleWeekDropdown(event)">
         <span>📅 Săptămâna 1</span>
@@ -1403,7 +1335,7 @@
       </div>
     </div>
 
-    <!-- Desktop Toolbar (Shown on Desktop only) -->
+    <!-- Desktop Toolbar -->
     <div class="desktop-header-tools">
       <div class="nav-tabs">
         <button class="nav-tab active" id="tabMapBtnDesk" onclick="app.switchTab('map')">🗺️ Hartă</button>
@@ -1413,15 +1345,13 @@
         <button class="icon-btn" id="headerLockBtnDesk" title="Pini Blocați (Apasă pt deblocare)" onclick="app.togglePinLock()">🔒</button>
         <button class="icon-btn" id="headerGpsBtnDesk" title="Localizare GPS live" onclick="app.toggleGpsTracking()">📍</button>
         <button class="icon-btn" title="Backup / Restaurare Date" onclick="app.openBackupModal()">💾</button>
-        <button class="icon-btn" title="Schimbă mod Telefon / Desktop" onclick="app.showModePicker()">📱</button>
         <button class="icon-btn" id="themeToggleBtnDesk" title="Temă Luminoasă / Întunecată" onclick="app.toggleTheme()">🌙</button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Area -->
+  <!-- Main Content -->
   <main>
-    <!-- View 1: Map & Route View -->
     <section id="mapView" class="view-panel active">
       <!-- Desktop Sidebar -->
       <aside class="map-sidebar" id="mapSidebar">
@@ -1431,7 +1361,6 @@
             <span class="badge badge-primary" id="sidebarProgressBadge">0/20 Vizitate</span>
           </div>
 
-          <!-- Filter chips row -->
           <div class="filter-scroll-row">
             <button class="filter-chip active" onclick="app.setStoreFilter('all', this)">Toate</button>
             <button class="filter-chip" onclick="app.setStoreFilter('Mega Image', this)">Mega Image</button>
@@ -1441,42 +1370,32 @@
             <button class="filter-chip" onclick="app.setStoreFilter('completed', this)">✅ Rezolvate</button>
           </div>
 
-          <div class="route-info-box" id="sidebarRouteDesc">
-            <!-- Injected dynamically -->
-          </div>
+          <div class="route-info-box" id="sidebarRouteDesc"></div>
           <div style="display: flex; gap: 6px; margin-top: 8px;">
-            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('tur')">
-              🔄 Tur (A2)
-            </button>
-            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('retur')">
-              🔄 Retur
-            </button>
-            <button class="btn btn-secondary btn-sm" style="flex:1;" title="Găsește cel mai apropiat magazin de GPS-ul tău" onclick="app.findNearestStoreToGps()">
-              🎯 Cel mai aproape
-            </button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('tur')">🔄 Tur (A2)</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('retur')">🔄 Retur</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.findNearestStoreToGps()">🎯 Cel mai aproape</button>
           </div>
         </div>
 
-        <div class="store-list-container" id="storeListContainer">
-          <!-- Populated dynamically -->
-        </div>
+        <div class="store-list-container" id="storeListContainer"></div>
       </aside>
 
-      <!-- Leaflet Map Canvas with Google Maps Tiles + Non-Overlapping Controls -->
+      <!-- Map Canvas -->
       <div id="map"></div>
 
-      <!-- Drag Notification Toast -->
+      <!-- Toast Alert -->
       <div class="map-toast-alert" id="mapDragToast">
         <span>📍</span> <span id="mapDragToastText">Poziția magazinului a fost actualizată!</span>
       </div>
 
-      <!-- Floating map stack tools (Top Right, Clean separation from layer control in Top Left) -->
+      <!-- Map Overlay Controls -->
       <div class="map-fab-stack">
-        <button class="map-action-bubble" id="mapGpsBtn" title="Activează/Dezactivează GPS" onclick="app.toggleGpsTracking()">📍</button>
-        <button class="map-action-bubble" title="Focalizează pe cel mai apropiat magazin" onclick="app.findNearestStoreToGps()">🎯</button>
+        <button class="map-action-bubble" id="mapGpsBtn" title="GPS Live" onclick="app.toggleGpsTracking()">📍</button>
+        <button class="map-action-bubble" title="Focalizează pe cel mai apropiat" onclick="app.findNearestStoreToGps()">🎯</button>
       </div>
 
-      <!-- Mobile Quick Card (Floating safely ABOVE the Bottom Dock) -->
+      <!-- Mobile Quick Card -->
       <div class="mobile-quick-card" id="mobileQuickCard">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
           <div>
@@ -1490,89 +1409,56 @@
           </div>
         </div>
 
-        <!-- Action buttons container (visible only when store is active) -->
         <div id="mqcActionsWrapper">
           <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-top: 8px;">
-            <button class="btn btn-waze" id="mqcWazeBtn" onclick="app.openActiveInWaze()">
-              🚗 Deschide în Waze
-            </button>
-            <button class="btn btn-secondary" onclick="app.goToNextStore()">
-              Următorul ➡️
-            </button>
+            <button class="btn btn-waze" id="mqcWazeBtn" onclick="app.openActiveInWaze()">🚗 Deschide în Waze</button>
+            <button class="btn btn-secondary" onclick="app.goToNextStore()">Următorul ➡️</button>
           </div>
 
           <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <button class="btn btn-success" onclick="app.markActiveAsResolved()">
-              ✓ Rezolvat
-            </button>
-            <button class="btn btn-danger" onclick="app.promptUnresolved()">
-              ✕ Nerezolvat
-            </button>
-            <button class="btn btn-secondary" style="flex:0.8;" onclick="app.openActiveStoreModal()">
-              ⚙️ Opțiuni
-            </button>
+            <button class="btn btn-success" onclick="app.markActiveAsResolved()">✓ Rezolvat</button>
+            <button class="btn btn-danger" onclick="app.promptUnresolved()">✕ Nerezolvat</button>
+            <button class="btn btn-secondary" style="flex:0.8;" onclick="app.openActiveStoreModal()">⚙️ Opțiuni</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- View 2: Raport Verificare Teren Tab -->
+    <!-- Report View -->
     <section id="reportView" class="view-panel">
       <div class="report-container">
         <div class="report-header">
           <div class="report-title-box">
             <h2 id="reportMainHeading">📋 Raport Verificare Teren - Săptămâna 1</h2>
-            <p id="reportSubHeading">Monitorizare status vizite, produse, prețuri și fotografii pe teren.</p>
+            <p id="reportSubHeading">Sincronizat în Cloud Firebase & local.</p>
           </div>
           <div class="report-actions">
-            <button class="btn btn-primary" onclick="app.copyWhatsAppReport()">
-              💬 Copiază pentru WhatsApp
-            </button>
-            <button class="btn btn-secondary" onclick="app.exportCSV()">
-              📊 Export CSV / Excel
-            </button>
-            <button class="btn btn-secondary" onclick="window.print()">
-              🖨️ Tipărește Raport
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="app.resetDayProgress()">
-              🔄 Resetează Ziua Curentă
-            </button>
+            <button class="btn btn-primary" onclick="app.copyWhatsAppReport()">💬 Copiază pt WhatsApp</button>
+            <button class="btn btn-secondary" onclick="app.exportCSV()">📊 Export CSV</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Tipărește</button>
+            <button class="btn btn-danger btn-sm" onclick="app.resetDayProgress()">🔄 Resetare Zi</button>
           </div>
         </div>
 
-        <!-- Summary KPI Cards -->
         <div class="stat-cards-grid">
           <div class="stat-card">
             <div class="stat-icon stat-icon-blue">🏪</div>
-            <div class="stat-info">
-              <h4 id="statTotalStores">20</h4>
-              <span>Total Magazine</span>
-            </div>
+            <div class="stat-info"><h4 id="statTotalStores">20</h4><span>Total Magazine</span></div>
           </div>
           <div class="stat-card">
             <div class="stat-icon stat-icon-green">✅</div>
-            <div class="stat-info">
-              <h4 id="statResolvedStores">0</h4>
-              <span>Vizite Rezolvate</span>
-            </div>
+            <div class="stat-info"><h4 id="statResolvedStores">0</h4><span>Vizite Rezolvate</span></div>
           </div>
           <div class="stat-card">
             <div class="stat-icon stat-icon-red">❌</div>
-            <div class="stat-info">
-              <h4 id="statUnresolvedStores">0</h4>
-              <span>Nerezolvate / Probleme</span>
-            </div>
+            <div class="stat-info"><h4 id="statUnresolvedStores">0</h4><span>Nerezolvate</span></div>
           </div>
           <div class="stat-card">
             <div class="stat-icon stat-icon-amber">⏳</div>
-            <div class="stat-info">
-              <h4 id="statPendingStores">20</h4>
-              <span>Rămase de Vizitat</span>
-            </div>
+            <div class="stat-info"><h4 id="statPendingStores">20</h4><span>Rămase de Vizitat</span></div>
           </div>
         </div>
 
-        <!-- Detailed Table -->
         <div class="report-table-card">
           <div class="table-responsive">
             <table class="report-table" id="reportDataTable">
@@ -1583,12 +1469,10 @@
                   <th>Ora Vizitei</th>
                   <th>Status</th>
                   <th>Secțiune Raft</th>
-                  <th>Produse Înregistrate (Poză, Denumire, Preț)</th>
+                  <th>Produse Înregistrate (Poză, Preț)</th>
                 </tr>
               </thead>
-              <tbody id="reportBodyRows">
-                <!-- Injected via JS -->
-              </tbody>
+              <tbody id="reportBodyRows"></tbody>
             </table>
           </div>
         </div>
@@ -1596,7 +1480,7 @@
     </section>
   </main>
 
-  <!-- Bottom Swipeable Dock Bar (Mobile Navigation & Toolbar) -->
+  <!-- Bottom Swipeable Dock Bar (Mobile) -->
   <nav class="bottom-dock-bar" id="mobileBottomDock">
     <div class="bottom-dock-scroll">
       <button class="dock-pill-btn active" id="tabMapBtnMob" onclick="app.switchTab('map')">
@@ -1612,13 +1496,10 @@
         <span>📍</span> <span>GPS Live</span>
       </button>
       <button class="dock-pill-btn" onclick="app.findNearestStoreToGps()">
-        <span>🎯</span> <span>Cel mai aproape</span>
+        <span>🎯</span> <span>Apropiat</span>
       </button>
       <button class="dock-pill-btn" onclick="app.openBackupModal()">
         <span>💾</span> <span>Backup</span>
-      </button>
-      <button class="dock-pill-btn" onclick="app.showModePicker()">
-        <span>📱</span> <span>Mod Afișare</span>
       </button>
       <button class="dock-pill-btn" onclick="app.toggleTheme()">
         <span id="dockThemeIcon">🌙</span> <span>Temă</span>
@@ -1626,55 +1507,47 @@
     </div>
   </nav>
 
-  <!-- Floating Messenger Bubble FAB (Draggable Anywhere) -->
+  <!-- Messenger Floating FAB -->
   <div class="floating-fab" id="floatingFab" title="Trage oriunde sau apasă pentru Secțiune, Produse & Poze">
     <div style="font-size: 24px; pointer-events: none;">📸</div>
     <div class="fab-badge" id="fabPhotosBadge" style="display: none;">0</div>
   </div>
 
-  <!-- Dynamic Product List & Photos Form Window (Messenger Style) -->
+  <!-- Dynamic Product Form Window -->
   <div class="fab-window" id="fabWindow">
     <div class="fab-window-header" id="fabWindowHeader">
       <h3><span>📝</span> Secțiune Nume & Listă Produse</h3>
       <button class="fab-close-btn" onclick="app.closeFabWindow()">&times;</button>
     </div>
     <div class="fab-window-body">
-      <!-- Store Selector -->
       <div class="form-group">
         <label class="form-label">Magazin Curent:</label>
-        <select class="form-control" id="fabStoreSelect" onchange="app.onFabStoreChange()">
-          <!-- Populated by JS -->
-        </select>
+        <select class="form-control" id="fabStoreSelect" onchange="app.onFabStoreChange()"></select>
       </div>
 
-      <!-- Section Name Input -->
       <div class="form-group">
         <label class="form-label">Nume Secțiune / Categorie Raft:</label>
-        <input type="text" class="form-control" id="fabSectionName" placeholder="Ex: Raft 1, Băuturi Răcoritoare, Promoție Capăt Raft" oninput="app.onSectionNameChange()" />
+        <input type="text" class="form-control" id="fabSectionName" placeholder="Ex: Raft 1, Promoție Capăt Raft" oninput="app.onSectionNameChange()" />
       </div>
 
-      <!-- Dynamic Numbered Products List -->
       <div class="form-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-          <label class="form-label">Listă Produse & Poze (Numerotate 1, 2, 3...):</label>
+          <label class="form-label">Listă Produse & Poze:</label>
           <span style="font-size: 11px; color: var(--text-muted);" id="fabProductCountLabel">0 produse</span>
         </div>
 
-        <div class="products-dynamic-list" id="fabProductsList">
-          <!-- Injected dynamically via JS -->
-        </div>
+        <div class="products-dynamic-list" id="fabProductsList"></div>
 
         <button class="btn btn-secondary btn-sm" style="margin-top: 8px; width: 100%; font-weight: 700;" onclick="app.addNewProductRow()">
           ➕ Adaugă Produs Nou
         </button>
       </div>
 
-      <!-- Hidden Input for camera / photo upload -->
       <input type="file" id="fabProductPhotoInput" accept="image/*" capture="environment" style="display: none;" onchange="app.handleProductPhotoSelected(event)" />
     </div>
   </div>
 
-  <!-- Action Sheet / Store Details Modal -->
+  <!-- Action Sheet / Store Modal -->
   <div class="modal-overlay" id="storeModalOverlay" onclick="if(event.target === this) app.closeStoreModal()">
     <div class="action-sheet">
       <div class="sheet-handle"></div>
@@ -1688,7 +1561,6 @@
       </div>
 
       <div class="btn-group-vertical">
-        <!-- Multi Navigation Switcher -->
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px;">
           <button class="btn btn-waze" onclick="app.openActiveInWaze()">🚗 Waze</button>
           <button class="btn btn-gmaps" onclick="app.openActiveInGoogleMaps()">Google</button>
@@ -1699,12 +1571,8 @@
           ➡️ Treci la următorul magazin
         </button>
         <div class="btn-group-horizontal">
-          <button class="btn btn-success" onclick="app.markActiveAsResolved(); app.closeStoreModal();">
-            ✓ Rezolvat
-          </button>
-          <button class="btn btn-danger" onclick="app.promptUnresolved(); app.closeStoreModal();">
-            ✕ Nerezolvat
-          </button>
+          <button class="btn btn-success" onclick="app.markActiveAsResolved(); app.closeStoreModal();">✓ Rezolvat</button>
+          <button class="btn btn-danger" onclick="app.promptUnresolved(); app.closeStoreModal();">✕ Nerezolvat</button>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="app.openFabForStore(app.activeStoreId); app.closeStoreModal();">
           📸 Deschide Listă Produse & Poze
@@ -1720,32 +1588,28 @@
   <div class="modal-overlay" id="backupModalOverlay" style="align-items: center;" onclick="if(event.target === this) app.closeBackupModal()">
     <div class="reason-dialog" style="max-width: 420px;">
       <h3 style="font-size: 16px; font-weight: 700;">💾 Backup & Restaurare Date</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Salvează un fișier JSON cu toate datele, coordonatele modificate ale pinurilor, pozele și prețurile culese.</p>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Datele se salvează în cloud pe Firebase, dar poți descărca și un fișier JSON de siguranță.</p>
       
       <div style="display: flex; flex-direction: column; gap: 10px; margin: 18px 0;">
-        <button class="btn btn-primary" onclick="app.exportFullBackup()">
-          📥 Descarcă Fișier Salvare (Backup JSON)
-        </button>
+        <button class="btn btn-primary" onclick="app.exportFullBackup()">📥 Descarcă Salvare JSON</button>
         <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
-        <button class="btn btn-secondary" onclick="document.getElementById('backupFileInput').click()">
-          📤 Restaurează din Fișier Backup
-        </button>
+        <button class="btn btn-secondary" onclick="document.getElementById('backupFileInput').click()">📤 Restaurează din Fișier</button>
         <input type="file" id="backupFileInput" accept=".json" style="display:none;" onchange="app.importBackupFile(event)" />
       </div>
       <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="app.closeBackupModal()">Închide</button>
     </div>
   </div>
 
-  <!-- Reason Prompt Modal for Unresolved Status -->
+  <!-- Reason Modal -->
   <div class="modal-overlay" id="reasonModalOverlay" style="align-items: center;" onclick="if(event.target === this) document.getElementById('reasonModalOverlay').classList.remove('active')">
     <div class="reason-dialog">
       <h3 style="font-size: 16px; font-weight: 700;">Motiv Nerezolvare</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">De ce nu s-a finalizat vizita la acest magazin?</p>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">De ce nu s-a finalizat vizita?</p>
       
       <div class="reason-options">
         <button class="reason-chip" onclick="app.confirmUnresolved('Lipsă stoc produs')">📦 Lipsă stoc produs</button>
-        <button class="reason-chip" onclick="app.confirmUnresolved('Magazin închis / În renovare')">🔒 Magazin închis / În renovare</button>
-        <button class="reason-chip" onclick="app.confirmUnresolved('Fără acces șef raion / Refuz')">⛔ Fără acces / Refuz magazin</button>
+        <button class="reason-chip" onclick="app.confirmUnresolved('Magazin închis / În renovare')">🔒 Magazin închis / Renovare</button>
+        <button class="reason-chip" onclick="app.confirmUnresolved('Fără acces șef raion / Refuz')">⛔ Fără acces / Refuz</button>
         <button class="reason-chip" onclick="app.confirmUnresolved('Preț greșit în sistem')">🏷️ Preț incorect în sistem</button>
         <button class="reason-chip" onclick="app.confirmUnresolved('Alt motiv')">✍️ Alt motiv</button>
       </div>
@@ -1753,7 +1617,7 @@
     </div>
   </div>
 
-  <!-- Photo Full Preview Modal -->
+  <!-- Zoom Modal -->
   <div class="modal-overlay" id="photoZoomModal" style="align-items: center;" onclick="this.classList.remove('active')">
     <div style="max-width: 90vw; max-height: 90vh; text-align: center;">
       <img id="zoomImg" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
@@ -1764,16 +1628,37 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script>
-    /**
-     * MERCHANDISER PRO APPLICATION - WEEK 1 (DAYS 1-5)
-     * Features:
-     * - Top Header is clean and notch-proof on iPhone 15 Pro Max.
-     * - Bottom Swipeable Dock Bar houses tabs and action tools.
-     * - Pin Lock / Unlock prevents accidental moving during pan/zoom.
-     * - Dynamic Numbered Product List (Thumbnail, Name, Price, Reorder, Delete).
-     */
-    
+  <!-- FIREBASE SCRIPTS + APP LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWd_QSC7ZsNaowpTItZqV9ha7LqC3dX-w",
+      authDomain: "dumanu-munca.firebaseapp.com",
+      projectId: "dumanu-munca",
+      storageBucket: "dumanu-munca.firebasestorage.app",
+      messagingSenderId: "684272170348",
+      appId: "1:684272170348:web:c525efdbdca02fbfe3ef49",
+      measurementId: "G-1JWKRRVJY8"
+    };
+
+    // Initialize Firebase
+    let firebaseApp = null;
+    let analytics = null;
+    let db = null;
+
+    try {
+      firebaseApp = initializeApp(firebaseConfig);
+      analytics = getAnalytics(firebaseApp);
+      db = getFirestore(firebaseApp);
+      console.log("Firebase conectat cu succes la proiectul:", firebaseConfig.projectId);
+    } catch (e) {
+      console.warn("Eroare la inițializarea Firebase:", e);
+    }
+
     // CANONICAL INITIAL DATASETS FOR WEEK 1 (DAYS 1-5)
     const INITIAL_DATA_WEEK_1 = {
       day1: [
@@ -1882,7 +1767,6 @@
 
     class MerchandiserApp {
       constructor() {
-        this.currentWeek = "week1";
         this.currentDay = localStorage.getItem("merch_active_day") || "day1";
         this.stores = [];
         this.activeStoreId = null;
@@ -1890,22 +1774,20 @@
         this.map = null;
         this.markers = {};
         this.routePolyline = null;
-        this.tileLayers = {};
         this.userGpsMarker = null;
         this.userGpsCircle = null;
         this.userGpsWatchId = null;
         this.userCoords = null;
-        this.isPinsLocked = localStorage.getItem("merch_pins_locked") !== "false"; // Default: true (Locked for safety)
-        this.deviceMode = localStorage.getItem("merch_device_mode") || null;
+        this.isPinsLocked = localStorage.getItem("merch_pins_locked") !== "false";
         this.theme = localStorage.getItem("merch_theme") || "light";
-        
-        // Dynamic product data per day: { [storeId]: { sectionName: string, items: [ { id, name, price, photoUrl } ] } }
         this.storeProductsData = {};
         this.storeLogs = {};
         this.activePhotoUploadTarget = null;
+        this.db = db;
+        this.cloudSyncTimer = null;
       }
 
-      init() {
+      async init() {
         this.applyTheme(this.theme);
         this.loadDayData(this.currentDay);
         this.initMap();
@@ -1914,12 +1796,19 @@
         this.renderSidebarList();
         this.renderReport();
         this.populateFabDropdown();
-        this.checkDeviceMode();
         this.setupDraggableFab();
         this.setupClickOutsideHandlers();
-        
-        // Hide quick card on initial launch
         this.closeQuickCard();
+
+        // Sync from Firebase
+        await this.syncFromFirebase();
+      }
+
+      setCloudBadge(status, text) {
+        const badge = document.getElementById("cloudSyncStatus");
+        if (!badge) return;
+        badge.className = `cloud-badge cloud-${status}`;
+        badge.textContent = text;
       }
 
       loadDayData(dayKey) {
@@ -1929,37 +1818,113 @@
         const initialList = INITIAL_DATA_WEEK_1[dayKey] || INITIAL_DATA_WEEK_1.day1;
         const savedStores = localStorage.getItem(`merch_stores_${dayKey}`);
         if (savedStores) {
-          try {
-            this.stores = JSON.parse(savedStores);
-          } catch(e) {
-            this.stores = [...initialList];
-          }
+          try { this.stores = JSON.parse(savedStores); }
+          catch(e) { this.stores = [...initialList]; }
         } else {
           this.stores = [...initialList];
-          this.saveStores();
+          this.saveStoresLocally();
         }
 
         this.storeLogs = JSON.parse(localStorage.getItem(`merch_logs_${dayKey}`) || "{}");
         this.storeProductsData = JSON.parse(localStorage.getItem(`merch_products_v2_${dayKey}`) || "{}");
       }
 
-      saveStores() {
+      saveStoresLocally() {
         localStorage.setItem(`merch_stores_${this.currentDay}`, JSON.stringify(this.stores));
       }
 
-      saveLogs() {
+      saveLogsLocally() {
         localStorage.setItem(`merch_logs_${this.currentDay}`, JSON.stringify(this.storeLogs));
       }
 
-      saveProductsData() {
+      saveProductsLocally() {
         try {
           localStorage.setItem(`merch_products_v2_${this.currentDay}`, JSON.stringify(this.storeProductsData));
         } catch(e) {
-          console.warn("Storage quota warning, keeping in memory.");
+          console.warn("Storage quota warning on localStorage", e);
         }
       }
 
-      /* WEEK 1 DROPDOWN TOGGLE & SELECT */
+      /* FIREBASE CLOUD SYNC */
+      async syncFromFirebase() {
+        if (!this.db) {
+          this.setCloudBadge("offline", "☁️ Mod Offline (Fără Firebase)");
+          return;
+        }
+
+        try {
+          this.setCloudBadge("syncing", "⏳ Conectare Firebase...");
+          const docRef = doc(this.db, "merchandiser_week1", this.currentDay);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data.stores && Array.isArray(data.stores) && data.stores.length > 0) {
+              this.stores = data.stores;
+              this.saveStoresLocally();
+            }
+            if (data.logs) {
+              this.storeLogs = data.logs;
+              this.saveLogsLocally();
+            }
+            if (data.productsData) {
+              this.storeProductsData = data.productsData;
+              this.saveProductsLocally();
+            }
+
+            this.renderMapMarkers();
+            this.drawRoutePolyline();
+            this.renderSidebarList();
+            this.renderReport();
+            this.renderFabProductsForm();
+            this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
+          } else {
+            // First time this day is loaded, upload initial state to Firebase
+            await this.pushToFirebase();
+            this.setCloudBadge("synced", "☁️ Firebase Inițializat");
+          }
+        } catch (error) {
+          console.warn("Eroare la citirea din Firestore:", error);
+          this.setCloudBadge("offline", "⚠️ Local (Verifică Reguli Firestore)");
+        }
+      }
+
+      scheduleFirebasePush() {
+        if (!this.db) return;
+        this.setCloudBadge("syncing", "⏳ Se salvează în Cloud...");
+        clearTimeout(this.cloudSyncTimer);
+        this.cloudSyncTimer = setTimeout(() => {
+          this.pushToFirebase();
+        }, 1200);
+      }
+
+      async pushToFirebase() {
+        if (!this.db) return;
+        try {
+          const docRef = doc(this.db, "merchandiser_week1", this.currentDay);
+          await setDoc(docRef, {
+            day: this.currentDay,
+            stores: this.stores,
+            logs: this.storeLogs,
+            productsData: this.storeProductsData,
+            lastUpdated: new Date().toISOString()
+          }, { merge: true });
+
+          this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
+        } catch (error) {
+          console.warn("Eroare la salvarea în Firestore:", error);
+          this.setCloudBadge("offline", "⚠️ Salvare Locală (Reguli Firestore)");
+        }
+      }
+
+      saveAll() {
+        this.saveStoresLocally();
+        this.saveLogsLocally();
+        this.saveProductsLocally();
+        this.scheduleFirebasePush();
+      }
+
+      /* WEEK 1 DROPDOWN */
       toggleWeekDropdown(event) {
         if (event) event.stopPropagation();
         const menu = document.getElementById("weekDropdownMenu");
@@ -1986,7 +1951,7 @@
         });
       }
 
-      switchDay(dayKey) {
+      async switchDay(dayKey) {
         this.loadDayData(dayKey);
         this.updateDayUI();
         this.renderMapMarkers();
@@ -1995,6 +1960,7 @@
         this.renderReport();
         this.populateFabDropdown();
         this.closeQuickCard();
+        await this.syncFromFirebase();
       }
 
       updateDayUI() {
@@ -2011,7 +1977,6 @@
         const activePill = document.getElementById("activeDayHeaderLabel");
         if (activePill) activePill.textContent = info.label;
 
-        // Update menu items active class
         ["day1", "day2", "day3", "day4", "day5"].forEach(k => {
           const item = document.getElementById(`btn${k.charAt(0).toUpperCase() + k.slice(1)}`);
           if (item) item.classList.toggle("active", d === k);
@@ -2020,40 +1985,34 @@
         const sidebarTitle = document.getElementById("sidebarTitle");
         const sidebarDesc = document.getElementById("sidebarRouteDesc");
         const repHeading = document.getElementById("reportMainHeading");
-        const repSub = document.getElementById("reportSubHeading");
 
         if (sidebarTitle) sidebarTitle.textContent = info.title;
         if (sidebarDesc) {
           sidebarDesc.innerHTML = `
-            <div>🛣️ <strong>Ruta Optimizată:</strong> Plecare din <strong>Brănești pe A2</strong>, vizitare ${info.desc} și finalizare la punctul cel mai rapid de retur spre casă.</div>
-            <div class="route-stats-row"><span>Distanță: ${info.dist}</span><span>Timp condus: ${info.time}</span></div>
+            <div>🛣️ <strong>Ruta:</strong> Start din <strong>Brănești pe A2</strong>, vizitare ${info.desc}.</div>
+            <div class="route-stats-row"><span>Distanță: ${info.dist}</span><span>Timp: ${info.time}</span></div>
           `;
         }
         if (repHeading) repHeading.textContent = `📋 Raport Verificare Teren - ${info.title}`;
-        if (repSub) repSub.textContent = `Monitorizare status vizite, produse, prețuri și fotografii pentru magazinele alocate.`;
       }
 
-      /* PIN LOCK & UNLOCK SYSTEM */
+      /* PIN LOCK & UNLOCK */
       togglePinLock() {
         this.isPinsLocked = !this.isPinsLocked;
         localStorage.setItem("merch_pins_locked", this.isPinsLocked);
         this.updatePinLockUI();
 
-        // Update draggable property on all active markers immediately
         Object.values(this.markers).forEach(marker => {
           if (marker.dragging) {
-            if (this.isPinsLocked) {
-              marker.dragging.disable();
-            } else {
-              marker.dragging.enable();
-            }
+            if (this.isPinsLocked) marker.dragging.disable();
+            else marker.dragging.enable();
           }
         });
 
         if (this.isPinsLocked) {
-          this.showDragToast("🔒 Pinii au fost BLOCAȚI (nu se pot muta accidental la zoom/pan).");
+          this.showDragToast("🔒 Pinii au fost BLOCAȚI împotriva atingerilor accidentale.");
         } else {
-          this.showDragToast("🔓 Pinii au fost DEBLOCAȚI! Poți trage acum markerul pentru a-i fixa poziția.");
+          this.showDragToast("🔓 Pinii au fost DEBLOCAȚI! Poți trage acum pinul pe hartă.");
         }
       }
 
@@ -2066,7 +2025,6 @@
         if (this.isPinsLocked) {
           if (btnDesk) {
             btnDesk.innerHTML = "🔒";
-            btnDesk.title = "Pini Blocați (Apasă pt deblocare)";
             btnDesk.classList.remove("unlocked-btn");
           }
           if (iconMob) iconMob.textContent = "🔒";
@@ -2075,43 +2033,11 @@
         } else {
           if (btnDesk) {
             btnDesk.innerHTML = "🔓";
-            btnDesk.title = "Pini Deblocați (Mod editare activ - apasă pt blocare)";
             btnDesk.classList.add("unlocked-btn");
           }
           if (iconMob) iconMob.textContent = "🔓";
           if (textMob) textMob.textContent = "Pini Deblocați";
           if (pillMob) pillMob.classList.add("unlocked-pill");
-        }
-      }
-
-      checkDeviceMode() {
-        if (!this.deviceMode) {
-          document.getElementById("modePickerModal").style.display = "flex";
-        } else {
-          this.applyDeviceMode(this.deviceMode);
-        }
-      }
-
-      setDeviceMode(mode) {
-        this.deviceMode = mode;
-        localStorage.setItem("merch_device_mode", mode);
-        document.getElementById("modePickerModal").style.display = "none";
-        this.applyDeviceMode(mode);
-      }
-
-      showModePicker() {
-        document.getElementById("modePickerModal").style.display = "flex";
-      }
-
-      applyDeviceMode(mode) {
-        const sidebar = document.getElementById("mapSidebar");
-        if (mode === "desktop") {
-          if (sidebar) sidebar.style.display = "flex";
-        } else {
-          if (sidebar) sidebar.style.display = "none";
-        }
-        if (this.map) {
-          setTimeout(() => this.map.invalidateSize(), 200);
         }
       }
 
@@ -2132,13 +2058,11 @@
       switchTab(tab) {
         const isMap = tab === "map";
         
-        // Update Desktop buttons
         const deskMap = document.getElementById("tabMapBtnDesk");
         const deskRep = document.getElementById("tabReportBtnDesk");
         if (deskMap) deskMap.classList.toggle("active", isMap);
         if (deskRep) deskRep.classList.toggle("active", !isMap);
 
-        // Update Mobile bottom dock buttons
         const mobMap = document.getElementById("tabMapBtnMob");
         const mobRep = document.getElementById("tabReportBtnMob");
         if (mobMap) mobMap.classList.toggle("active", isMap);
@@ -2149,29 +2073,28 @@
 
         if (isMap && this.map) {
           setTimeout(() => this.map.invalidateSize(), 200);
-        }
-        if (!isMap) {
+        } else {
           this.renderReport();
         }
       }
 
-      /* GOOGLE MAPS TILES + NON-OVERLAPPING CONTROLS */
+      /* MAP SETUP */
       initMap() {
         const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
           maxZoom: 20,
           subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-          attribution: '&copy; Google Maps (Satelit + Străzi)'
+          attribution: '&copy; Google Maps'
         });
 
         const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
           maxZoom: 20,
           subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-          attribution: '&copy; Google Maps (Străzi)'
+          attribution: '&copy; Google Maps'
         });
 
         const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors'
+          attribution: '&copy; OpenStreetMap'
         });
 
         this.map = L.map('map', { 
@@ -2179,10 +2102,8 @@
           layers: [googleHybrid] 
         }).setView([44.420, 26.040], 12);
 
-        // Zoom Control placed on bottom-left, safely above the bottom dock
         L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
 
-        // Map Layers Control placed on TOP-LEFT (Top-Right is for GPS/Target)
         const baseMaps = {
           "🛰️ Google Satelit": googleHybrid,
           "🗺️ Google Străzi": googleStreets,
@@ -2200,11 +2121,11 @@
 
         let colorClass = "pin-pending";
         if (log && log.status === "completed") {
-          colorClass = "pin-completed"; // Green
+          colorClass = "pin-completed";
         } else if (log && log.status === "unresolved") {
-          colorClass = "pin-unresolved"; // Red
+          colorClass = "pin-unresolved";
         } else if (isActive) {
-          colorClass = "pin-active-pending"; // Blue when selected
+          colorClass = "pin-active-pending";
         }
 
         const activeClass = isActive ? "is-active" : "";
@@ -2217,7 +2138,6 @@
         });
       }
 
-      /* RENDER PINS WITH DRAG & DROP LOCK/UNLOCK LOGIC */
       renderMapMarkers() {
         Object.values(this.markers).forEach(m => this.map.removeLayer(m));
         this.markers = {};
@@ -2228,23 +2148,20 @@
           const originalIndex = this.stores.findIndex(s => s.id === store.id);
           const icon = this.createPinIcon(store, originalIndex);
           
-          // Marker draggable state obeys this.isPinsLocked
           const marker = L.marker([store.lat, store.lng], { 
             icon: icon,
             draggable: !this.isPinsLocked 
           }).addTo(this.map);
 
-          // Click opens store details & quick card cleanly
           marker.on('click', () => this.setActiveStore(store.id, false));
 
-          // Dragend saves exact new coordinates to localStorage
           marker.on('dragend', (e) => {
             const newPos = e.target.getLatLng();
             store.lat = parseFloat(newPos.lat.toFixed(6));
             store.lng = parseFloat(newPos.lng.toFixed(6));
-            this.saveStores();
+            this.saveAll();
             this.drawRoutePolyline();
-            this.showDragToast(`📍 Poziția magazinului "${store.name}" a fost actualizată și fixată!`);
+            this.showDragToast(`📍 Poziția magazinului "${store.name}" a fost salvată în Cloud!`);
           });
 
           this.markers[store.id] = marker;
@@ -2272,11 +2189,11 @@
         if (canonical && current) {
           current.lat = canonical.lat;
           current.lng = canonical.lng;
-          this.saveStores();
+          this.saveAll();
           this.renderMapMarkers();
           this.drawRoutePolyline();
           this.setActiveStore(storeId, false);
-          alert(`✓ Pinul magazinului "${current.name}" a fost readus la coordonatele inițiale.`);
+          alert(`✓ Pinul magazinului "${current.name}" a fost resetat.`);
         }
       }
 
@@ -2293,7 +2210,6 @@
         }).addTo(this.map);
       }
 
-      /* STORE FILTERS */
       setStoreFilter(filterType, element) {
         this.currentFilter = filterType;
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -2314,7 +2230,6 @@
         });
       }
 
-      /* SELECT STORE & DISPLAY QUICK CARD ONLY UPON CLICK */
       setActiveStore(id, openSheet = false) {
         this.activeStoreId = id;
         const store = this.stores.find(s => s.id === id);
@@ -2331,7 +2246,6 @@
 
         this.map.panTo([store.lat, store.lng], { animate: true, duration: 0.4 });
 
-        // Update & Show Mobile Quick Card smoothly above the dock
         const quickCard = document.getElementById("mobileQuickCard");
         const mqcOrder = document.getElementById("mqcOrder");
         const mqcName = document.getElementById("mqcName");
@@ -2355,10 +2269,7 @@
           }
         }
 
-        // Make quick card visible when a store is active
-        if (quickCard) {
-          quickCard.style.display = "block";
-        }
+        if (quickCard) quickCard.style.display = "block";
 
         document.querySelectorAll('.store-card').forEach(card => {
           card.classList.toggle('active', card.dataset.id === id);
@@ -2368,7 +2279,6 @@
         if (fabSelect) fabSelect.value = id;
         this.renderFabProductsForm();
 
-        // If explicit modal open requested (e.g. from Options button)
         if (openSheet) {
           this.openStoreModal(store, index, log);
         }
@@ -2411,7 +2321,6 @@
         document.getElementById("storeModalOverlay").classList.remove("active");
       }
 
-      /* LIVE GPS TRACKING & NEAREST STORE FINDER */
       toggleGpsTracking() {
         const headerBtn = document.getElementById("headerGpsBtnDesk");
         const mapBtn = document.getElementById("mapGpsBtn");
@@ -2427,12 +2336,12 @@
           if (headerBtn) headerBtn.classList.remove("active-btn");
           if (mapBtn) mapBtn.classList.remove("active-btn");
           if (dockBtn) dockBtn.classList.remove("active");
-          alert("📍 Urmărire GPS dezactivată.");
+          alert("📍 GPS dezactivat.");
           return;
         }
 
         if (!navigator.geolocation) {
-          alert("Dispozitivul tău nu suportă localizarea GPS.");
+          alert("Dispozitivul nu suportă GPS.");
           return;
         }
 
@@ -2462,8 +2371,7 @@
             }
           },
           (err) => {
-            console.warn("GPS error:", err);
-            alert("Nu am putut obține locația GPS. Te rugăm să permiți accesul la locație în Safari / Browser.");
+            alert("Permite accesul la locație în browser.");
             if (headerBtn) headerBtn.classList.remove("active-btn");
             if (mapBtn) mapBtn.classList.remove("active-btn");
             if (dockBtn) dockBtn.classList.remove("active");
@@ -2480,10 +2388,10 @@
                 this.userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                 this.locateClosestUnvisitedStore();
               },
-              () => alert("Activează mai întâi butonul 📍 GPS pentru a găsi magazinul cel mai apropiat!")
+              () => alert("Activează mai întâi GPS-ul!")
             );
           } else {
-            alert("Localizarea GPS nu este disponibilă.");
+            alert("GPS indisponibil.");
           }
           return;
         }
@@ -2497,7 +2405,7 @@
         });
 
         if (unvisited.length === 0) {
-          alert("🎉 Toate magazinele din această zi au fost deja vizitate!");
+          alert("🎉 Toate magazinele din această zi au fost vizitate!");
           return;
         }
 
@@ -2522,11 +2430,10 @@
 
         if (closest) {
           this.setActiveStore(closest.id, false);
-          alert(`🎯 Cel mai apropiat magazin rămas:\n*${closest.name}*\nDistanță directă: ~${minDist.toFixed(2)} km`);
+          alert(`🎯 Cel mai apropiat magazin:\n${closest.name} (~${minDist.toFixed(2)} km)`);
         }
       }
 
-      /* DRAGGABLE FLOATING ACTION BUBBLE */
       setupDraggableFab() {
         const fab = document.getElementById("floatingFab");
         if (!fab) return;
@@ -2535,21 +2442,6 @@
         let startX = 0, startY = 0;
         let initialLeft = 0, initialTop = 0;
         let dragDistance = 0;
-
-        const savedPos = localStorage.getItem("merch_fab_pos");
-        if (savedPos) {
-          try {
-            const { x, y } = JSON.parse(savedPos);
-            const maxX = window.innerWidth - 70;
-            const maxY = window.innerHeight - 140;
-            const boundedX = Math.max(10, Math.min(x, maxX));
-            const boundedY = Math.max(90, Math.min(y, maxY));
-            fab.style.left = `${boundedX}px`;
-            fab.style.top = `${boundedY}px`;
-            fab.style.bottom = "auto";
-            fab.style.right = "auto";
-          } catch(e) {}
-        }
 
         const onStart = (e) => {
           isDragging = true;
@@ -2601,9 +2493,6 @@
           document.removeEventListener('mousemove', onMove);
           document.removeEventListener('mouseup', onEnd);
 
-          const rect = fab.getBoundingClientRect();
-          localStorage.setItem("merch_fab_pos", JSON.stringify({ x: rect.left, y: rect.top }));
-
           if (dragDistance < 8) {
             this.toggleFabWindow();
           }
@@ -2613,46 +2502,36 @@
         fab.addEventListener('mousedown', onStart);
       }
 
-            /* NAVIGATION SHORTCUTS - FIXED FOR IOS SAFARI & PWA (NO BLANK SCREEN ON RETURN) */
       launchNavigation(webUrl, nativeSchemeUrl) {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         const targetUrl = (isIOS && nativeSchemeUrl) ? nativeSchemeUrl : webUrl;
         
-        // Use an invisible <a> link without target="_blank" so Safari does NOT create a blank orphan tab
         const link = document.createElement("a");
         link.href = targetUrl;
         link.style.display = "none";
         document.body.appendChild(link);
         link.click();
         setTimeout(() => {
-          if (link.parentNode) {
-            link.parentNode.removeChild(link);
-          }
+          if (link.parentNode) link.parentNode.removeChild(link);
         }, 400);
       }
 
       openActiveInWaze() {
         const store = this.stores.find(s => s.id === this.activeStoreId);
         if (!store) return;
-        const webUrl = `https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`;
-        const nativeUrl = `waze://?ll=${store.lat},${store.lng}&navigate=yes`;
-        this.launchNavigation(webUrl, nativeUrl);
+        this.launchNavigation(`https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`, `waze://?ll=${store.lat},${store.lng}&navigate=yes`);
       }
 
       openActiveInGoogleMaps() {
         const store = this.stores.find(s => s.id === this.activeStoreId);
         if (!store) return;
-        const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`;
-        const nativeUrl = `comgooglemaps://?daddr=${store.lat},${store.lng}&directionsmode=driving`;
-        this.launchNavigation(webUrl, nativeUrl);
+        this.launchNavigation(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`, `comgooglemaps://?daddr=${store.lat},${store.lng}&directionsmode=driving`);
       }
 
       openActiveInAppleMaps() {
         const store = this.stores.find(s => s.id === this.activeStoreId);
         if (!store) return;
-        const webUrl = `https://maps.apple.com/?daddr=${store.lat},${store.lng}`;
-        const nativeUrl = `maps://?daddr=${store.lat},${store.lng}&dirflg=d`;
-        this.launchNavigation(webUrl, nativeUrl);
+        this.launchNavigation(`https://maps.apple.com/?daddr=${store.lat},${store.lng}`, `maps://?daddr=${store.lat},${store.lng}&dirflg=d`);
       }
 
       goToNextStore() {
@@ -2661,12 +2540,7 @@
           const nextStore = this.stores[currentIndex + 1];
           this.setActiveStore(nextStore.id, false);
         } else {
-          let exitPoint = "Timpuri Noi / Splai / A2";
-          if (this.currentDay === "day2") exitPoint = "Regina Maria / B-dul Unirii / A2";
-          if (this.currentDay === "day3") exitPoint = "Str. Brașov / Răzoare / Splai / A2";
-          if (this.currentDay === "day4") exitPoint = "Bd. Timișoara 18 / Răzoare / Splai / A2";
-          if (this.currentDay === "day5") exitPoint = "B-dul Libertății / Piața Constituției / Splai / A2";
-          alert(`🎉 Felicitări! Ai finalizat toate cele ${this.stores.length} magazine din traseu! Drum bun spre casă spre Brănești via ${exitPoint}!`);
+          alert(`🎉 Felicitări! Ai finalizat toate magazinele de astăzi. Drum bun spre casă la Brănești!`);
         }
       }
 
@@ -2680,7 +2554,7 @@
           time: timeStr,
           timestamp: Date.now()
         };
-        this.saveLogs();
+        this.saveAll();
         this.updateUIAfterStatusChange();
       }
 
@@ -2700,7 +2574,7 @@
           time: timeStr,
           timestamp: Date.now()
         };
-        this.saveLogs();
+        this.saveAll();
         document.getElementById("reasonModalOverlay").classList.remove("active");
         this.updateUIAfterStatusChange();
       }
@@ -2716,7 +2590,6 @@
         this.renderReport();
       }
 
-      /* ROUTE RE-ORDERING */
       reorderRoute(strategy) {
         const initialList = INITIAL_DATA_WEEK_1[this.currentDay] || [];
         if (strategy === "tur") {
@@ -2724,15 +2597,14 @@
         } else if (strategy === "retur") {
           this.stores = [...initialList].reverse().map((s, idx) => ({ ...s, order: idx + 1 }));
         }
-        this.saveStores();
+        this.saveAll();
         this.renderSidebarList();
         this.renderMapMarkers();
         this.drawRoutePolyline();
         this.setActiveStore(this.stores[0].id, false);
-        alert(`Traseu reordonat: ${strategy === 'tur' ? 'Ordine Tur (Optimizată A2)' : 'Ordine Inversată (Retur)'}`);
+        alert(`Traseu reordonat: ${strategy === 'tur' ? 'Tur (Plecare A2)' : 'Retur'}`);
       }
 
-      /* SIDEBAR RENDERING */
       renderSidebarList() {
         const container = document.getElementById("storeListContainer");
         if (!container) return;
@@ -2776,7 +2648,7 @@
         if (badge) badge.textContent = `${totalResolved}/${this.stores.length} Vizitate`;
       }
 
-      /* DYNAMIC PRODUCTS LIST & PHOTO FORM */
+      /* FORM & PHOTOS */
       toggleFabWindow() {
         const win = document.getElementById("fabWindow");
         win.classList.toggle("active");
@@ -2836,7 +2708,7 @@
         const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
         const data = this.getOrCreateStoreData(storeId);
         data.sectionName = document.getElementById("fabSectionName").value;
-        this.saveProductsData();
+        this.saveAll();
         this.renderReport();
       }
 
@@ -2859,30 +2731,27 @@
 
           row.innerHTML = `
             <div class="product-index-badge">${idx + 1}</div>
-            
-            <div class="product-thumb-container" onclick="app.triggerProductPhotoUpload('${storeId}', '${item.id}')" title="Fă o poză sau alege din galerie">
+            <div class="product-thumb-container" onclick="app.triggerProductPhotoUpload('${storeId}', '${item.id}')" title="Încarcă Poză">
               ${photoHtml}
             </div>
-
             <div class="product-fields-col">
-              <input type="text" class="product-input-name" placeholder="Denumire Produs (ex: Coca-Cola 2L)" value="${item.name || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'name', this.value)" />
+              <input type="text" class="product-input-name" placeholder="Denumire Produs" value="${item.name || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'name', this.value)" />
               <div style="display: flex; align-items: center; gap: 4px;">
-                <input type="number" step="0.01" class="product-input-price" placeholder="Preț (RON)" value="${item.price || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'price', this.value)" />
+                <input type="number" step="0.01" class="product-input-price" placeholder="Preț" value="${item.price || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'price', this.value)" />
                 <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">RON</span>
               </div>
             </div>
-
             <div class="product-actions-col">
-              <button class="action-icon-btn" title="Mută mai sus" onclick="app.moveProductRow('${storeId}', ${idx}, -1)">⬆️</button>
-              <button class="action-icon-btn" title="Mută mai jos" onclick="app.moveProductRow('${storeId}', ${idx}, 1)">⬇️</button>
-              <button class="action-icon-btn delete-btn" title="Șterge produs" onclick="app.deleteProductRow('${storeId}', '${item.id}')">🗑️</button>
+              <button class="action-icon-btn" onclick="app.moveProductRow('${storeId}', ${idx}, -1)">⬆️</button>
+              <button class="action-icon-btn" onclick="app.moveProductRow('${storeId}', ${idx}, 1)">⬇️</button>
+              <button class="action-icon-btn delete-btn" onclick="app.deleteProductRow('${storeId}', '${item.id}')">🗑️</button>
             </div>
           `;
 
           listContainer.appendChild(row);
         });
 
-        document.getElementById("fabProductCountLabel").textContent = `${data.items.length} produs(e)`;
+        document.getElementById("fabProductCountLabel").textContent = `${data.items.length} produse`;
         this.updateTotalPhotosBadge();
       }
 
@@ -2895,7 +2764,7 @@
           price: "",
           photoUrl: ""
         });
-        this.saveProductsData();
+        this.saveAll();
         this.renderFabProductsForm();
         this.renderReport();
       }
@@ -2905,7 +2774,7 @@
         const item = data.items.find(it => it.id === itemId);
         if (item) {
           item[field] = value;
-          this.saveProductsData();
+          this.saveAll();
           this.renderReport();
         }
       }
@@ -2919,21 +2788,18 @@
         data.items[fromIndex] = data.items[toIndex];
         data.items[toIndex] = temp;
 
-        this.saveProductsData();
+        this.saveAll();
         this.renderFabProductsForm();
         this.renderReport();
       }
 
       deleteProductRow(storeId, itemId) {
         const data = this.getOrCreateStoreData(storeId);
-        if (data.items.length === 1 && !data.items[0].name && !data.items[0].photoUrl) {
-          return;
-        }
         data.items = data.items.filter(it => it.id !== itemId);
         if (data.items.length === 0) {
           data.items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" });
         }
-        this.saveProductsData();
+        this.saveAll();
         this.renderFabProductsForm();
         this.renderReport();
       }
@@ -2943,7 +2809,7 @@
         document.getElementById("fabProductPhotoInput").click();
       }
 
-      compressImageFile(file, maxWidth = 800, quality = 0.75) {
+      compressImageFile(file, maxWidth = 600, quality = 0.65) {
         return new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (e) => {
@@ -2967,9 +2833,7 @@
               canvas.height = height;
               const ctx = canvas.getContext("2d");
               ctx.drawImage(img, 0, 0, width, height);
-
-              const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
-              resolve(compressedBase64);
+              resolve(canvas.toDataURL("image/jpeg", quality));
             };
             img.src = e.target.result;
           };
@@ -2988,7 +2852,7 @@
         const item = data.items.find(it => it.id === productId);
         if (item) {
           item.photoUrl = compressedBase64;
-          this.saveProductsData();
+          this.saveAll();
           this.renderFabProductsForm();
           this.renderReport();
         }
@@ -3017,7 +2881,6 @@
         modal.classList.add("active");
       }
 
-      /* RAPORT VERIFICARE TEREN TAB */
       renderReport() {
         const tbody = document.getElementById("reportBodyRows");
         if (!tbody) return;
@@ -3049,7 +2912,6 @@
             pending++;
           }
 
-          // Format items list
           let productsHtml = "-";
           const validItems = data.items.filter(it => it.name || it.price || it.photoUrl);
           if (validItems.length > 0) {
@@ -3058,7 +2920,7 @@
                 <span style="font-weight:800; color:var(--primary); font-size:11px;">#${i+1}</span>
                 ${it.photoUrl ? `<img src="${it.photoUrl}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="app.zoomPhoto('${it.photoUrl}')" />` : ''}
                 <div style="flex:1;">
-                  <strong>${it.name || 'Produs fără nume'}</strong>
+                  <strong>${it.name || 'Produs'}</strong>
                   ${it.price ? `<span style="color:var(--success); font-weight:700; margin-left:6px;">${it.price} RON</span>` : ''}
                 </div>
               </div>
@@ -3091,12 +2953,9 @@
         const dayMap = { day1: "Ziua 1", day2: "Ziua 2", day3: "Ziua 3", day4: "Ziua 4", day5: "Ziua 5" };
         const dayLabel = `SĂPTĂMÂNA 1 - ${dayMap[this.currentDay] || this.currentDay.toUpperCase()}`;
 
-        let text = `📊 *RAPORT MERCHANDISER - ${dayLabel}*\n`;
-        text += `📅 Data: ${dateStr}\n`;
-        text += `🚗 Traseu: Plecare din Brănești (A2)\n\n`;
+        let text = `📊 *RAPORT MERCHANDISER - ${dayLabel}*\n📅 Data: ${dateStr}\n🚗 Plecare din Brănești (A2)\n\n`;
 
-        let resolved = 0;
-        let unresolved = 0;
+        let resolved = 0, unresolved = 0;
 
         this.stores.forEach((store, idx) => {
           const log = this.storeLogs[store.id];
@@ -3113,10 +2972,7 @@
             text += `⏳ *${idx + 1}. ${store.name}* - În așteptare\n`;
           }
 
-          if (data.sectionName) {
-            text += `   📂 Secțiune: ${data.sectionName}\n`;
-          }
-
+          if (data.sectionName) text += `   📂 Secțiune: ${data.sectionName}\n`;
           if (validItems.length > 0) {
             validItems.forEach((it, i) => {
               text += `   ${i+1}. ${it.name || 'Produs'} - ${it.price ? it.price + ' RON' : 'Fără preț'} ${it.photoUrl ? '📸 [Foto]' : ''}\n`;
@@ -3124,12 +2980,10 @@
           }
         });
 
-        text += `\n📈 *Sumar Zi:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.stores.length - resolved - unresolved} Rămase`;
+        text += `\n📈 *Sumar:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.stores.length - resolved - unresolved} Rămase`;
 
-        navigator.clipboard.writeText(text.replace(/\\n/g, '\n')).then(() => {
-          alert(`✓ Raportul complet pentru ${dayLabel} a fost copiat în Clipboard! Îl poți trimite direct pe WhatsApp.`);
-        }).catch(() => {
-          alert("Nu s-a putut copia automat. Te rugăm să verifici permisiunile browserului.");
+        navigator.clipboard.writeText(text).then(() => {
+          alert(`✓ Raportul complet pentru WhatsApp a fost copiat în Clipboard!`);
         });
       }
 
@@ -3148,49 +3002,30 @@
           csv += `"${idx + 1}","${store.name}","${store.city}","${store.address}","${log.time || ''}","${status}","${data.sectionName || ''}","${productsStr}"\n`;
         });
 
-        const blob = new Blob([csv.replace(/\\n/g, '\n')], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Raport_Merchandiser_Saptamana1_${dayTag}_${new Date().toISOString().slice(0,10)}.csv`;
+        link.download = `Raport_${dayTag}_${new Date().toISOString().slice(0,10)}.csv`;
         link.click();
       }
 
-      /* BACKUP & RESTORE COMPLETE STATE */
-      openBackupModal() {
-        document.getElementById("backupModalOverlay").classList.add("active");
-      }
-
-      closeBackupModal() {
-        document.getElementById("backupModalOverlay").classList.remove("active");
-      }
+      openBackupModal() { document.getElementById("backupModalOverlay").classList.add("active"); }
+      closeBackupModal() { document.getElementById("backupModalOverlay").classList.remove("active"); }
 
       exportFullBackup() {
         const backupData = {
-          version: "3.2_week1",
           exportDate: new Date().toISOString(),
-          day1_stores: localStorage.getItem("merch_stores_day1"),
-          day1_logs: localStorage.getItem("merch_logs_day1"),
-          day1_products: localStorage.getItem("merch_products_v2_day1"),
-          day2_stores: localStorage.getItem("merch_stores_day2"),
-          day2_logs: localStorage.getItem("merch_logs_day2"),
-          day2_products: localStorage.getItem("merch_products_v2_day2"),
-          day3_stores: localStorage.getItem("merch_stores_day3"),
-          day3_logs: localStorage.getItem("merch_logs_day3"),
-          day3_products: localStorage.getItem("merch_products_v2_day3"),
-          day4_stores: localStorage.getItem("merch_stores_day4"),
-          day4_logs: localStorage.getItem("merch_logs_day4"),
-          day4_products: localStorage.getItem("merch_products_v2_day4"),
-          day5_stores: localStorage.getItem("merch_stores_day5"),
-          day5_logs: localStorage.getItem("merch_logs_day5"),
-          day5_products: localStorage.getItem("merch_products_v2_day5"),
+          activeDay: this.currentDay,
+          stores: this.stores,
+          logs: this.storeLogs,
+          products: this.storeProductsData
         };
 
         const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Merchandiser_Backup_Saptamana1_${new Date().toISOString().slice(0,10)}.json`;
+        link.download = `Backup_Merchandiser_${new Date().toISOString().slice(0,10)}.json`;
         link.click();
-        alert("✓ Salvarea completă (Backup JSON Săptămâna 1) a fost descărcată!");
       }
 
       importBackupFile(event) {
@@ -3198,77 +3033,47 @@
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           try {
             const data = JSON.parse(e.target.result);
-            ["day1", "day2", "day3", "day4", "day5"].forEach(k => {
-              if (data[`${k}_stores`]) localStorage.setItem(`merch_stores_${k}`, data[`${k}_stores`]);
-              if (data[`${k}_logs`]) localStorage.setItem(`merch_logs_${k}`, data[`${k}_logs`]);
-              if (data[`${k}_products`]) localStorage.setItem(`merch_products_v2_${k}`, data[`${k}_products`]);
-            });
-
-            alert("✓ Toate datele, coordonatele și pozele au fost restaurate cu succes!");
+            if (data.stores) this.stores = data.stores;
+            if (data.logs) this.storeLogs = data.logs;
+            if (data.products) this.storeProductsData = data.products;
+            this.saveAll();
+            alert("✓ Datele au fost restaurate cu succes!");
             location.reload();
           } catch(err) {
-            alert("Fișierul de backup este invalid.");
+            alert("Fișier invalid.");
           }
         };
         reader.readAsText(file);
       }
 
-      resetDayProgress() {
-        const dayMap = { day1: "Ziua 1", day2: "Ziua 2", day3: "Ziua 3", day4: "Ziua 4", day5: "Ziua 5" };
-        const dayName = dayMap[this.currentDay] || "Ziua Curentă";
-
-        if (confirm(`⚠️ Ești sigur că vrei să resetezi statusul și produsele pentru Săptămâna 1 - ${dayName}?`)) {
+      async resetDayProgress() {
+        if (confirm(`⚠️ Ești sigur că vrei să resetezi progresul pentru această zi?`)) {
           this.storeLogs = {};
           this.storeProductsData = {};
-          this.saveLogs();
-          this.saveProductsData();
+          this.saveAll();
           this.renderSidebarList();
           this.renderMapMarkers();
           this.renderReport();
           this.renderFabProductsForm();
           this.closeQuickCard();
-          alert(`✓ Progresul pentru ${dayName} a fost resetat cu succes!`);
+          alert(`✓ Progresul a fost resetat!`);
         }
       }
     }
 
-    let app;
+    // Expose app to global window for inline onclick handlers
+    window.app = new MerchandiserApp();
     window.addEventListener("DOMContentLoaded", () => {
-      app = new MerchandiserApp();
-      app.init();
+      window.app.init();
     });
 
-    /* iOS WebKit Lifecycle Event Listeners - Auto-Resume Map & UI upon returning from Waze/Background */
+    // Auto resize map when returning from Waze on iOS Safari
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden && app && app.map) {
-        setTimeout(() => {
-          app.map.invalidateSize(true);
-          if (app.activeStoreId) {
-            const store = app.stores.find(s => s.id === app.activeStoreId);
-            if (store) {
-              app.map.panTo([store.lat, store.lng], { animate: false });
-            }
-          }
-        }, 150);
-      }
-    });
-
-    window.addEventListener("pageshow", () => {
-      if (app && app.map) {
-        setTimeout(() => {
-          app.map.invalidateSize(true);
-        }, 150);
-      }
-    });
-
-    window.addEventListener("focus", () => {
-      if (app && app.map) {
-        setTimeout(() => {
-          app.map.invalidateSize(true);
-        }, 100);
+      if (!document.hidden && window.app && window.app.map) {
+        setTimeout(() => window.app.map.invalidateSize(true), 150);
       }
     });
   </script>
