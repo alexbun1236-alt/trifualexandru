@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -88,13 +88,18 @@
       overflow: hidden;
     }
 
-    /* Top Navigation Bar - Safe for iPhone Notch & Dynamic Island */
+    body.ctrl-pressed .custom-marker-pin {
+      cursor: crosshair !important;
+      box-shadow: 0 0 0 3px #f59e0b, 0 4px 10px rgba(245, 158, 11, 0.5) !important;
+    }
+
+    /* Top Navigation Bar */
     header {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--border);
-      padding-top: max(52px, calc(env(safe-area-inset-top) + 8px));
-      padding-left: max(12px, env(safe-area-inset-left));
-      padding-right: max(12px, env(safe-area-inset-right));
+      padding-top: max(50px, calc(env(safe-area-inset-top) + 8px));
+      padding-left: max(10px, env(safe-area-inset-left));
+      padding-right: max(10px, env(safe-area-inset-right));
       padding-bottom: 8px;
       display: flex;
       align-items: center;
@@ -116,6 +121,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
     }
 
     .brand-logo {
@@ -146,10 +152,6 @@
       font-size: 10px;
     }
 
-    .brand-info span {
-      color: var(--text-muted);
-    }
-
     .cloud-badge {
       font-size: 10px;
       font-weight: 700;
@@ -161,25 +163,33 @@
     .cloud-syncing { color: var(--warning); }
     .cloud-offline { color: var(--text-muted); }
 
-    /* Week 1 Dropdown Selector in Header */
-    .week-dropdown-container {
+    /* Week & Category Container Fix */
+    .route-selector-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       position: relative;
-      display: inline-block;
+      min-width: 0;
+      flex-shrink: 1;
     }
 
     .week-dropdown-btn {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       background-color: var(--gray-100);
       border: 1px solid var(--border);
-      padding: 6px 12px;
+      padding: 5px 9px;
       border-radius: 10px;
       font-size: 12px;
       font-weight: 700;
       color: var(--text);
       cursor: pointer;
       transition: all 0.2s;
+      max-width: 320px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .week-dropdown-btn:hover {
@@ -187,51 +197,109 @@
       border-color: var(--primary);
     }
 
+    #headerCategoryLabel {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      flex-shrink: 1;
+    }
+
     .active-day-pill {
       background: var(--primary);
       color: white;
       font-size: 11px;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+      flex-shrink: 1;
+      display: inline-block;
+      line-height: 1.2;
+    }
+
+    .btn-quick-add {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-quick-add:hover {
+      background: var(--primary);
+      color: white;
     }
 
     .week-dropdown-menu {
       position: absolute;
       top: calc(100% + 6px);
-      right: 0;
+      left: 0;
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 12px;
       box-shadow: var(--shadow-lg);
-      width: 240px;
-      padding: 6px;
+      width: 290px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding: 8px;
       z-index: 2500;
       display: none;
       flex-direction: column;
-      gap: 4px;
-      animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: 8px;
     }
 
     .week-dropdown-menu.show {
       display: flex;
     }
 
-    .dropdown-header {
-      font-size: 10px;
+    .category-block {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px;
+      background: var(--gray-50);
+    }
+
+    .category-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .category-block-title {
+      font-size: 11px;
       font-weight: 800;
-      color: var(--text-muted);
+      color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 4px 8px;
+    }
+
+    .days-grid-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
     }
 
     .week-menu-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 10px;
-      border-radius: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
       border: none;
       background: transparent;
       color: var(--text);
@@ -251,6 +319,54 @@
       background: var(--primary-light);
       color: var(--primary);
       font-weight: 800;
+    }
+
+    /* Toggle all stores button */
+    .toggle-all-stores-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--gray-100);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .toggle-all-stores-btn.active {
+      background: #7c3aed;
+      color: white;
+      border-color: #6d28d9;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+    }
+
+    /* Toggle Hide Profi Button (Desktop) */
+    .toggle-profi-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--gray-100);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .toggle-profi-btn.active {
+      background: #ea580c;
+      color: white;
+      border-color: #c2410c;
+      box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
     }
 
     /* Desktop header actions */
@@ -380,6 +496,12 @@
       box-shadow: 0 2px 8px rgba(37,99,235,0.3);
     }
 
+    .dock-pill-btn.active-purple {
+      background: #7c3aed;
+      color: white;
+      border-color: #6d28d9;
+    }
+
     .dock-pill-btn.unlocked-pill {
       background: var(--warning-light);
       color: #d97706;
@@ -397,6 +519,7 @@
     .badge-primary { background: var(--primary-light); color: var(--primary); }
     .badge-success { background: var(--success-light); color: var(--success); }
     .badge-danger { background: var(--danger-light); color: var(--danger); }
+    .badge-purple { background: var(--purple-light); color: var(--purple); }
     .badge-gray { background: var(--gray-100); color: var(--text-muted); }
 
     /* Filter Bar */
@@ -743,10 +866,10 @@
     }
 
     .btn {
-      min-height: 46px;
-      padding: 10px 16px;
+      min-height: 44px;
+      padding: 9px 14px;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       border: none;
       cursor: pointer;
@@ -765,7 +888,7 @@
       background: linear-gradient(135deg, #00c6ff, #0072ff);
       color: white;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14px;
       box-shadow: 0 4px 10px rgba(0, 198, 255, 0.3);
     }
     .btn-waze:hover { opacity: 0.95; }
@@ -787,9 +910,9 @@
     .btn-danger:hover { background: var(--danger-dark); }
 
     .btn-sm {
-      min-height: 36px;
-      padding: 6px 12px;
-      font-size: 12px;
+      min-height: 34px;
+      padding: 5px 10px;
+      font-size: 11px;
       border-radius: 8px;
     }
 
@@ -798,8 +921,8 @@
       position: fixed;
       bottom: 85px;
       right: 18px;
-      width: 58px;
-      height: 58px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: white;
@@ -942,11 +1065,6 @@
       gap: 10px;
       align-items: center;
       position: relative;
-      transition: all 0.2s;
-    }
-
-    .product-row-item:hover {
-      border-color: var(--primary);
     }
 
     .product-index-badge {
@@ -1193,7 +1311,7 @@
       justify-content: center;
       box-shadow: 0 3px 8px rgba(0,0,0,0.3);
       border: 2px solid #ffffff;
-      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .custom-marker-pin span {
@@ -1207,19 +1325,12 @@
     .pin-completed { background: #10b981 !important; }
     .pin-unresolved { background: #ef4444 !important; }
     .pin-active-pending { background: #2563eb; }
+    .pin-external { background: #7c3aed !important; opacity: 0.85; }
 
     .custom-marker-pin.is-active {
       box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #2563eb, 0 6px 14px rgba(0,0,0,0.4);
       transform: rotate(-45deg) scale(1.18);
       z-index: 1000 !important;
-    }
-
-    .custom-marker-pin.is-active.pin-completed {
-      box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #059669, 0 6px 14px rgba(16,185,129,0.5);
-    }
-
-    .custom-marker-pin.is-active.pin-unresolved {
-      box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #dc2626, 0 6px 14px rgba(239,68,68,0.5);
     }
 
     .user-gps-dot {
@@ -1272,24 +1383,6 @@
       border-color: var(--danger);
       background: var(--danger-light);
     }
-
-    @media print {
-      header, .floating-fab, .fab-window, .modal-overlay, .map-fab-stack, .bottom-dock-bar {
-        display: none !important;
-      }
-      body, main, #reportView {
-        height: auto !important;
-        overflow: visible !important;
-        display: block !important;
-        background: white !important;
-        color: black !important;
-      }
-      .report-container { max-width: 100% !important; }
-      .report-header, .stat-card, .report-table-card {
-        box-shadow: none !important;
-        border: 1px solid #ccc !important;
-      }
-    }
   </style>
 </head>
 <body>
@@ -1302,36 +1395,29 @@
         <h1>Merchandiser Pro</h1>
         <div class="brand-status-line">
           <span id="routeOriginStatus">Start: Brănești (A2)</span>
-          <span id="cloudSyncStatus" class="cloud-badge cloud-offline">☁️ Inițializare Firebase...</span>
+          <span id="cloudSyncStatus" class="cloud-badge cloud-offline">☁️ Conectare Firebase...</span>
         </div>
       </div>
     </div>
 
-    <!-- Week 1 Dropdown Selector -->
-    <div class="week-dropdown-container">
+    <!-- Category & Day Selector Group -->
+    <div class="route-selector-group">
       <button class="week-dropdown-btn" id="weekDropdownTriggerBtn" onclick="app.toggleWeekDropdown(event)">
-        <span>📅 Săptămâna 1</span>
-        <span class="active-day-pill" id="activeDayHeaderLabel">Ziua 1 (20)</span>
-        <span style="font-size: 10px; color: var(--text-muted);">▼</span>
+        <span id="headerCategoryLabel">📅 Săptămâna 1</span>
+        <span class="active-day-pill" id="activeDayHeaderLabel">Ziua 1</span>
+        <span style="font-size: 9px; color: var(--text-muted); margin-left: 2px;">▼</span>
       </button>
 
+      <!-- Quick Add Category / Day Button -->
+      <button class="btn-quick-add" title="Adaugă Categorie sau Zi nouă" onclick="app.promptAddCategoryOrDay()">+</button>
+
+      <!-- Category & Days Dropdown Menu -->
       <div class="week-dropdown-menu" id="weekDropdownMenu">
-        <div class="dropdown-header">Alege Ziua de Lucru:</div>
-        <button class="week-menu-item active" id="btnDay1" onclick="app.selectDayFromMenu('day1')">
-          <span>📅 Ziua 1</span> <span class="badge badge-primary">20 Magazine</span>
-        </button>
-        <button class="week-menu-item" id="btnDay2" onclick="app.selectDayFromMenu('day2')">
-          <span>📅 Ziua 2</span> <span class="badge badge-primary">19 Magazine</span>
-        </button>
-        <button class="week-menu-item" id="btnDay3" onclick="app.selectDayFromMenu('day3')">
-          <span>📅 Ziua 3</span> <span class="badge badge-primary">20 Magazine</span>
-        </button>
-        <button class="week-menu-item" id="btnDay4" onclick="app.selectDayFromMenu('day4')">
-          <span>📅 Ziua 4</span> <span class="badge badge-primary">14 Magazine</span>
-        </button>
-        <button class="week-menu-item" id="btnDay5" onclick="app.selectDayFromMenu('day5')">
-          <span>📅 Ziua 5</span> <span class="badge badge-primary">19 Magazine</span>
-        </button>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:6px; border-bottom:1px solid var(--border);">
+          <span style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Trasee & Zile</span>
+          <button class="btn btn-primary btn-sm" onclick="app.promptAddCategory()">➕ Categorie Nouă</button>
+        </div>
+        <div id="categoryMenuList" style="display:flex; flex-direction:column; gap:8px;"></div>
       </div>
     </div>
 
@@ -1341,6 +1427,17 @@
         <button class="nav-tab active" id="tabMapBtnDesk" onclick="app.switchTab('map')">🗺️ Hartă</button>
         <button class="nav-tab" id="tabReportBtnDesk" onclick="app.switchTab('report')">📋 Raport</button>
       </div>
+
+      <!-- Toggle all stores button -->
+      <button class="toggle-all-stores-btn" id="toggleAllStoresBtnDesk" onclick="app.toggleShowAllStores()">
+        <span>👁️</span> <span id="toggleAllStoresLabelDesk">Toate Magazinele</span>
+      </button>
+
+      <!-- Hide Profi button (Desktop only) -->
+      <button class="toggle-profi-btn" id="toggleHideProfiBtnDesk" onclick="app.toggleHideProfi()" title="Ascunde sau afișează Profi-urile când sunt afișate toate magazinele">
+        <span>🚫</span> <span id="toggleHideProfiLabelDesk">Fără Profi</span>
+      </button>
+
       <div class="header-actions">
         <button class="icon-btn" id="headerLockBtnDesk" title="Pini Blocați (Apasă pt deblocare)" onclick="app.togglePinLock()">🔒</button>
         <button class="icon-btn" id="headerGpsBtnDesk" title="Localizare GPS live" onclick="app.toggleGpsTracking()">📍</button>
@@ -1357,7 +1454,7 @@
       <aside class="map-sidebar" id="mapSidebar">
         <div class="sidebar-header">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 id="sidebarTitle">Magazine Săptămâna 1 - Ziua 1</h2>
+            <h2 id="sidebarTitle">Magazine Traseu</h2>
             <span class="badge badge-primary" id="sidebarProgressBadge">0/20 Vizitate</span>
           </div>
 
@@ -1429,7 +1526,7 @@
       <div class="report-container">
         <div class="report-header">
           <div class="report-title-box">
-            <h2 id="reportMainHeading">📋 Raport Verificare Teren - Săptămâna 1</h2>
+            <h2 id="reportMainHeading">📋 Raport Verificare Teren</h2>
             <p id="reportSubHeading">Sincronizat în Cloud Firebase & local.</p>
           </div>
           <div class="report-actions">
@@ -1443,7 +1540,7 @@
         <div class="stat-cards-grid">
           <div class="stat-card">
             <div class="stat-icon stat-icon-blue">🏪</div>
-            <div class="stat-info"><h4 id="statTotalStores">20</h4><span>Total Magazine</span></div>
+            <div class="stat-info"><h4 id="statTotalStores">0</h4><span>Total Magazine</span></div>
           </div>
           <div class="stat-card">
             <div class="stat-icon stat-icon-green">✅</div>
@@ -1455,7 +1552,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon stat-icon-amber">⏳</div>
-            <div class="stat-info"><h4 id="statPendingStores">20</h4><span>Rămase de Vizitat</span></div>
+            <div class="stat-info"><h4 id="statPendingStores">0</h4><span>Rămase de Vizitat</span></div>
           </div>
         </div>
 
@@ -1488,6 +1585,9 @@
       </button>
       <button class="dock-pill-btn" id="tabReportBtnMob" onclick="app.switchTab('report')">
         <span>📋</span> <span>Raport</span>
+      </button>
+      <button class="dock-pill-btn" id="dockAllStoresBtnMob" onclick="app.toggleShowAllStores()">
+        <span>👁️</span> <span id="toggleAllStoresLabelMob">Toate Magazinele</span>
       </button>
       <button class="dock-pill-btn" id="dockLockBtnMob" onclick="app.togglePinLock()">
         <span id="dockLockIcon">🔒</span> <span id="dockLockText">Pini Blocați</span>
@@ -1547,6 +1647,37 @@
     </div>
   </div>
 
+  <!-- Assign Pin to Category & Day Modal -->
+  <div class="modal-overlay" id="assignModalOverlay" style="align-items: center;" onclick="if(event.target === this) app.closeAssignModal()">
+    <div class="reason-dialog" style="max-width: 440px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <span class="badge badge-purple">Asignare Traseu Personalizat</span>
+          <h3 id="assignStoreTitle" style="font-size: 16px; font-weight: 800; margin-top: 4px;">Nume Magazin</h3>
+          <p id="assignStoreAddress" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Adresă magazin</p>
+        </div>
+        <button class="icon-btn" style="width:28px; height:28px; border-radius:50%;" onclick="app.closeAssignModal()">✕</button>
+      </div>
+
+      <div style="margin: 16px 0; display:flex; flex-direction:column; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">Alege Categoria / Săptămâna:</label>
+          <select class="form-control" id="assignCatSelect" onchange="app.onAssignCategoryChange()"></select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Alege Ziua de Lucru:</label>
+          <select class="form-control" id="assignDaySelect"></select>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn btn-primary" onclick="app.confirmAssignStore()">📥 Asignează în această Zi</button>
+        <button class="btn btn-secondary btn-sm" id="btnRemoveFromCurrentDay" style="color:var(--danger);" onclick="app.removeStoreFromActiveDay()">🗑️ Elimină din Ziua Curentă</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Action Sheet / Store Modal -->
   <div class="modal-overlay" id="storeModalOverlay" onclick="if(event.target === this) app.closeStoreModal()">
     <div class="action-sheet">
@@ -1574,6 +1705,9 @@
           <button class="btn btn-success" onclick="app.markActiveAsResolved(); app.closeStoreModal();">✓ Rezolvat</button>
           <button class="btn btn-danger" onclick="app.promptUnresolved(); app.closeStoreModal();">✕ Nerezolvat</button>
         </div>
+        <button class="btn btn-secondary btn-sm" onclick="app.openAssignModalForActive(); app.closeStoreModal();">
+          📌 Asignează în altă Categorie / Zi
+        </button>
         <button class="btn btn-secondary btn-sm" onclick="app.openFabForStore(app.activeStoreId); app.closeStoreModal();">
           📸 Deschide Listă Produse & Poze
         </button>
@@ -1588,7 +1722,7 @@
   <div class="modal-overlay" id="backupModalOverlay" style="align-items: center;" onclick="if(event.target === this) app.closeBackupModal()">
     <div class="reason-dialog" style="max-width: 420px;">
       <h3 style="font-size: 16px; font-weight: 700;">💾 Backup & Restaurare Date</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Datele se salvează în cloud pe Firebase, dar poți descărca și un fișier JSON de siguranță.</p>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Toate categoriile, rutele, produsele și fotografiile se pot descărca sau restaura integral.</p>
       
       <div style="display: flex; flex-direction: column; gap: 10px; margin: 18px 0;">
         <button class="btn btn-primary" onclick="app.exportFullBackup()">📥 Descarcă Salvare JSON</button>
@@ -1634,7 +1768,6 @@
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAWd_QSC7ZsNaowpTItZqV9ha7LqC3dX-w",
       authDomain: "dumanu-munca.firebaseapp.com",
@@ -1645,7 +1778,6 @@
       measurementId: "G-1JWKRRVJY8"
     };
 
-    // Initialize Firebase
     let firebaseApp = null;
     let analytics = null;
     let db = null;
@@ -1654,12 +1786,10 @@
       firebaseApp = initializeApp(firebaseConfig);
       analytics = getAnalytics(firebaseApp);
       db = getFirestore(firebaseApp);
-      console.log("Firebase conectat cu succes la proiectul:", firebaseConfig.projectId);
     } catch (e) {
       console.warn("Eroare la inițializarea Firebase:", e);
     }
 
-    // CANONICAL INITIAL DATASETS FOR WEEK 1 (DAYS 1-5)
     const INITIAL_DATA_WEEK_1 = {
       day1: [
         { id: "d1_1", name: "Mega Image Popești-Leordeni", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Șos. Olteniței 51A-55, Popești-Leordeni", lat: 44.3802, lng: 26.1685, order: 1 },
@@ -1767,9 +1897,14 @@
 
     class MerchandiserApp {
       constructor() {
-        this.currentDay = localStorage.getItem("merch_active_day") || "day1";
-        this.stores = [];
+        this.categories = {};
+        this.masterStores = [];
+        this.currentCatId = localStorage.getItem("merch_active_cat") || "cat_week1";
+        this.currentDayId = localStorage.getItem("merch_active_day") || "day1";
+        this.showAllStores = localStorage.getItem("merch_show_all_stores") === "true";
+        this.hideProfi = localStorage.getItem("merch_hide_profi") === "true";
         this.activeStoreId = null;
+        this.assignTargetStore = null;
         this.currentFilter = "all";
         this.map = null;
         this.markers = {};
@@ -1785,22 +1920,30 @@
         this.activePhotoUploadTarget = null;
         this.db = db;
         this.cloudSyncTimer = null;
+
+        // Interactive Ctrl + Drag Linking properties
+        this.isCtrlDragging = false;
+        this.ctrlDragSourceStore = null;
+        this.ctrlDragTempLine = null;
       }
 
       async init() {
         this.applyTheme(this.theme);
-        this.loadDayData(this.currentDay);
+        this.initDataHierarchy();
         this.initMap();
-        this.updateDayUI();
+        this.updateHeaderUI();
         this.updatePinLockUI();
+        this.updateShowAllStoresUI();
+        this.updateHideProfiUI();
+        this.renderCategoryMenu();
         this.renderSidebarList();
         this.renderReport();
         this.populateFabDropdown();
         this.setupDraggableFab();
         this.setupClickOutsideHandlers();
+        this.setupCtrlKeyListener();
         this.closeQuickCard();
 
-        // Sync from Firebase
         await this.syncFromFirebase();
       }
 
@@ -1811,120 +1954,252 @@
         badge.textContent = text;
       }
 
-      loadDayData(dayKey) {
-        this.currentDay = dayKey;
-        localStorage.setItem("merch_active_day", dayKey);
+      initDataHierarchy() {
+        const masterMap = new Map();
+        Object.values(INITIAL_DATA_WEEK_1).forEach(list => {
+          list.forEach(s => {
+            if (!masterMap.has(s.id)) masterMap.set(s.id, { ...s });
+          });
+        });
 
-        const initialList = INITIAL_DATA_WEEK_1[dayKey] || INITIAL_DATA_WEEK_1.day1;
-        const savedStores = localStorage.getItem(`merch_stores_${dayKey}`);
-        if (savedStores) {
-          try { this.stores = JSON.parse(savedStores); }
-          catch(e) { this.stores = [...initialList]; }
-        } else {
-          this.stores = [...initialList];
-          this.saveStoresLocally();
+        const savedMaster = localStorage.getItem("merch_master_stores");
+        if (savedMaster) {
+          try {
+            const parsed = JSON.parse(savedMaster);
+            parsed.forEach(s => masterMap.set(s.id, s));
+          } catch(e) {}
+        }
+        this.masterStores = Array.from(masterMap.values());
+
+        const savedCategories = localStorage.getItem("merch_categories_v3");
+        if (savedCategories) {
+          try {
+            this.categories = JSON.parse(savedCategories);
+          } catch(e) {
+            this.categories = null;
+          }
         }
 
-        this.storeLogs = JSON.parse(localStorage.getItem(`merch_logs_${dayKey}`) || "{}");
-        this.storeProductsData = JSON.parse(localStorage.getItem(`merch_products_v2_${dayKey}`) || "{}");
+        if (!this.categories || Object.keys(this.categories).length === 0) {
+          this.categories = {
+            cat_week1: {
+              id: "cat_week1",
+              name: "Săptămâna 1",
+              days: {
+                day1: { id: "day1", name: "Ziua 1 (Popești & S4)", stores: [...INITIAL_DATA_WEEK_1.day1] },
+                day2: { id: "day2", name: "Ziua 2 (Ilfov SV & S5)", stores: [...INITIAL_DATA_WEEK_1.day2] },
+                day3: { id: "day3", name: "Ziua 3 (Chitila / Chiajna / S6)", stores: [...INITIAL_DATA_WEEK_1.day3] },
+                day4: { id: "day4", name: "Ziua 4 (Giulești & Militari)", stores: [...INITIAL_DATA_WEEK_1.day4] },
+                day5: { id: "day5", name: "Ziua 5 (Chiajna / Rahova)", stores: [...INITIAL_DATA_WEEK_1.day5] }
+              }
+            }
+          };
+          this.saveCategoriesLocally();
+        }
+
+        if (!this.categories[this.currentCatId]) {
+          this.currentCatId = Object.keys(this.categories)[0];
+        }
+        const currentCat = this.categories[this.currentCatId];
+        if (!currentCat.days[this.currentDayId]) {
+          this.currentDayId = Object.keys(currentCat.days)[0] || "day1";
+        }
+
+        this.loadActiveDayLogsAndProducts();
       }
 
-      saveStoresLocally() {
-        localStorage.setItem(`merch_stores_${this.currentDay}`, JSON.stringify(this.stores));
+      get currentStores() {
+        const cat = this.categories[this.currentCatId];
+        if (!cat || !cat.days[this.currentDayId]) return [];
+        return cat.days[this.currentDayId].stores || [];
+      }
+
+      set currentStores(newStores) {
+        const cat = this.categories[this.currentCatId];
+        if (cat && cat.days[this.currentDayId]) {
+          cat.days[this.currentDayId].stores = newStores;
+        }
+      }
+
+      loadActiveDayLogsAndProducts() {
+        const key = `${this.currentCatId}_${this.currentDayId}`;
+        this.storeLogs = JSON.parse(localStorage.getItem(`merch_logs_${key}`) || "{}");
+        this.storeProductsData = JSON.parse(localStorage.getItem(`merch_products_${key}`) || "{}");
+      }
+
+      saveCategoriesLocally() {
+        localStorage.setItem("merch_categories_v3", JSON.stringify(this.categories));
+        localStorage.setItem("merch_master_stores", JSON.stringify(this.masterStores));
       }
 
       saveLogsLocally() {
-        localStorage.setItem(`merch_logs_${this.currentDay}`, JSON.stringify(this.storeLogs));
+        const key = `${this.currentCatId}_${this.currentDayId}`;
+        localStorage.setItem(`merch_logs_${key}`, JSON.stringify(this.storeLogs));
       }
 
       saveProductsLocally() {
+        const key = `${this.currentCatId}_${this.currentDayId}`;
         try {
-          localStorage.setItem(`merch_products_v2_${this.currentDay}`, JSON.stringify(this.storeProductsData));
-        } catch(e) {
-          console.warn("Storage quota warning on localStorage", e);
-        }
-      }
-
-      /* FIREBASE CLOUD SYNC */
-      async syncFromFirebase() {
-        if (!this.db) {
-          this.setCloudBadge("offline", "☁️ Mod Offline (Fără Firebase)");
-          return;
-        }
-
-        try {
-          this.setCloudBadge("syncing", "⏳ Conectare Firebase...");
-          const docRef = doc(this.db, "merchandiser_week1", this.currentDay);
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data.stores && Array.isArray(data.stores) && data.stores.length > 0) {
-              this.stores = data.stores;
-              this.saveStoresLocally();
-            }
-            if (data.logs) {
-              this.storeLogs = data.logs;
-              this.saveLogsLocally();
-            }
-            if (data.productsData) {
-              this.storeProductsData = data.productsData;
-              this.saveProductsLocally();
-            }
-
-            this.renderMapMarkers();
-            this.drawRoutePolyline();
-            this.renderSidebarList();
-            this.renderReport();
-            this.renderFabProductsForm();
-            this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
-          } else {
-            // First time this day is loaded, upload initial state to Firebase
-            await this.pushToFirebase();
-            this.setCloudBadge("synced", "☁️ Firebase Inițializat");
-          }
-        } catch (error) {
-          console.warn("Eroare la citirea din Firestore:", error);
-          this.setCloudBadge("offline", "⚠️ Local (Verifică Reguli Firestore)");
-        }
-      }
-
-      scheduleFirebasePush() {
-        if (!this.db) return;
-        this.setCloudBadge("syncing", "⏳ Se salvează în Cloud...");
-        clearTimeout(this.cloudSyncTimer);
-        this.cloudSyncTimer = setTimeout(() => {
-          this.pushToFirebase();
-        }, 1200);
-      }
-
-      async pushToFirebase() {
-        if (!this.db) return;
-        try {
-          const docRef = doc(this.db, "merchandiser_week1", this.currentDay);
-          await setDoc(docRef, {
-            day: this.currentDay,
-            stores: this.stores,
-            logs: this.storeLogs,
-            productsData: this.storeProductsData,
-            lastUpdated: new Date().toISOString()
-          }, { merge: true });
-
-          this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
-        } catch (error) {
-          console.warn("Eroare la salvarea în Firestore:", error);
-          this.setCloudBadge("offline", "⚠️ Salvare Locală (Reguli Firestore)");
-        }
+          localStorage.setItem(`merch_products_${key}`, JSON.stringify(this.storeProductsData));
+        } catch(e) {}
       }
 
       saveAll() {
-        this.saveStoresLocally();
+        this.saveCategoriesLocally();
         this.saveLogsLocally();
         this.saveProductsLocally();
         this.scheduleFirebasePush();
       }
 
-      /* WEEK 1 DROPDOWN */
+      /* FIREBASE SYNC */
+      async syncFromFirebase() {
+        if (!this.db) {
+          this.setCloudBadge("offline", "☁️ Local (Fără Firebase)");
+          return;
+        }
+
+        try {
+          this.setCloudBadge("syncing", "⏳ Conectare Firebase...");
+          const docRef = doc(this.db, "merchandiser_data", "main_state");
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data.categories && Object.keys(data.categories).length > 0) {
+              this.categories = data.categories;
+              this.saveCategoriesLocally();
+            }
+            if (data.masterStores && Array.isArray(data.masterStores)) {
+              this.masterStores = data.masterStores;
+              localStorage.setItem("merch_master_stores", JSON.stringify(this.masterStores));
+            }
+
+            this.loadActiveDayLogsAndProducts();
+            this.updateHeaderUI();
+            this.renderCategoryMenu();
+            this.renderMapMarkers();
+            this.drawRoutePolyline();
+            this.renderSidebarList();
+            this.renderReport();
+            this.populateFabDropdown();
+            this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
+          } else {
+            await this.pushToFirebase();
+            this.setCloudBadge("synced", "☁️ Firebase Inițializat");
+          }
+        } catch (error) {
+          console.warn("Eroare Firebase:", error);
+          this.setCloudBadge("offline", "⚠️ Salvare Locală");
+        }
+      }
+
+      scheduleFirebasePush() {
+        if (!this.db) return;
+        this.setCloudBadge("syncing", "⏳ Salvare...");
+        clearTimeout(this.cloudSyncTimer);
+        this.cloudSyncTimer = setTimeout(() => this.pushToFirebase(), 1500);
+      }
+
+      async pushToFirebase() {
+        if (!this.db) return;
+        try {
+          const docRef = doc(this.db, "merchandiser_data", "main_state");
+          await setDoc(docRef, {
+            categories: this.categories,
+            masterStores: this.masterStores,
+            lastUpdated: new Date().toISOString()
+          }, { merge: true });
+          this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
+        } catch (error) {
+          console.warn("Eroare salvare Firebase:", error);
+          this.setCloudBadge("offline", "⚠️ Salvare Locală");
+        }
+      }
+
+      /* TOGGLE SHOW ALL STORES */
+      toggleShowAllStores() {
+        this.showAllStores = !this.showAllStores;
+        localStorage.setItem("merch_show_all_stores", this.showAllStores);
+        this.updateShowAllStoresUI();
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+
+        if (this.showAllStores) {
+          this.showDragToast("👁️ Sunt afișate magazinele. Ține apăsat CTRL și trage cu mouse-ul pt a uni o rută!");
+        } else {
+          this.showDragToast("📍 Se afișează doar magazinele din ziua selectată.");
+        }
+      }
+
+      updateShowAllStoresUI() {
+        const btnDesk = document.getElementById("toggleAllStoresBtnDesk");
+        const btnMob = document.getElementById("dockAllStoresBtnMob");
+        const labelDesk = document.getElementById("toggleAllStoresLabelDesk");
+        const labelMob = document.getElementById("toggleAllStoresLabelMob");
+
+        if (this.showAllStores) {
+          if (btnDesk) {
+            btnDesk.classList.add("active");
+            labelDesk.textContent = "Toate (ON)";
+          }
+          if (btnMob) {
+            btnMob.classList.add("active-purple");
+            labelMob.textContent = "Toate (ON)";
+          }
+        } else {
+          if (btnDesk) {
+            btnDesk.classList.remove("active");
+            labelDesk.textContent = "Toate Magazinele";
+          }
+          if (btnMob) {
+            btnMob.classList.remove("active-purple");
+            labelMob.textContent = "Toate Magazinele";
+          }
+        }
+      }
+
+      /* TOGGLE HIDE PROFI (DESKTOP ONLY) */
+      toggleHideProfi() {
+        this.hideProfi = !this.hideProfi;
+        localStorage.setItem("merch_hide_profi", this.hideProfi);
+        this.updateHideProfiUI();
+        this.renderMapMarkers();
+        if (this.hideProfi) {
+          this.showDragToast("🚫 Magazinele Profi sunt ASCUNSE din modul de afișare general.");
+        } else {
+          this.showDragToast("🛒 Magazinele Profi sunt din nou VIZIBILE pe hartă.");
+        }
+      }
+
+      updateHideProfiUI() {
+        const btn = document.getElementById("toggleHideProfiBtnDesk");
+        const label = document.getElementById("toggleHideProfiLabelDesk");
+        if (!btn || !label) return;
+
+        if (this.hideProfi) {
+          btn.classList.add("active");
+          label.textContent = "Fără Profi (ON)";
+        } else {
+          btn.classList.remove("active");
+          label.textContent = "Fără Profi";
+        }
+      }
+
+      /* CTRL KEY LISTENER FOR VISUAL CROSSHAIR */
+      setupCtrlKeyListener() {
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Control" || e.key === "Meta") {
+            document.body.classList.add("ctrl-pressed");
+          }
+        });
+        window.addEventListener("keyup", (e) => {
+          if (e.key === "Control" || e.key === "Meta") {
+            document.body.classList.remove("ctrl-pressed");
+          }
+        });
+      }
+
+      /* CATEGORIES & DAYS DROPDOWN */
       toggleWeekDropdown(event) {
         if (event) event.stopPropagation();
         const menu = document.getElementById("weekDropdownMenu");
@@ -1936,64 +2211,766 @@
         if (menu) menu.classList.remove("show");
       }
 
-      selectDayFromMenu(dayKey) {
-        this.closeWeekDropdown();
-        if (this.currentDay === dayKey) return;
-        this.switchDay(dayKey);
-      }
-
       setupClickOutsideHandlers() {
         document.addEventListener("click", (e) => {
-          const container = document.querySelector(".week-dropdown-container");
-          if (container && !container.contains(e.target)) {
+          const group = document.querySelector(".route-selector-group");
+          if (group && !group.contains(e.target)) {
             this.closeWeekDropdown();
           }
         });
       }
 
-      async switchDay(dayKey) {
-        this.loadDayData(dayKey);
-        this.updateDayUI();
+      renderCategoryMenu() {
+        const listContainer = document.getElementById("categoryMenuList");
+        if (!listContainer) return;
+        listContainer.innerHTML = "";
+
+        Object.values(this.categories).forEach(cat => {
+          const block = document.createElement("div");
+          block.className = "category-block";
+
+          const header = document.createElement("div");
+          header.className = "category-block-header";
+          header.innerHTML = `
+            <span class="category-block-title">${cat.name}</span>
+            <div style="display:flex; gap:4px;">
+              <button class="btn btn-secondary btn-sm" style="padding:2px 6px; font-size:10px;" onclick="event.stopPropagation(); app.promptAddDayToCategory('${cat.id}')">➕ Zi</button>
+              <button class="action-icon-btn delete-btn" title="Șterge categoria" onclick="event.stopPropagation(); app.deleteCategory('${cat.id}')">🗑️</button>
+            </div>
+          `;
+          block.appendChild(header);
+
+          const daysList = document.createElement("div");
+          daysList.className = "days-grid-list";
+
+          const dayKeys = Object.keys(cat.days || {});
+          if (dayKeys.length === 0) {
+            daysList.innerHTML = `<div style="font-size:11px; color:var(--text-muted); padding:4px;">Fără zile. Apasă ➕ Zi.</div>`;
+          } else {
+            dayKeys.forEach(dayId => {
+              const day = cat.days[dayId];
+              const isActive = (this.currentCatId === cat.id && this.currentDayId === dayId);
+              const storeCount = (day.stores || []).length;
+
+              const itemBtn = document.createElement("button");
+              itemBtn.className = `week-menu-item ${isActive ? 'active' : ''}`;
+              itemBtn.innerHTML = `
+                <span>📅 ${day.name}</span>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <span class="badge badge-primary">${storeCount} Mag</span>
+                  <span style="color:var(--danger); font-size:12px;" onclick="event.stopPropagation(); app.deleteDay('${cat.id}', '${dayId}')" title="Șterge ziua">✕</span>
+                </div>
+              `;
+              itemBtn.onclick = () => {
+                this.selectCategoryAndDay(cat.id, dayId);
+                this.closeWeekDropdown();
+              };
+              daysList.appendChild(itemBtn);
+            });
+          }
+
+          block.appendChild(daysList);
+          listContainer.appendChild(block);
+        });
+      }
+
+      selectCategoryAndDay(catId, dayId) {
+        this.currentCatId = catId;
+        this.currentDayId = dayId;
+        localStorage.setItem("merch_active_cat", catId);
+        localStorage.setItem("merch_active_day", dayId);
+
+        this.loadActiveDayLogsAndProducts();
+        this.updateHeaderUI();
+        this.renderCategoryMenu();
         this.renderMapMarkers();
         this.drawRoutePolyline();
         this.renderSidebarList();
         this.renderReport();
         this.populateFabDropdown();
         this.closeQuickCard();
-        await this.syncFromFirebase();
       }
 
-      updateDayUI() {
-        const d = this.currentDay;
-        const dayMap = {
-          day1: { label: "Ziua 1 (20)", title: "Săptămâna 1 - Ziua 1 (20 Magazine)", desc: "Popești & Sector 4", dist: "~19.2 km", time: "~40-50 min" },
-          day2: { label: "Ziua 2 (19)", title: "Săptămâna 1 - Ziua 2 (19 Magazine)", desc: "Ilfov Sud-Vest & Sector 5", dist: "~40.3 km", time: "~60-75 min" },
-          day3: { label: "Ziua 3 (20)", title: "Săptămâna 1 - Ziua 3 (20 Magazine)", desc: "Chitila / Chiajna / Domnești / Sector 6", dist: "~44.4 km", time: "~65-80 min" },
-          day4: { label: "Ziua 4 (14)", title: "Săptămâna 1 - Ziua 4 (14 Magazine)", desc: "Giulești / Crângași / Militari / Drumul Taberei", dist: "~17.2 km", time: "~35-45 min" },
-          day5: { label: "Ziua 5 (19)", title: "Săptămâna 1 - Ziua 5 (19 Magazine)", desc: "Chiajna / Bragadiru / Sector 5 (Rahova)", dist: "~22.8 km", time: "~45-55 min" }
-        };
+      updateHeaderUI() {
+        const cat = this.categories[this.currentCatId];
+        const day = cat ? cat.days[this.currentDayId] : null;
 
-        const info = dayMap[d] || dayMap.day1;
-        const activePill = document.getElementById("activeDayHeaderLabel");
-        if (activePill) activePill.textContent = info.label;
-
-        ["day1", "day2", "day3", "day4", "day5"].forEach(k => {
-          const item = document.getElementById(`btn${k.charAt(0).toUpperCase() + k.slice(1)}`);
-          if (item) item.classList.toggle("active", d === k);
-        });
-
+        const catLabel = document.getElementById("headerCategoryLabel");
+        const dayLabel = document.getElementById("activeDayHeaderLabel");
         const sidebarTitle = document.getElementById("sidebarTitle");
-        const sidebarDesc = document.getElementById("sidebarRouteDesc");
         const repHeading = document.getElementById("reportMainHeading");
+        const sidebarDesc = document.getElementById("sidebarRouteDesc");
 
-        if (sidebarTitle) sidebarTitle.textContent = info.title;
+        const storeCount = (day && day.stores) ? day.stores.length : 0;
+
+        if (catLabel) catLabel.textContent = `📅 ${cat ? cat.name : 'Traseu'}`;
+        if (dayLabel) dayLabel.textContent = `${day ? day.name : 'Ziua'} (${storeCount})`;
+        if (sidebarTitle) sidebarTitle.textContent = `${cat ? cat.name : ''} - ${day ? day.name : ''}`;
+        if (repHeading) repHeading.textContent = `📋 Raport - ${cat ? cat.name : ''} (${day ? day.name : ''})`;
+
         if (sidebarDesc) {
           sidebarDesc.innerHTML = `
-            <div>🛣️ <strong>Ruta:</strong> Start din <strong>Brănești pe A2</strong>, vizitare ${info.desc}.</div>
-            <div class="route-stats-row"><span>Distanță: ${info.dist}</span><span>Timp: ${info.time}</span></div>
+            <div>🛣️ <strong>Traseu activ:</strong> ${cat ? cat.name : ''} &bull; ${day ? day.name : ''}</div>
+            <div class="route-stats-row"><span>Magazine alocate: ${storeCount}</span><span>Ctrl + Drag pt unire traseu</span></div>
           `;
         }
-        if (repHeading) repHeading.textContent = `📋 Raport Verificare Teren - ${info.title}`;
+      }
+
+      promptAddCategoryOrDay() {
+        const choice = confirm("Apasă OK pentru a crea o CATEGORIE nouă (ex: Săptămâna 2).\nApasă CANCEL pentru a adăuga o ZI NOUĂ în categoria curentă.");
+        if (choice) {
+          this.promptAddCategory();
+        } else {
+          this.promptAddDayToCategory(this.currentCatId);
+        }
+      }
+
+      promptAddCategory() {
+        const name = prompt("Introdu numele noii categorii (ex: Săptămâna 2, Ruta Specială, Zona Ilfov):");
+        if (!name || !name.trim()) return;
+
+        const catId = "cat_" + Date.now();
+        this.categories[catId] = {
+          id: catId,
+          name: name.trim(),
+          days: {
+            day1: { id: "day1", name: "Luni / Ziua 1", stores: [] }
+          }
+        };
+
+        this.saveAll();
+        this.selectCategoryAndDay(catId, "day1");
+        this.closeWeekDropdown();
+        alert(`✓ Categoria "${name.trim()}" a fost creată cu succes!`);
+      }
+
+      promptAddDayToCategory(catId) {
+        const cat = this.categories[catId];
+        if (!cat) return;
+
+        const dayName = prompt(`Introdu numele noii zile în "${cat.name}" (ex: Marți, Ziua 3, Urgențe):`);
+        if (!dayName || !dayName.trim()) return;
+
+        const dayId = "day_" + Date.now();
+        if (!cat.days) cat.days = {};
+        cat.days[dayId] = {
+          id: dayId,
+          name: dayName.trim(),
+          stores: []
+        };
+
+        this.saveAll();
+        this.selectCategoryAndDay(catId, dayId);
+        this.closeWeekDropdown();
+        alert(`✓ Ziua "${dayName.trim()}" a fost adăugată în ${cat.name}!`);
+      }
+
+      deleteCategory(catId) {
+        if (Object.keys(this.categories).length <= 1) {
+          alert("Trebuie să păstrezi cel puțin o categorie.");
+          return;
+        }
+        const cat = this.categories[catId];
+        if (confirm(`Sigur dorești să ștergi categoria "${cat.name}" și toate zilele din ea?`)) {
+          delete this.categories[catId];
+          const remainingCatId = Object.keys(this.categories)[0];
+          const remainingDayId = Object.keys(this.categories[remainingCatId].days)[0];
+          this.saveAll();
+          this.selectCategoryAndDay(remainingCatId, remainingDayId);
+        }
+      }
+
+      deleteDay(catId, dayId) {
+        const cat = this.categories[catId];
+        if (!cat || !cat.days) return;
+
+        if (Object.keys(cat.days).length <= 1) {
+          alert("O categorie trebuie să conțină cel puțin o zi.");
+          return;
+        }
+
+        if (confirm(`Ștergi ziua "${cat.days[dayId].name}"?`)) {
+          delete cat.days[dayId];
+          this.saveAll();
+          if (this.currentDayId === dayId) {
+            const nextDayId = Object.keys(cat.days)[0];
+            this.selectCategoryAndDay(catId, nextDayId);
+          } else {
+            this.renderCategoryMenu();
+            this.updateHeaderUI();
+          }
+        }
+      }
+
+      /* MAP SETUP & MARKERS */
+      initMap() {
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+          maxZoom: 20,
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps'
+        });
+
+        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+          maxZoom: 20,
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps'
+        });
+
+        const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        });
+
+        this.map = L.map('map', { 
+          zoomControl: false,
+          layers: [googleHybrid] 
+        }).setView([44.420, 26.040], 12);
+
+        L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
+
+        const baseMaps = {
+          "🛰️ Google Satelit": googleHybrid,
+          "🗺️ Google Străzi": googleStreets,
+          "🌍 OpenStreetMap": osmStandard
+        };
+        L.control.layers(baseMaps, null, { position: 'topleft' }).addTo(this.map);
+
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+      }
+
+      createPinIcon(store, index, isExternal = false) {
+        const log = this.storeLogs[store.id];
+        const isActive = this.activeStoreId === store.id;
+
+        let colorClass = "pin-pending";
+        let label = (index !== null && index !== undefined) ? (index + 1) : "•";
+
+        if (isExternal) {
+          colorClass = "pin-external";
+          label = "🏪";
+        } else if (log && log.status === "completed") {
+          colorClass = "pin-completed";
+        } else if (log && log.status === "unresolved") {
+          colorClass = "pin-unresolved";
+        } else if (isActive) {
+          colorClass = "pin-active-pending";
+        }
+
+        const activeClass = isActive ? "is-active" : "";
+
+        return L.divIcon({
+          className: 'custom-leaflet-marker',
+          html: `<div class="custom-marker-pin ${colorClass} ${activeClass}"><span>${label}</span></div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32]
+        });
+      }
+
+      renderMapMarkers() {
+        Object.values(this.markers).forEach(m => this.map.removeLayer(m));
+        this.markers = {};
+
+        const activeDayStores = this.currentStores;
+        const activeIds = new Set(activeDayStores.map(s => s.id));
+
+        let storesToRender = [];
+        if (this.showAllStores) {
+          storesToRender = this.masterStores;
+          // Desktop Hide Profi logic:
+          if (this.hideProfi) {
+            storesToRender = storesToRender.filter(s => {
+              const isProfi = (s.chain && s.chain.toLowerCase().includes("profi")) || s.name.toLowerCase().includes("profi");
+              // Retain if it's not Profi OR if it's already in the active day's planned route
+              return !isProfi || activeIds.has(s.id);
+            });
+          }
+        } else {
+          storesToRender = this.getFilteredStores();
+        }
+
+        storesToRender.forEach((store) => {
+          const isExternal = !activeIds.has(store.id);
+          const originalIndex = activeDayStores.findIndex(s => s.id === store.id);
+          const icon = this.createPinIcon(store, originalIndex >= 0 ? originalIndex : null, isExternal);
+
+          const marker = L.marker([store.lat, store.lng], {
+            icon: icon,
+            draggable: !this.isPinsLocked
+          }).addTo(this.map);
+
+          // Click handling
+          marker.on('click', () => {
+            if (this.isCtrlDragging) return;
+            this.setActiveStore(store.id, false);
+          });
+
+          // PC: Intercept mousedown when Ctrl key is held down to initiate Route Link Drag
+          marker.on('mousedown', (e) => {
+            if (e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
+              L.DomEvent.stopPropagation(e);
+              L.DomEvent.preventDefault(e);
+              this.startCtrlRouteDrag(store, e.originalEvent);
+            }
+          });
+
+          // PC: Right Click (contextmenu)
+          marker.on('contextmenu', (e) => {
+            L.DomEvent.preventDefault(e);
+            this.openAssignModal(store);
+          });
+
+          // Mobile: Touch Long Press detection
+          let touchTimer = null;
+          let touchMoved = false;
+          let startPos = null;
+
+          marker.on('touchstart', (e) => {
+            touchMoved = false;
+            const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null;
+            if (touch) startPos = { x: touch.clientX, y: touch.clientY };
+
+            touchTimer = setTimeout(() => {
+              if (!touchMoved) {
+                if (navigator.vibrate) navigator.vibrate(60);
+                this.openAssignModal(store);
+              }
+            }, 550);
+          });
+
+          marker.on('touchmove', (e) => {
+            const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null;
+            if (touch && startPos) {
+              const dist = Math.hypot(touch.clientX - startPos.x, touch.clientY - startPos.y);
+              if (dist > 8) {
+                touchMoved = true;
+                clearTimeout(touchTimer);
+              }
+            }
+          });
+
+          marker.on('touchend touchcancel', () => {
+            clearTimeout(touchTimer);
+          });
+
+          // Standard pin dragging when unlocked
+          marker.on('dragend', (e) => {
+            if (this.isCtrlDragging) return;
+            const newPos = e.target.getLatLng();
+            store.lat = parseFloat(newPos.lat.toFixed(6));
+            store.lng = parseFloat(newPos.lng.toFixed(6));
+
+            const mStore = this.masterStores.find(s => s.id === store.id);
+            if (mStore) {
+              mStore.lat = store.lat;
+              mStore.lng = store.lng;
+            }
+
+            this.saveAll();
+            this.drawRoutePolyline();
+            this.showDragToast(`📍 Poziția magazinului "${store.name}" a fost salvată!`);
+          });
+
+          this.markers[store.id] = marker;
+        });
+
+        if (storesToRender.length > 0 && !this.activeStoreId) {
+          const group = new L.featureGroup(Object.values(this.markers));
+          this.map.fitBounds(group.getBounds().pad(0.1));
+        }
+      }
+
+      /* CTRL + DRAG TO LINK STORES INTO ROUTE */
+      startCtrlRouteDrag(sourceStore, e) {
+        if (this.isCtrlDragging) return;
+        this.isCtrlDragging = true;
+        this.ctrlDragSourceStore = sourceStore;
+        this.map.dragging.disable();
+
+        const startPt = [sourceStore.lat, sourceStore.lng];
+        this.ctrlDragTempLine = L.polyline([startPt, startPt], {
+          color: '#f59e0b',
+          weight: 4,
+          dashArray: '6, 6',
+          opacity: 0.9,
+          zIndexOffset: 3000
+        }).addTo(this.map);
+
+        this.showDragToast(`🔗 Trage către magazinul pe care vrei să-l unești după "${sourceStore.name}"!`);
+
+        const onMouseMove = (ev) => {
+          if (!this.isCtrlDragging) return;
+          const latLng = this.map.mouseEventToLatLng(ev);
+          if (this.ctrlDragTempLine) {
+            this.ctrlDragTempLine.setLatLngs([startPt, [latLng.lat, latLng.lng]]);
+          }
+        };
+
+        const onMouseUp = (ev) => {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          this.map.dragging.enable();
+
+          if (this.ctrlDragTempLine) {
+            this.map.removeLayer(this.ctrlDragTempLine);
+            this.ctrlDragTempLine = null;
+          }
+          this.isCtrlDragging = false;
+
+          const targetStore = this.findStoreUnderCursor(ev.clientX, ev.clientY, sourceStore.id);
+          if (targetStore) {
+            this.connectStoresInRoute(sourceStore, targetStore);
+          }
+          this.ctrlDragSourceStore = null;
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      }
+
+      findStoreUnderCursor(clientX, clientY, excludeId) {
+        let closest = null;
+        let minDistancePx = 45; // Pixel hit-box radius around pin
+
+        const listToCheck = this.showAllStores ? this.masterStores : this.currentStores;
+        listToCheck.forEach(s => {
+          if (s.id === excludeId) return;
+          const pt = this.map.latLngToContainerPoint([s.lat, s.lng]);
+          const mapRect = this.map.getContainer().getBoundingClientRect();
+          const screenX = mapRect.left + pt.x;
+          const screenY = mapRect.top + pt.y;
+          const dist = Math.hypot(clientX - screenX, clientY - screenY);
+          if (dist < minDistancePx) {
+            minDistancePx = dist;
+            closest = s;
+          }
+        });
+        return closest;
+      }
+
+      connectStoresInRoute(sourceStore, targetStore) {
+        let stores = [...this.currentStores];
+
+        // Ensure sourceStore is in current day
+        let srcIdx = stores.findIndex(s => s.id === sourceStore.id);
+        if (srcIdx === -1) {
+          stores.push({ ...sourceStore });
+          srcIdx = stores.length - 1;
+        }
+
+        // Remove targetStore if already in current list to reposition it
+        const targetIdx = stores.findIndex(s => s.id === targetStore.id);
+        if (targetIdx !== -1) {
+          stores.splice(targetIdx, 1);
+          srcIdx = stores.findIndex(s => s.id === sourceStore.id);
+        }
+
+        // Insert target directly after source
+        stores.splice(srcIdx + 1, 0, { ...targetStore });
+
+        // Renumber order
+        stores.forEach((s, idx) => { s.order = idx + 1; });
+        this.currentStores = stores;
+
+        this.saveAll();
+        this.updateHeaderUI();
+        this.renderCategoryMenu();
+        this.renderSidebarList();
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+        this.renderReport();
+        this.showDragToast(`✅ Rută unită: "${sourceStore.name}" ➔ "${targetStore.name}"!`);
+      }
+
+      drawRoutePolyline() {
+        if (this.routePolyline) {
+          this.map.removeLayer(this.routePolyline);
+        }
+        const latLngs = this.currentStores.map(s => [s.lat, s.lng]);
+        if (latLngs.length > 1) {
+          this.routePolyline = L.polyline(latLngs, {
+            color: '#2563eb',
+            weight: 4,
+            opacity: 0.75,
+            dashArray: '8, 8'
+          }).addTo(this.map);
+        }
+      }
+
+      showDragToast(msg) {
+        const toast = document.getElementById("mapDragToast");
+        const toastText = document.getElementById("mapDragToastText");
+        if (!toast) return;
+        toastText.textContent = msg;
+        toast.style.display = "flex";
+        setTimeout(() => { toast.style.display = "none"; }, 3500);
+      }
+
+      /* ASSIGN PIN TO CATEGORY & DAY MODAL */
+      openAssignModal(store) {
+        this.assignTargetStore = store;
+        const modal = document.getElementById("assignModalOverlay");
+        document.getElementById("assignStoreTitle").textContent = store.name;
+        document.getElementById("assignStoreAddress").textContent = store.address;
+
+        const catSelect = document.getElementById("assignCatSelect");
+        catSelect.innerHTML = "";
+        Object.values(this.categories).forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat.id;
+          opt.textContent = cat.name;
+          if (cat.id === this.currentCatId) opt.selected = true;
+          catSelect.appendChild(opt);
+        });
+
+        this.onAssignCategoryChange();
+
+        const isInCurrent = this.currentStores.some(s => s.id === store.id);
+        document.getElementById("btnRemoveFromCurrentDay").style.display = isInCurrent ? "block" : "none";
+
+        modal.classList.add("active");
+      }
+
+      onAssignCategoryChange() {
+        const catId = document.getElementById("assignCatSelect").value;
+        const cat = this.categories[catId];
+        const daySelect = document.getElementById("assignDaySelect");
+        daySelect.innerHTML = "";
+
+        if (cat && cat.days) {
+          Object.values(cat.days).forEach(day => {
+            const opt = document.createElement("option");
+            opt.value = day.id;
+            opt.textContent = `${day.name} (${(day.stores || []).length} magazine)`;
+            if (day.id === this.currentDayId && catId === this.currentCatId) opt.selected = true;
+            daySelect.appendChild(opt);
+          });
+        }
+      }
+
+      confirmAssignStore() {
+        if (!this.assignTargetStore) return;
+        const catId = document.getElementById("assignCatSelect").value;
+        const dayId = document.getElementById("assignDaySelect").value;
+
+        const cat = this.categories[catId];
+        if (!cat || !cat.days[dayId]) {
+          alert("Zi sau categorie invalidă.");
+          return;
+        }
+
+        const targetDay = cat.days[dayId];
+        if (!targetDay.stores) targetDay.stores = [];
+
+        const existingIdx = targetDay.stores.findIndex(s => s.id === this.assignTargetStore.id);
+        if (existingIdx >= 0) {
+          alert(`Magazinul "${this.assignTargetStore.name}" se află deja în ${targetDay.name}!`);
+        } else {
+          targetDay.stores.push({
+            ...this.assignTargetStore,
+            order: targetDay.stores.length + 1
+          });
+          this.saveAll();
+          alert(`✓ Magazinul "${this.assignTargetStore.name}" a fost adăugat în ${cat.name} -> ${targetDay.name}!`);
+        }
+
+        this.closeAssignModal();
+        this.updateHeaderUI();
+        this.renderCategoryMenu();
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+        this.renderSidebarList();
+      }
+
+      removeStoreFromActiveDay() {
+        if (!this.assignTargetStore) return;
+        const storeName = this.assignTargetStore.name;
+        if (confirm(`Elimini magazinul "${storeName}" din ziua curentă?`)) {
+          this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id);
+          this.saveAll();
+          this.closeAssignModal();
+          this.updateHeaderUI();
+          this.renderCategoryMenu();
+          this.renderMapMarkers();
+          this.drawRoutePolyline();
+          this.renderSidebarList();
+          this.renderReport();
+          alert(`✓ Magazinul a fost eliminat din ziua curentă.`);
+        }
+      }
+
+      closeAssignModal() {
+        document.getElementById("assignModalOverlay").classList.remove("active");
+        this.assignTargetStore = null;
+      }
+
+      openAssignModalForActive() {
+        if (!this.activeStoreId) return;
+        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
+        if (store) this.openAssignModal(store);
+      }
+
+      /* FILTER & SIDEBAR */
+      setStoreFilter(filterType, element) {
+        this.currentFilter = filterType;
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        if (element) element.classList.add('active');
+        this.renderSidebarList();
+        this.renderMapMarkers();
+      }
+
+      getFilteredStores() {
+        return this.currentStores.filter(store => {
+          const log = this.storeLogs[store.id];
+          if (this.currentFilter === "all") return true;
+          if (this.currentFilter === "pending") return !log || (log.status !== "completed" && log.status !== "unresolved");
+          if (this.currentFilter === "completed") return log && log.status === "completed";
+          if (store.chain && store.chain.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
+          if (store.name.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
+          return false;
+        });
+      }
+
+      renderSidebarList() {
+        const container = document.getElementById("storeListContainer");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const storesList = this.getFilteredStores();
+        let resolvedCount = 0;
+
+        if (storesList.length === 0) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:30px 14px; color:var(--text-muted); font-size:12px;">
+              Nu există magazine în această zi.<br/><br/>
+              Activează butonul <strong>"Toate Magazinele"</strong> și unește magazine ținând apăsat <strong>Ctrl</strong> și trăgând cu mouse-ul!
+            </div>
+          `;
+        }
+
+        storesList.forEach((store) => {
+          const originalIndex = this.currentStores.findIndex(s => s.id === store.id);
+          const log = this.storeLogs[store.id];
+          const isResolved = log && log.status === "completed";
+          const isUnresolved = log && log.status === "unresolved";
+          if (isResolved) resolvedCount++;
+
+          const card = document.createElement("div");
+          card.className = `store-card ${isResolved ? 'completed' : ''} ${isUnresolved ? 'unresolved' : ''} ${this.activeStoreId === store.id ? 'active' : ''}`;
+          card.dataset.id = store.id;
+
+          let statusBadge = `<span class="badge badge-gray">Neînceput</span>`;
+          if (isResolved) statusBadge = `<span class="badge badge-success">✓ ${log.time}</span>`;
+          if (isUnresolved) statusBadge = `<span class="badge badge-danger">✕ Problemă</span>`;
+
+          card.innerHTML = `
+            <div class="store-card-num">${originalIndex + 1}</div>
+            <div class="store-card-content">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="store-card-title">${store.name}</div>
+                ${statusBadge}
+              </div>
+              <div class="store-card-address">${store.address}</div>
+            </div>
+          `;
+
+          card.onclick = () => this.setActiveStore(store.id, false);
+          card.oncontextmenu = (e) => {
+            e.preventDefault();
+            this.openAssignModal(store);
+          };
+          container.appendChild(card);
+        });
+
+        const totalResolved = this.currentStores.filter(s => this.storeLogs[s.id] && this.storeLogs[s.id].status === "completed").length;
+        const badge = document.getElementById("sidebarProgressBadge");
+        if (badge) badge.textContent = `${totalResolved}/${this.currentStores.length} Vizitate`;
+      }
+
+      setActiveStore(id, openSheet = false) {
+        this.activeStoreId = id;
+        const store = this.masterStores.find(s => s.id === id) || this.currentStores.find(s => s.id === id);
+        if (!store) return;
+
+        const index = this.currentStores.findIndex(s => s.id === id);
+        const log = this.storeLogs[id] || { status: "pending" };
+
+        this.renderMapMarkers();
+        this.map.panTo([store.lat, store.lng], { animate: true, duration: 0.4 });
+
+        const quickCard = document.getElementById("mobileQuickCard");
+        const mqcOrder = document.getElementById("mqcOrder");
+        const mqcName = document.getElementById("mqcName");
+        const mqcAddress = document.getElementById("mqcAddress");
+        const mqcStatusBadge = document.getElementById("mqcStatusBadge");
+
+        if (mqcOrder) mqcOrder.textContent = (index >= 0) ? `OPRIREA ${index + 1} DIN ${this.currentStores.length}` : `MAGAZIN EXTERN (Din afara zilei)`;
+        if (mqcName) mqcName.textContent = store.name;
+        if (mqcAddress) mqcAddress.textContent = store.address;
+        
+        if (mqcStatusBadge) {
+          if (log.status === "completed") {
+            mqcStatusBadge.className = "badge badge-success";
+            mqcStatusBadge.textContent = `Rezolvat (${log.time || 'OK'})`;
+          } else if (log.status === "unresolved") {
+            mqcStatusBadge.className = "badge badge-danger";
+            mqcStatusBadge.textContent = "Nerezolvat";
+          } else {
+            mqcStatusBadge.className = "badge badge-gray";
+            mqcStatusBadge.textContent = "Neînceput";
+          }
+        }
+
+        if (quickCard) quickCard.style.display = "block";
+
+        document.querySelectorAll('.store-card').forEach(card => {
+          card.classList.toggle('active', card.dataset.id === id);
+        });
+
+        const fabSelect = document.getElementById("fabStoreSelect");
+        if (fabSelect) fabSelect.value = id;
+        this.renderFabProductsForm();
+
+        if (openSheet) {
+          this.openStoreModal(store, index >= 0 ? index : 0, log);
+        }
+      }
+
+      closeQuickCard() {
+        const quickCard = document.getElementById("mobileQuickCard");
+        if (quickCard) quickCard.style.display = "none";
+      }
+
+      openActiveStoreModal() {
+        if (!this.activeStoreId) return;
+        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
+        const idx = this.currentStores.findIndex(s => s.id === this.activeStoreId);
+        const log = this.storeLogs[this.activeStoreId] || { status: "pending" };
+        this.openStoreModal(store, idx >= 0 ? idx : 0, log);
+      }
+
+      openStoreModal(store, index, log) {
+        document.getElementById("modalOrderBadge").textContent = `Oprirea ${index + 1} din ${this.currentStores.length}`;
+        document.getElementById("modalStoreTitle").textContent = store.name;
+        document.getElementById("modalStoreAddress").textContent = store.address;
+        
+        const badge = document.getElementById("modalStatusBadge");
+        if (log.status === "completed") {
+          badge.className = "badge badge-success";
+          badge.textContent = `Rezolvat la ${log.time}`;
+        } else if (log.status === "unresolved") {
+          badge.className = "badge badge-danger";
+          badge.textContent = `Nerezolvat (${log.reason || 'Problemă'})`;
+        } else {
+          badge.className = "badge badge-gray";
+          badge.textContent = "Neînceput";
+        }
+
+        document.getElementById("storeModalOverlay").classList.add("active");
+      }
+
+      closeStoreModal() {
+        document.getElementById("storeModalOverlay").classList.remove("active");
       }
 
       /* PIN LOCK & UNLOCK */
@@ -2010,7 +2987,7 @@
         });
 
         if (this.isPinsLocked) {
-          this.showDragToast("🔒 Pinii au fost BLOCAȚI împotriva atingerilor accidentale.");
+          this.showDragToast("🔒 Pinii au fost BLOCAȚI.");
         } else {
           this.showDragToast("🔓 Pinii au fost DEBLOCAȚI! Poți trage acum pinul pe hartă.");
         }
@@ -2076,249 +3053,6 @@
         } else {
           this.renderReport();
         }
-      }
-
-      /* MAP SETUP */
-      initMap() {
-        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-          maxZoom: 20,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-          attribution: '&copy; Google Maps'
-        });
-
-        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-          maxZoom: 20,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-          attribution: '&copy; Google Maps'
-        });
-
-        const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; OpenStreetMap'
-        });
-
-        this.map = L.map('map', { 
-          zoomControl: false,
-          layers: [googleHybrid] 
-        }).setView([44.420, 26.040], 12);
-
-        L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
-
-        const baseMaps = {
-          "🛰️ Google Satelit": googleHybrid,
-          "🗺️ Google Străzi": googleStreets,
-          "🌍 OpenStreetMap": osmStandard
-        };
-        L.control.layers(baseMaps, null, { position: 'topleft' }).addTo(this.map);
-
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
-      }
-
-      createPinIcon(store, index) {
-        const log = this.storeLogs[store.id];
-        const isActive = this.activeStoreId === store.id;
-
-        let colorClass = "pin-pending";
-        if (log && log.status === "completed") {
-          colorClass = "pin-completed";
-        } else if (log && log.status === "unresolved") {
-          colorClass = "pin-unresolved";
-        } else if (isActive) {
-          colorClass = "pin-active-pending";
-        }
-
-        const activeClass = isActive ? "is-active" : "";
-
-        return L.divIcon({
-          className: 'custom-leaflet-marker',
-          html: `<div class="custom-marker-pin ${colorClass} ${activeClass}"><span>${index + 1}</span></div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 32]
-        });
-      }
-
-      renderMapMarkers() {
-        Object.values(this.markers).forEach(m => this.map.removeLayer(m));
-        this.markers = {};
-
-        const filtered = this.getFilteredStores();
-
-        filtered.forEach((store) => {
-          const originalIndex = this.stores.findIndex(s => s.id === store.id);
-          const icon = this.createPinIcon(store, originalIndex);
-          
-          const marker = L.marker([store.lat, store.lng], { 
-            icon: icon,
-            draggable: !this.isPinsLocked 
-          }).addTo(this.map);
-
-          marker.on('click', () => this.setActiveStore(store.id, false));
-
-          marker.on('dragend', (e) => {
-            const newPos = e.target.getLatLng();
-            store.lat = parseFloat(newPos.lat.toFixed(6));
-            store.lng = parseFloat(newPos.lng.toFixed(6));
-            this.saveAll();
-            this.drawRoutePolyline();
-            this.showDragToast(`📍 Poziția magazinului "${store.name}" a fost salvată în Cloud!`);
-          });
-
-          this.markers[store.id] = marker;
-        });
-
-        if (filtered.length > 0) {
-          const group = new L.featureGroup(Object.values(this.markers));
-          this.map.fitBounds(group.getBounds().pad(0.1));
-        }
-      }
-
-      showDragToast(msg) {
-        const toast = document.getElementById("mapDragToast");
-        const toastText = document.getElementById("mapDragToastText");
-        if (!toast) return;
-        toastText.textContent = msg;
-        toast.style.display = "flex";
-        setTimeout(() => { toast.style.display = "none"; }, 3500);
-      }
-
-      resetStoreCoordinates(storeId) {
-        const initialList = INITIAL_DATA_WEEK_1[this.currentDay] || [];
-        const canonical = initialList.find(s => s.id === storeId);
-        const current = this.stores.find(s => s.id === storeId);
-        if (canonical && current) {
-          current.lat = canonical.lat;
-          current.lng = canonical.lng;
-          this.saveAll();
-          this.renderMapMarkers();
-          this.drawRoutePolyline();
-          this.setActiveStore(storeId, false);
-          alert(`✓ Pinul magazinului "${current.name}" a fost resetat.`);
-        }
-      }
-
-      drawRoutePolyline() {
-        if (this.routePolyline) {
-          this.map.removeLayer(this.routePolyline);
-        }
-        const latLngs = this.stores.map(s => [s.lat, s.lng]);
-        this.routePolyline = L.polyline(latLngs, {
-          color: '#2563eb',
-          weight: 4,
-          opacity: 0.75,
-          dashArray: '8, 8'
-        }).addTo(this.map);
-      }
-
-      setStoreFilter(filterType, element) {
-        this.currentFilter = filterType;
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        if (element) element.classList.add('active');
-        this.renderSidebarList();
-        this.renderMapMarkers();
-      }
-
-      getFilteredStores() {
-        return this.stores.filter(store => {
-          const log = this.storeLogs[store.id];
-          if (this.currentFilter === "all") return true;
-          if (this.currentFilter === "pending") return !log || (log.status !== "completed" && log.status !== "unresolved");
-          if (this.currentFilter === "completed") return log && log.status === "completed";
-          if (store.chain && store.chain.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
-          if (store.name.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
-          return false;
-        });
-      }
-
-      setActiveStore(id, openSheet = false) {
-        this.activeStoreId = id;
-        const store = this.stores.find(s => s.id === id);
-        if (!store) return;
-
-        const index = this.stores.findIndex(s => s.id === id);
-        const log = this.storeLogs[id] || { status: "pending" };
-
-        this.stores.forEach((s, idx) => {
-          if (this.markers[s.id]) {
-            this.markers[s.id].setIcon(this.createPinIcon(s, idx));
-          }
-        });
-
-        this.map.panTo([store.lat, store.lng], { animate: true, duration: 0.4 });
-
-        const quickCard = document.getElementById("mobileQuickCard");
-        const mqcOrder = document.getElementById("mqcOrder");
-        const mqcName = document.getElementById("mqcName");
-        const mqcAddress = document.getElementById("mqcAddress");
-        const mqcStatusBadge = document.getElementById("mqcStatusBadge");
-
-        if (mqcOrder) mqcOrder.textContent = `OPRIREA ${index + 1} DIN ${this.stores.length}`;
-        if (mqcName) mqcName.textContent = store.name;
-        if (mqcAddress) mqcAddress.textContent = store.address;
-        
-        if (mqcStatusBadge) {
-          if (log.status === "completed") {
-            mqcStatusBadge.className = "badge badge-success";
-            mqcStatusBadge.textContent = `Rezolvat (${log.time || 'OK'})`;
-          } else if (log.status === "unresolved") {
-            mqcStatusBadge.className = "badge badge-danger";
-            mqcStatusBadge.textContent = "Nerezolvat";
-          } else {
-            mqcStatusBadge.className = "badge badge-gray";
-            mqcStatusBadge.textContent = "Neînceput";
-          }
-        }
-
-        if (quickCard) quickCard.style.display = "block";
-
-        document.querySelectorAll('.store-card').forEach(card => {
-          card.classList.toggle('active', card.dataset.id === id);
-        });
-
-        const fabSelect = document.getElementById("fabStoreSelect");
-        if (fabSelect) fabSelect.value = id;
-        this.renderFabProductsForm();
-
-        if (openSheet) {
-          this.openStoreModal(store, index, log);
-        }
-      }
-
-      closeQuickCard() {
-        const quickCard = document.getElementById("mobileQuickCard");
-        if (quickCard) quickCard.style.display = "none";
-      }
-
-      openActiveStoreModal() {
-        if (!this.activeStoreId) return;
-        const store = this.stores.find(s => s.id === this.activeStoreId);
-        const idx = this.stores.findIndex(s => s.id === this.activeStoreId);
-        const log = this.storeLogs[this.activeStoreId] || { status: "pending" };
-        this.openStoreModal(store, idx, log);
-      }
-
-      openStoreModal(store, index, log) {
-        document.getElementById("modalOrderBadge").textContent = `Oprirea ${index + 1} din ${this.stores.length}`;
-        document.getElementById("modalStoreTitle").textContent = store.name;
-        document.getElementById("modalStoreAddress").textContent = store.address;
-        
-        const badge = document.getElementById("modalStatusBadge");
-        if (log.status === "completed") {
-          badge.className = "badge badge-success";
-          badge.textContent = `Rezolvat la ${log.time}`;
-        } else if (log.status === "unresolved") {
-          badge.className = "badge badge-danger";
-          badge.textContent = `Nerezolvat (${log.reason || 'Problemă'})`;
-        } else {
-          badge.className = "badge badge-gray";
-          badge.textContent = "Neînceput";
-        }
-
-        document.getElementById("storeModalOverlay").classList.add("active");
-      }
-
-      closeStoreModal() {
-        document.getElementById("storeModalOverlay").classList.remove("active");
       }
 
       toggleGpsTracking() {
@@ -2399,7 +3133,7 @@
       }
 
       locateClosestUnvisitedStore() {
-        const unvisited = this.stores.filter(s => {
+        const unvisited = this.currentStores.filter(s => {
           const log = this.storeLogs[s.id];
           return !log || (log.status !== "completed" && log.status !== "unresolved");
         });
@@ -2434,6 +3168,102 @@
         }
       }
 
+      launchNavigation(webUrl, nativeSchemeUrl) {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const targetUrl = (isIOS && nativeSchemeUrl) ? nativeSchemeUrl : webUrl;
+        
+        const link = document.createElement("a");
+        link.href = targetUrl;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          if (link.parentNode) link.parentNode.removeChild(link);
+        }, 400);
+      }
+
+      openActiveInWaze() {
+        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
+        if (!store) return;
+        this.launchNavigation(`https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`, `waze://?ll=${store.lat},${store.lng}&navigate=yes`);
+      }
+
+      openActiveInGoogleMaps() {
+        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
+        if (!store) return;
+        this.launchNavigation(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`, `comgooglemaps://?daddr=${store.lat},${store.lng}&directionsmode=driving`);
+      }
+
+      openActiveInAppleMaps() {
+        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
+        if (!store) return;
+        this.launchNavigation(`https://maps.apple.com/?daddr=${store.lat},${store.lng}`, `maps://?daddr=${store.lat},${store.lng}&dirflg=d`);
+      }
+
+      goToNextStore() {
+        const currentIndex = this.currentStores.findIndex(s => s.id === this.activeStoreId);
+        if (currentIndex < this.currentStores.length - 1) {
+          const nextStore = this.currentStores[currentIndex + 1];
+          this.setActiveStore(nextStore.id, false);
+        } else {
+          alert(`🎉 Felicitări! Ai finalizat toate magazinele de astăzi.`);
+        }
+      }
+
+      markActiveAsResolved() {
+        if (!this.activeStoreId) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+
+        this.storeLogs[this.activeStoreId] = {
+          status: "completed",
+          time: timeStr,
+          timestamp: Date.now()
+        };
+        this.saveAll();
+        this.updateUIAfterStatusChange();
+      }
+
+      promptUnresolved() {
+        if (!this.activeStoreId) return;
+        document.getElementById("reasonModalOverlay").classList.add("active");
+      }
+
+      confirmUnresolved(reason) {
+        if (!this.activeStoreId) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+
+        this.storeLogs[this.activeStoreId] = {
+          status: "unresolved",
+          reason: reason,
+          time: timeStr,
+          timestamp: Date.now()
+        };
+        this.saveAll();
+        document.getElementById("reasonModalOverlay").classList.remove("active");
+        this.updateUIAfterStatusChange();
+      }
+
+      updateUIAfterStatusChange() {
+        this.renderMapMarkers();
+        this.renderSidebarList();
+        this.setActiveStore(this.activeStoreId, false);
+        this.renderReport();
+      }
+
+      reorderRoute(strategy) {
+        if (strategy === "retur") {
+          this.currentStores = [...this.currentStores].reverse().map((s, idx) => ({ ...s, order: idx + 1 }));
+        }
+        this.saveAll();
+        this.renderSidebarList();
+        this.renderMapMarkers();
+        this.drawRoutePolyline();
+        if (this.currentStores.length > 0) this.setActiveStore(this.currentStores[0].id, false);
+      }
+
+      /* FORM & PHOTOS */
       setupDraggableFab() {
         const fab = document.getElementById("floatingFab");
         if (!fab) return;
@@ -2502,153 +3332,6 @@
         fab.addEventListener('mousedown', onStart);
       }
 
-      launchNavigation(webUrl, nativeSchemeUrl) {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        const targetUrl = (isIOS && nativeSchemeUrl) ? nativeSchemeUrl : webUrl;
-        
-        const link = document.createElement("a");
-        link.href = targetUrl;
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => {
-          if (link.parentNode) link.parentNode.removeChild(link);
-        }, 400);
-      }
-
-      openActiveInWaze() {
-        const store = this.stores.find(s => s.id === this.activeStoreId);
-        if (!store) return;
-        this.launchNavigation(`https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`, `waze://?ll=${store.lat},${store.lng}&navigate=yes`);
-      }
-
-      openActiveInGoogleMaps() {
-        const store = this.stores.find(s => s.id === this.activeStoreId);
-        if (!store) return;
-        this.launchNavigation(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`, `comgooglemaps://?daddr=${store.lat},${store.lng}&directionsmode=driving`);
-      }
-
-      openActiveInAppleMaps() {
-        const store = this.stores.find(s => s.id === this.activeStoreId);
-        if (!store) return;
-        this.launchNavigation(`https://maps.apple.com/?daddr=${store.lat},${store.lng}`, `maps://?daddr=${store.lat},${store.lng}&dirflg=d`);
-      }
-
-      goToNextStore() {
-        const currentIndex = this.stores.findIndex(s => s.id === this.activeStoreId);
-        if (currentIndex < this.stores.length - 1) {
-          const nextStore = this.stores[currentIndex + 1];
-          this.setActiveStore(nextStore.id, false);
-        } else {
-          alert(`🎉 Felicitări! Ai finalizat toate magazinele de astăzi. Drum bun spre casă la Brănești!`);
-        }
-      }
-
-      markActiveAsResolved() {
-        if (!this.activeStoreId) return;
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
-
-        this.storeLogs[this.activeStoreId] = {
-          status: "completed",
-          time: timeStr,
-          timestamp: Date.now()
-        };
-        this.saveAll();
-        this.updateUIAfterStatusChange();
-      }
-
-      promptUnresolved() {
-        if (!this.activeStoreId) return;
-        document.getElementById("reasonModalOverlay").classList.add("active");
-      }
-
-      confirmUnresolved(reason) {
-        if (!this.activeStoreId) return;
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
-
-        this.storeLogs[this.activeStoreId] = {
-          status: "unresolved",
-          reason: reason,
-          time: timeStr,
-          timestamp: Date.now()
-        };
-        this.saveAll();
-        document.getElementById("reasonModalOverlay").classList.remove("active");
-        this.updateUIAfterStatusChange();
-      }
-
-      updateUIAfterStatusChange() {
-        this.stores.forEach((s, idx) => {
-          if (this.markers[s.id]) {
-            this.markers[s.id].setIcon(this.createPinIcon(s, idx));
-          }
-        });
-        this.renderSidebarList();
-        this.setActiveStore(this.activeStoreId, false);
-        this.renderReport();
-      }
-
-      reorderRoute(strategy) {
-        const initialList = INITIAL_DATA_WEEK_1[this.currentDay] || [];
-        if (strategy === "tur") {
-          this.stores = [...initialList];
-        } else if (strategy === "retur") {
-          this.stores = [...initialList].reverse().map((s, idx) => ({ ...s, order: idx + 1 }));
-        }
-        this.saveAll();
-        this.renderSidebarList();
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
-        this.setActiveStore(this.stores[0].id, false);
-        alert(`Traseu reordonat: ${strategy === 'tur' ? 'Tur (Plecare A2)' : 'Retur'}`);
-      }
-
-      renderSidebarList() {
-        const container = document.getElementById("storeListContainer");
-        if (!container) return;
-        container.innerHTML = "";
-
-        let resolvedCount = 0;
-        const filtered = this.getFilteredStores();
-
-        filtered.forEach((store) => {
-          const originalIndex = this.stores.findIndex(s => s.id === store.id);
-          const log = this.storeLogs[store.id];
-          const isResolved = log && log.status === "completed";
-          const isUnresolved = log && log.status === "unresolved";
-          if (isResolved) resolvedCount++;
-
-          const card = document.createElement("div");
-          card.className = `store-card ${isResolved ? 'completed' : ''} ${isUnresolved ? 'unresolved' : ''} ${this.activeStoreId === store.id ? 'active' : ''}`;
-          card.dataset.id = store.id;
-
-          let statusBadge = `<span class="badge badge-gray">Neînceput</span>`;
-          if (isResolved) statusBadge = `<span class="badge badge-success">✓ ${log.time}</span>`;
-          if (isUnresolved) statusBadge = `<span class="badge badge-danger">✕ Problemă</span>`;
-
-          card.innerHTML = `
-            <div class="store-card-num">${originalIndex + 1}</div>
-            <div class="store-card-content">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="store-card-title">${store.name}</div>
-                ${statusBadge}
-              </div>
-              <div class="store-card-address">${store.address}</div>
-            </div>
-          `;
-
-          card.onclick = () => this.setActiveStore(store.id, false);
-          container.appendChild(card);
-        });
-
-        const totalResolved = this.stores.filter(s => this.storeLogs[s.id] && this.storeLogs[s.id].status === "completed").length;
-        const badge = document.getElementById("sidebarProgressBadge");
-        if (badge) badge.textContent = `${totalResolved}/${this.stores.length} Vizitate`;
-      }
-
-      /* FORM & PHOTOS */
       toggleFabWindow() {
         const win = document.getElementById("fabWindow");
         win.classList.toggle("active");
@@ -2678,7 +3361,7 @@
         const select = document.getElementById("fabStoreSelect");
         if (!select) return;
         select.innerHTML = "";
-        this.stores.forEach((store, idx) => {
+        this.currentStores.forEach((store, idx) => {
           const opt = document.createElement("option");
           opt.value = store.id;
           opt.textContent = `${idx + 1}. ${store.name}`;
@@ -2714,6 +3397,7 @@
 
       renderFabProductsForm() {
         const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
+        if (!storeId) return;
         const data = this.getOrCreateStoreData(storeId);
 
         document.getElementById("fabSectionName").value = data.sectionName || "";
@@ -2881,17 +3565,18 @@
         modal.classList.add("active");
       }
 
+      /* REPORT TAB */
       renderReport() {
         const tbody = document.getElementById("reportBodyRows");
         if (!tbody) return;
         tbody.innerHTML = "";
 
-        let total = this.stores.length;
+        let total = this.currentStores.length;
         let resolved = 0;
         let unresolved = 0;
         let pending = 0;
 
-        this.stores.forEach((store, idx) => {
+        this.currentStores.forEach((store, idx) => {
           const log = this.storeLogs[store.id];
           const data = this.storeProductsData[store.id] || { sectionName: "-", items: [] };
 
@@ -2950,14 +3635,15 @@
 
       copyWhatsAppReport() {
         const dateStr = new Date().toLocaleDateString('ro-RO');
-        const dayMap = { day1: "Ziua 1", day2: "Ziua 2", day3: "Ziua 3", day4: "Ziua 4", day5: "Ziua 5" };
-        const dayLabel = `SĂPTĂMÂNA 1 - ${dayMap[this.currentDay] || this.currentDay.toUpperCase()}`;
+        const cat = this.categories[this.currentCatId];
+        const day = cat ? cat.days[this.currentDayId] : null;
+        const dayLabel = `${cat ? cat.name.toUpperCase() : ''} - ${day ? day.name.toUpperCase() : ''}`;
 
         let text = `📊 *RAPORT MERCHANDISER - ${dayLabel}*\n📅 Data: ${dateStr}\n🚗 Plecare din Brănești (A2)\n\n`;
 
         let resolved = 0, unresolved = 0;
 
-        this.stores.forEach((store, idx) => {
+        this.currentStores.forEach((store, idx) => {
           const log = this.storeLogs[store.id];
           const data = this.storeProductsData[store.id] || { sectionName: "", items: [] };
           const validItems = data.items.filter(it => it.name || it.price || it.photoUrl);
@@ -2980,7 +3666,7 @@
           }
         });
 
-        text += `\n📈 *Sumar:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.stores.length - resolved - unresolved} Rămase`;
+        text += `\n📈 *Sumar:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.currentStores.length - resolved - unresolved} Rămase`;
 
         navigator.clipboard.writeText(text).then(() => {
           alert(`✓ Raportul complet pentru WhatsApp a fost copiat în Clipboard!`);
@@ -2988,10 +3674,9 @@
       }
 
       exportCSV() {
-        const dayTag = this.currentDay.toUpperCase();
         let csv = "\uFEFFNr,Magazin,Oras,Adresa,Ora Vizita,Status,Sectiune,Produse Detaliate\n";
         
-        this.stores.forEach((store, idx) => {
+        this.currentStores.forEach((store, idx) => {
           const log = this.storeLogs[store.id] || {};
           const data = this.storeProductsData[store.id] || { sectionName: "", items: [] };
           const validItems = data.items.filter(it => it.name || it.price);
@@ -3005,7 +3690,7 @@
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Raport_${dayTag}_${new Date().toISOString().slice(0,10)}.csv`;
+        link.download = `Raport_${this.currentCatId}_${this.currentDayId}_${new Date().toISOString().slice(0,10)}.csv`;
         link.click();
       }
 
@@ -3015,16 +3700,16 @@
       exportFullBackup() {
         const backupData = {
           exportDate: new Date().toISOString(),
-          activeDay: this.currentDay,
-          stores: this.stores,
-          logs: this.storeLogs,
-          products: this.storeProductsData
+          activeCategory: this.currentCatId,
+          activeDay: this.currentDayId,
+          categories: this.categories,
+          masterStores: this.masterStores
         };
 
         const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Backup_Merchandiser_${new Date().toISOString().slice(0,10)}.json`;
+        link.download = `Backup_Complet_Merchandiser_${new Date().toISOString().slice(0,10)}.json`;
         link.click();
       }
 
@@ -3036,14 +3721,13 @@
         reader.onload = async (e) => {
           try {
             const data = JSON.parse(e.target.result);
-            if (data.stores) this.stores = data.stores;
-            if (data.logs) this.storeLogs = data.logs;
-            if (data.products) this.storeProductsData = data.products;
+            if (data.categories) this.categories = data.categories;
+            if (data.masterStores) this.masterStores = data.masterStores;
             this.saveAll();
-            alert("✓ Datele au fost restaurate cu succes!");
+            alert("✓ Toate datele au fost restaurate cu succes!");
             location.reload();
           } catch(err) {
-            alert("Fișier invalid.");
+            alert("Fișier JSON invalid.");
           }
         };
         reader.readAsText(file);
@@ -3064,13 +3748,11 @@
       }
     }
 
-    // Expose app to global window for inline onclick handlers
     window.app = new MerchandiserApp();
     window.addEventListener("DOMContentLoaded", () => {
       window.app.init();
     });
 
-    // Auto resize map when returning from Waze on iOS Safari
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden && window.app && window.app.map) {
         setTimeout(() => window.app.map.invalidateSize(true), 150);
