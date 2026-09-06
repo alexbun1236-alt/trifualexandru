@@ -2183,21 +2183,6 @@
           btn.classList.remove("active");
           label.textContent = "Fără Profi";
         }
-
-      /* GET ALLOCATED STORES IN OTHER DAYS OF CURRENT CATEGORY */
-      getStoresAllocatedInOtherDays() {
-        const currentCat = this.categories[this.currentCatId];
-        if (!currentCat || !currentCat.days) return new Set();
-
-        const allocatedIds = new Set();
-        Object.entries(currentCat.days).forEach(([dayId, day]) => {
-          if (dayId !== this.currentDayId && Array.isArray(day.stores)) {
-            day.stores.forEach(s => allocatedIds.add(s.id));
-          }
-        });
-        return allocatedIds;
-      }
-
       }
 
       /* CTRL KEY LISTENER FOR VISUAL CROSSHAIR */
@@ -2490,21 +2475,16 @@
         const activeIds = new Set(activeDayStores.map(s => s.id));
 
         let storesToRender = [];
-        const otherDaysAllocated = this.getStoresAllocatedInOtherDays();
-
         if (this.showAllStores) {
-          storesToRender = this.masterStores.filter(s => {
-            // Exclude stores already allocated to other days of this week/category
-            if (otherDaysAllocated.has(s.id)) {
-              return false;
-            }
-            // Hide Profi logic
-            if (this.hideProfi) {
+          storesToRender = this.masterStores;
+          // Desktop Hide Profi logic:
+          if (this.hideProfi) {
+            storesToRender = storesToRender.filter(s => {
               const isProfi = (s.chain && s.chain.toLowerCase().includes("profi")) || s.name.toLowerCase().includes("profi");
+              // Retain if it's not Profi OR if it's already in the active day's planned route
               return !isProfi || activeIds.has(s.id);
-            }
-            return true;
-          });
+            });
+          }
         } else {
           storesToRender = this.getFilteredStores();
         }
@@ -2652,10 +2632,7 @@
         let closest = null;
         let minDistancePx = 45; // Pixel hit-box radius around pin
 
-        const otherDaysAllocated = this.getStoresAllocatedInOtherDays();
-        const listToCheck = this.showAllStores 
-          ? this.masterStores.filter(s => !otherDaysAllocated.has(s.id)) 
-          : this.currentStores;
+        const listToCheck = this.showAllStores ? this.masterStores : this.currentStores;
         listToCheck.forEach(s => {
           if (s.id === excludeId) return;
           const pt = this.map.latLngToContainerPoint([s.lat, s.lng]);
