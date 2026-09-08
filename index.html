@@ -20,1369 +20,263 @@
 
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --primary-light: #dbeafe;
-      --success: #10b981;
-      --success-dark: #059669;
-      --success-light: #d1fae5;
-      --danger: #ef4444;
-      --danger-dark: #dc2626;
-      --danger-light: #fee2e2;
-      --warning: #f59e0b;
-      --warning-light: #fef3c7;
-      --purple: #8b5cf6;
-      --purple-light: #ede9fe;
-      --gray-50: #f8fafc;
-      --gray-100: #f1f5f9;
-      --gray-200: #e2e8f0;
-      --gray-300: #cbd5e1;
-      --gray-400: #94a3b8;
-      --gray-500: #64748b;
-      --gray-600: #475569;
-      --gray-700: #334155;
-      --gray-800: #1e293b;
-      --gray-900: #0f172a;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #dbeafe;
+      --success: #10b981; --success-dark: #059669; --success-light: #d1fae5;
+      --danger: #ef4444; --danger-dark: #dc2626; --danger-light: #fee2e2;
+      --warning: #f59e0b; --warning-light: #fef3c7;
+      --purple: #8b5cf6; --purple-light: #ede9fe;
+      --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1;
+      --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569; --gray-700: #334155;
+      --gray-800: #1e293b; --gray-900: #0f172a;
+      --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-muted: #64748b;
       --border: #e2e8f0;
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-      --radius: 12px;
-      --radius-sm: 8px;
+      --radius: 12px; --radius-sm: 8px;
       --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     [data-theme="dark"] {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #334155;
-      --gray-50: #1e293b;
-      --gray-100: #334155;
-      --gray-200: #475569;
-      --primary-light: #1e3a8a;
-      --success-light: #064e3b;
-      --danger-light: #7f1d1d;
-      --purple-light: #4c1d95;
+      --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --text-muted: #94a3b8;
+      --border: #334155; --gray-50: #1e293b; --gray-100: #334155; --gray-200: #475569;
+      --primary-light: #1e3a8a; --success-light: #064e3b; --danger-light: #7f1d1d; --purple-light: #4c1d95;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
+    body { font-family: var(--font); background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+    body.ctrl-pressed .custom-marker-pin { cursor: crosshair !important; box-shadow: 0 0 0 3px #f59e0b, 0 4px 10px rgba(245, 158, 11, 0.5) !important; }
 
-    body {
-      font-family: var(--font);
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
-    }
+    /* Optimizare PWA iPhone: Previne delay-ul de click pe butoane */
+    button, a, .store-card, .filter-chip, select, input { touch-action: manipulation; }
 
-    body.ctrl-pressed .custom-marker-pin {
-      cursor: crosshair !important;
-      box-shadow: 0 0 0 3px #f59e0b, 0 4px 10px rgba(245, 158, 11, 0.5) !important;
+    /* Top Navigation Bar cu Safe Area pentru Dynamic Island (iPhone 15 Pro Max) */
+    header { 
+        background-color: var(--card-bg); 
+        border-bottom: 1px solid var(--border); 
+        padding-top: max(14px, env(safe-area-inset-top)); 
+        padding-left: max(10px, env(safe-area-inset-left)); 
+        padding-right: max(10px, env(safe-area-inset-right)); 
+        padding-bottom: 8px; 
+        display: flex; align-items: center; justify-content: space-between; z-index: 1000; flex-shrink: 0; gap: 8px; position: relative; 
     }
+    @media (min-width: 769px) { header { padding-top: 10px; padding-bottom: 10px; } }
+    
+    .brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .brand-logo { width: 32px; height: 32px; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 16px; box-shadow: 0 2px 4px rgba(37,99,235,0.3); flex-shrink: 0; }
+    .brand-info h1 { font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .brand-status-line { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+    .cloud-badge { font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
+    .cloud-synced { color: var(--success); } .cloud-syncing { color: var(--warning); } .cloud-offline { color: var(--text-muted); }
 
-    /* Top Navigation Bar */
-    header {
-      background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border);
-      padding-top: max(50px, calc(env(safe-area-inset-top) + 8px));
-      padding-left: max(10px, env(safe-area-inset-left));
-      padding-right: max(10px, env(safe-area-inset-right));
-      padding-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 1000;
-      flex-shrink: 0;
-      gap: 8px;
-      position: relative;
-    }
+    /* Week & Category Container */
+    .route-selector-group { display: flex; align-items: center; gap: 6px; position: relative; min-width: 0; flex-shrink: 1; }
+    .week-dropdown-btn { display: inline-flex; align-items: center; gap: 6px; background-color: var(--gray-100); border: 1px solid var(--border); padding: 5px 9px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--text); cursor: pointer; transition: all 0.2s; max-width: 320px; min-width: 0; overflow: hidden; white-space: nowrap; }
+    .week-dropdown-btn:hover { background-color: var(--gray-200); border-color: var(--primary); }
+    #headerCategoryLabel { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; flex-shrink: 1; }
+    .active-day-pill { background: var(--primary); color: white; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; flex-shrink: 1; display: inline-block; line-height: 1.2; }
+    .btn-quick-add { width: 30px; height: 30px; border-radius: 8px; background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary); font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+    .btn-quick-add:hover { background: var(--primary); color: white; }
+    .week-dropdown-menu { position: absolute; top: calc(100% + 6px); left: 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); width: 290px; max-height: 420px; overflow-y: auto; padding: 8px; z-index: 2500; display: none; flex-direction: column; gap: 8px; }
+    .week-dropdown-menu.show { display: flex; }
+    .category-block { border: 1px solid var(--border); border-radius: 8px; padding: 6px; background: var(--gray-50); }
+    .category-block-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+    .category-block-title { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .days-grid-list { display: flex; flex-direction: column; gap: 3px; }
+    .week-menu-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; border: none; background: transparent; color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; text-align: left; }
+    .week-menu-item:hover { background: var(--gray-100); color: var(--primary); }
+    .week-menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; }
 
-    @media (min-width: 769px) {
-      header {
-        padding-top: 10px;
-        padding-bottom: 10px;
-      }
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 800;
-      font-size: 16px;
-      box-shadow: 0 2px 4px rgba(37,99,235,0.3);
-      flex-shrink: 0;
-    }
-
-    .brand-info h1 {
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .brand-status-line {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 10px;
-    }
-
-    .cloud-badge {
-      font-size: 10px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-    }
-    .cloud-synced { color: var(--success); }
-    .cloud-syncing { color: var(--warning); }
-    .cloud-offline { color: var(--text-muted); }
-
-    /* Week & Category Container Fix */
-    .route-selector-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      position: relative;
-      min-width: 0;
-      flex-shrink: 1;
-    }
-
-    .week-dropdown-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background-color: var(--gray-100);
-      border: 1px solid var(--border);
-      padding: 5px 9px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s;
-      max-width: 320px;
-      min-width: 0;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .week-dropdown-btn:hover {
-      background-color: var(--gray-200);
-      border-color: var(--primary);
-    }
-
-    #headerCategoryLabel {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 120px;
-      flex-shrink: 1;
-    }
-
-    .active-day-pill {
-      background: var(--primary);
-      color: white;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 140px;
-      flex-shrink: 1;
-      display: inline-block;
-      line-height: 1.2;
-    }
-
-    .btn-quick-add {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      background: var(--primary-light);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      font-size: 18px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    .btn-quick-add:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    .week-dropdown-menu {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: var(--shadow-lg);
-      width: 290px;
-      max-height: 420px;
-      overflow-y: auto;
-      padding: 8px;
-      z-index: 2500;
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .week-dropdown-menu.show {
-      display: flex;
-    }
-
-    .category-block {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px;
-      background: var(--gray-50);
-    }
-
-    .category-block-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 4px;
-      margin-bottom: 4px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .category-block-title {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .days-grid-list {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .week-menu-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: left;
-    }
-
-    .week-menu-item:hover {
-      background: var(--gray-100);
-      color: var(--primary);
-    }
-
-    .week-menu-item.active {
-      background: var(--primary-light);
-      color: var(--primary);
-      font-weight: 800;
-    }
-
-    /* Toggle all stores button */
-    .toggle-all-stores-btn {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--gray-100);
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .toggle-all-stores-btn.active {
-      background: #7c3aed;
-      color: white;
-      border-color: #6d28d9;
-      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
-    }
-
-    /* Toggle Hide Profi Button (Desktop) */
-    .toggle-profi-btn {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--gray-100);
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .toggle-profi-btn.active {
-      background: #ea580c;
-      color: white;
-      border-color: #c2410c;
-      box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
-    }
-
-    /* Desktop header actions */
-    .desktop-header-tools {
-      display: none;
-    }
-
-    @media (min-width: 769px) {
-      .desktop-header-tools {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-    }
-
-    .nav-tabs {
-      display: flex;
-      gap: 3px;
-      background-color: var(--gray-100);
-      padding: 3px;
-      border-radius: 10px;
-    }
-
-    .nav-tab {
-      padding: 6px 11px;
-      font-size: 11px;
-      font-weight: 600;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      border-radius: 7px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s;
-    }
-
-    .nav-tab.active {
-      background-color: var(--card-bg);
-      color: var(--primary);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .icon-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background-color: var(--card-bg);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 15px;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
+    /* Desktop Controls */
+    .toggle-all-stores-btn { display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--gray-100); color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .toggle-all-stores-btn.active { background: #7c3aed; color: white; border-color: #6d28d9; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35); }
+    .toggle-profi-btn { display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--gray-100); color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .toggle-profi-btn.active { background: #ea580c; color: white; border-color: #c2410c; box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35); }
+    .desktop-header-tools { display: none; }
+    @media (min-width: 769px) { .desktop-header-tools { display: flex; align-items: center; gap: 6px; } }
+    .nav-tabs { display: flex; gap: 3px; background-color: var(--gray-100); padding: 3px; border-radius: 10px; }
+    .nav-tab { padding: 6px 11px; font-size: 11px; font-weight: 600; border: none; background: transparent; color: var(--text-muted); border-radius: 7px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+    .nav-tab.active { background-color: var(--card-bg); color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background-color: var(--card-bg); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: all 0.2s; flex-shrink: 0; }
     .icon-btn:hover { background-color: var(--gray-100); }
     .icon-btn.active-btn { background-color: var(--primary-light); color: var(--primary); border-color: var(--primary); }
     .icon-btn.unlocked-btn { background-color: var(--warning-light); color: #d97706; border-color: var(--warning); }
 
-    /* Bottom Swipeable Dock Bar (Mobile) */
-    .bottom-dock-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 1500;
-      background: var(--card-bg);
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
-      padding-left: 10px;
-      padding-right: 10px;
-      box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    /* Mobile Dock Bar - PWA SafeArea Adjustment */
+    .bottom-dock-bar { 
+        position: fixed; bottom: 0; left: 0; right: 0; z-index: 1500; background: var(--card-bg); border-top: 1px solid var(--border); 
+        padding-top: 8px; 
+        padding-bottom: max(16px, env(safe-area-inset-bottom)); 
+        padding-left: 10px; padding-right: 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 6px; 
     }
-
-    @media (min-width: 769px) {
-      .bottom-dock-bar {
-        display: none;
-      }
-    }
-
-    .bottom-dock-scroll {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 2px;
-    }
+    @media (min-width: 769px) { .bottom-dock-bar { display: none; } }
+    .bottom-dock-scroll { display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
     .bottom-dock-scroll::-webkit-scrollbar { display: none; }
+    .dock-pill-btn { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--gray-100); color: var(--text); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; }
+    .dock-pill-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+    .dock-pill-btn.active-purple { background: #7c3aed; color: white; border-color: #6d28d9; }
+    .dock-pill-btn.unlocked-pill { background: var(--warning-light); color: #d97706; border-color: var(--warning); }
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; }
+    .badge-primary { background: var(--primary-light); color: var(--primary); } .badge-success { background: var(--success-light); color: var(--success); } .badge-danger { background: var(--danger-light); color: var(--danger); } .badge-purple { background: var(--purple-light); color: var(--purple); } .badge-gray { background: var(--gray-100); color: var(--text-muted); }
 
-    .dock-pill-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--gray-100);
-      color: var(--text);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: all 0.2s;
-    }
-
-    .dock-pill-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
-    }
-
-    .dock-pill-btn.active-purple {
-      background: #7c3aed;
-      color: white;
-      border-color: #6d28d9;
-    }
-
-    .dock-pill-btn.unlocked-pill {
-      background: var(--warning-light);
-      color: #d97706;
-      border-color: var(--warning);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .badge-primary { background: var(--primary-light); color: var(--primary); }
-    .badge-success { background: var(--success-light); color: var(--success); }
-    .badge-danger { background: var(--danger-light); color: var(--danger); }
-    .badge-purple { background: var(--purple-light); color: var(--purple); }
-    .badge-gray { background: var(--gray-100); color: var(--text-muted); }
-
-    /* Filter Bar */
-    .filter-scroll-row {
-      display: flex;
-      gap: 5px;
-      overflow-x: auto;
-      padding: 6px 0;
-      scrollbar-width: none;
-    }
+    /* Layout & Map */
+    .filter-scroll-row { display: flex; gap: 5px; overflow-x: auto; padding: 6px 0; scrollbar-width: none; }
     .filter-scroll-row::-webkit-scrollbar { display: none; }
+    .filter-chip { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+    main { flex: 1; position: relative; overflow: hidden; display: flex; }
+    .view-panel { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; }
+    .view-panel.active { display: flex; }
+    #mapView { flex-direction: row; }
+    #map { flex: 1; height: 100%; width: 100%; z-index: 1; }
+    
+    /* Evităm ca panoul de zoom al hărții să intre sub Dock */
+    .leaflet-bottom { bottom: calc(65px + env(safe-area-inset-bottom, 0px)) !important; }
 
-    .filter-chip {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      border: 1px solid var(--border);
-      background: var(--card-bg);
-      color: var(--text-muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s;
-    }
-    .filter-chip.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
+    .map-sidebar { width: 380px; height: 100%; background-color: var(--card-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 8px rgba(0,0,0,0.05); flex-shrink: 0; }
+    .sidebar-header { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .sidebar-header h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .route-info-box { background: var(--gray-50); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 11px; line-height: 1.4; margin-top: 6px; }
+    .route-stats-row { display: flex; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); font-weight: 600; font-size: 11px; }
+    .store-list-container { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+    .store-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: all 0.2s; display: flex; gap: 10px; align-items: flex-start; position: relative; }
+    .store-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .store-card.active { border-color: var(--primary); background-color: var(--primary-light); }
+    .store-card.completed { border-color: var(--success); background-color: #f0fdf4; }
+    [data-theme="dark"] .store-card.completed { background-color: #064e3b33; }
+    .store-card.unresolved { border-color: var(--danger); background-color: #fef2f2; }
+    [data-theme="dark"] .store-card.unresolved { background-color: #7f1d1d33; }
+    .store-card-num { width: 26px; height: 26px; border-radius: 50%; background: var(--gray-100); color: var(--text); font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .store-card.completed .store-card-num { background: var(--success) !important; color: white !important; }
+    .store-card.unresolved .store-card-num { background: var(--danger) !important; color: white !important; }
+    .store-card-content { flex: 1; min-width: 0; }
+    .store-card-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .store-card-address { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
 
-    /* Main Layout */
-    main {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-    }
-
-    .view-panel {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: none;
-    }
-
-    .view-panel.active {
-      display: flex;
-    }
-
-    #mapView {
-      flex-direction: row;
-    }
-
-    #map {
-      flex: 1;
-      height: 100%;
-      width: 100%;
-      z-index: 1;
-    }
-
-    /* Desktop Sidebar for Map */
-    .map-sidebar {
-      width: 380px;
-      height: 100%;
-      background-color: var(--card-bg);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      z-index: 10;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-      flex-shrink: 0;
-    }
-
-    .sidebar-header {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .sidebar-header h2 {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .route-info-box {
-      background: var(--gray-50);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 11px;
-      line-height: 1.4;
-      margin-top: 6px;
-    }
-
-    .route-stats-row {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px dashed var(--border);
-      font-weight: 600;
-      font-size: 11px;
-    }
-
-    .store-list-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .store-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      position: relative;
-    }
-
-    .store-card:hover {
-      border-color: var(--primary);
-      transform: translateY(-1px);
-    }
-
-    .store-card.active {
-      border-color: var(--primary);
-      background-color: var(--primary-light);
-    }
-
-    .store-card.completed {
-      border-color: var(--success);
-      background-color: #f0fdf4;
-    }
-    [data-theme="dark"] .store-card.completed {
-      background-color: #064e3b33;
-    }
-
-    .store-card.unresolved {
-      border-color: var(--danger);
-      background-color: #fef2f2;
-    }
-    [data-theme="dark"] .store-card.unresolved {
-      background-color: #7f1d1d33;
-    }
-
-    .store-card-num {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--gray-100);
-      color: var(--text);
-      font-weight: 700;
-      font-size: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .store-card.completed .store-card-num {
-      background: var(--success) !important;
-      color: white !important;
-    }
-
-    .store-card.unresolved .store-card-num {
-      background: var(--danger) !important;
-      color: white !important;
-    }
-
-    .store-card-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .store-card-title {
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 2px;
-    }
-
-    .store-card-address {
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.3;
-    }
-
-    /* Map floating action tools */
-    .map-fab-stack {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .map-action-bubble {
-      width: 42px;
-      height: 42px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    /* Map UI */
+    .map-fab-stack { position: absolute; top: 14px; right: 14px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+    .map-action-bubble { width: 42px; height: 42px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.2s; }
     .map-action-bubble:hover { transform: scale(1.06); }
     .map-action-bubble.active-btn { background: var(--primary); color: white; border-color: var(--primary); }
+    .map-toast-alert { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.92); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; z-index: 2000; box-shadow: 0 4px 14px rgba(0,0,0,0.3); display: none; align-items: center; gap: 6px; animation: fadeInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes fadeInDown { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-    .map-toast-alert {
-      position: absolute;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.92);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      z-index: 2000;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      display: none;
-      align-items: center;
-      gap: 6px;
-      animation: fadeInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Quick Card & Action Sheet - OPITMIZAT iPhone 15 Pro Max Safe Area */
+    .mobile-quick-card { 
+        position: absolute; 
+        bottom: calc(75px + env(safe-area-inset-bottom, 0px)); 
+        left: 12px; right: 12px; background: var(--card-bg); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); z-index: 1400; display: none; transition: background-color 0.3s, border-color 0.3s; animation: slideUpQuick 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
     }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translate(-50%, -10px); }
-      to { opacity: 1; transform: translate(-50%, 0); }
-    }
+    @keyframes slideUpQuick { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Mobile Quick Card */
-    .mobile-quick-card {
-      position: absolute;
-      bottom: 85px;
-      left: 12px;
-      right: 12px;
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 14px 16px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border);
-      z-index: 1400;
-      display: none;
-      animation: slideUpQuick 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .mobile-quick-card.completed, .action-sheet.completed { border-color: var(--success); background-color: #f0fdf4; }
+    [data-theme="dark"] .mobile-quick-card.completed, [data-theme="dark"] .action-sheet.completed { background-color: #064e3b33; }
+    .mobile-quick-card.unresolved, .action-sheet.unresolved { border-color: var(--danger); background-color: #fef2f2; }
+    [data-theme="dark"] .mobile-quick-card.unresolved, [data-theme="dark"] .action-sheet.unresolved { background-color: #7f1d1d33; }
 
-    @keyframes slideUpQuick {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Modals & Action Sheet */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-    }
+    /* Modals & Buttons */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
     .modal-overlay.active { display: flex; }
-
-    .action-sheet {
-      background: var(--card-bg);
-      width: 100%;
-      max-width: 500px;
-      border-radius: 20px 20px 0 0;
-      padding: 18px 20px 28px 20px;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      max-height: 85vh;
-      overflow-y: auto;
+    
+    .action-sheet { 
+        background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; 
+        padding: 18px 20px max(28px, env(safe-area-inset-bottom)) 20px; 
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15); transition: background-color 0.3s, border-color 0.3s; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto; 
     }
-
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
-    .sheet-handle {
-      width: 40px;
-      height: 5px;
-      background: var(--gray-300);
-      border-radius: 3px;
-      margin: 0 auto 14px auto;
-    }
-
-    .sheet-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .sheet-title {
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.3;
-    }
-
-    .sheet-address {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .btn-group-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .btn-group-horizontal {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      min-height: 44px;
-      padding: 9px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-hover); }
-
-    .btn-waze {
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: white;
-      font-weight: 700;
-      font-size: 14px;
-      box-shadow: 0 4px 10px rgba(0, 198, 255, 0.3);
-    }
-    .btn-waze:hover { opacity: 0.95; }
-
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    
+    .sheet-handle { width: 40px; height: 5px; background: var(--gray-300); border-radius: 3px; margin: 0 auto 14px auto; }
+    .sheet-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .sheet-title { font-size: 16px; font-weight: 700; line-height: 1.3; }
+    .sheet-address { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .btn-group-vertical { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .btn-group-horizontal { display: flex; gap: 10px; }
+    .btn { min-height: 44px; padding: 9px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; text-decoration: none; }
+    .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-hover); }
+    .btn-waze { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; font-weight: 700; font-size: 14px; box-shadow: 0 4px 10px rgba(0, 198, 255, 0.3); } .btn-waze:hover { opacity: 0.95; }
     .btn-gmaps { background: #34a853; color: white; font-size: 13px; font-weight: 600; }
     .btn-apple { background: #1e293b; color: white; font-size: 13px; font-weight: 600; }
+    .btn-secondary { background: var(--gray-100); color: var(--text); border: 1px solid var(--border); } .btn-secondary:hover { background: var(--gray-200); }
+    .btn-success { background: var(--success); color: white; flex: 1; } .btn-success:hover { background: var(--success-dark); }
+    .btn-danger { background: var(--danger); color: white; flex: 1; } .btn-danger:hover { background: var(--danger-dark); }
+    .btn-sm { min-height: 34px; padding: 5px 10px; font-size: 11px; border-radius: 8px; }
 
-    .btn-secondary {
-      background: var(--gray-100);
-      color: var(--text);
-      border: 1px solid var(--border);
+    /* FAB - iPhone SafeArea Fix */
+    .floating-fab { 
+        position: fixed; 
+        bottom: calc(75px + env(safe-area-inset-bottom, 0px)); 
+        right: 18px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(37,99,235,0.45); cursor: grab; z-index: 1450; border: 2.5px solid white; user-select: none; touch-action: none; transition: transform 0.15s ease-out, box-shadow 0.15s; 
     }
-    .btn-secondary:hover { background: var(--gray-200); }
-
-    .btn-success { background: var(--success); color: white; flex: 1; }
-    .btn-success:hover { background: var(--success-dark); }
-
-    .btn-danger { background: var(--danger); color: white; flex: 1; }
-    .btn-danger:hover { background: var(--danger-dark); }
-
-    .btn-sm {
-      min-height: 34px;
-      padding: 5px 10px;
-      font-size: 11px;
-      border-radius: 8px;
-    }
-
-    /* Messenger-style Draggable FAB */
-    .floating-fab {
-      position: fixed;
-      bottom: 85px;
-      right: 18px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 25px rgba(37,99,235,0.45);
-      cursor: grab;
-      z-index: 1450;
-      border: 2.5px solid white;
-      user-select: none;
-      touch-action: none;
-      transition: transform 0.15s ease-out, box-shadow 0.15s;
-    }
-
-    .floating-fab:active {
-      cursor: grabbing;
-      transform: scale(1.08);
-      box-shadow: 0 12px 30px rgba(37,99,235,0.6);
-    }
-
-    .fab-badge {
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      background: var(--danger);
-      color: white;
-      font-size: 10px;
-      font-weight: 800;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid white;
-      pointer-events: none;
-    }
-
-    /* Product Form Window */
-    .fab-window {
-      position: fixed;
-      bottom: 85px;
-      right: 16px;
-      width: 410px;
-      max-width: calc(100vw - 24px);
-      max-height: 580px;
-      background: var(--card-bg);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
-      z-index: 2500;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    .floating-fab:active { cursor: grabbing; transform: scale(1.08); box-shadow: 0 12px 30px rgba(37,99,235,0.6); }
+    .fab-badge { position: absolute; top: -2px; right: -2px; background: var(--danger); color: white; font-size: 10px; font-weight: 800; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid white; pointer-events: none; }
+    
+    .fab-window { 
+        position: fixed; 
+        bottom: calc(75px + env(safe-area-inset-bottom, 0px)); 
+        right: 16px; width: 410px; max-width: calc(100vw - 24px); max-height: 580px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 12px 30px rgba(0,0,0,0.18); z-index: 2500; display: none; flex-direction: column; overflow: hidden; animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
     }
     .fab-window.active { display: flex; }
+    @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    
+    .fab-window-header { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .fab-window-header h3 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .fab-close-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; opacity: 0.8; } .fab-close-btn:hover { opacity: 1; }
+    .fab-window-body { padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-label { font-size: 12px; font-weight: 700; color: var(--text); }
+    .form-control { min-height: 38px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 13px; outline: none; transition: border-color 0.2s; } .form-control:focus { border-color: var(--primary); }
+    .products-dynamic-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .product-row-item { background: var(--gray-50); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: flex; gap: 10px; align-items: center; position: relative; }
+    .product-index-badge { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: white; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .product-thumb-container { width: 52px; height: 52px; border-radius: 8px; border: 1px dashed var(--gray-300); background: var(--card-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; flex-shrink: 0; }
+    .product-thumb-container img { width: 100%; height: 100%; object-fit: cover; }
+    .product-thumb-container .thumb-placeholder { font-size: 18px; color: var(--gray-400); }
+    .product-fields-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .product-input-name { font-size: 12px; font-weight: 700; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; background: var(--card-bg); color: var(--text); outline: none; width: 100%; }
+    .product-input-price { font-size: 12px; font-weight: 700; color: var(--primary); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; background: var(--card-bg); outline: none; width: 100%; }
+    .product-actions-col { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+    .action-icon-btn { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: var(--text-muted); transition: all 0.2s; } .action-icon-btn:hover { background: var(--gray-200); color: var(--text); } .action-icon-btn.delete-btn:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
 
-    @keyframes popIn {
-      from { transform: scale(0.85); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
+    /* Reports - Ajustat pt PWA Bottom Safe Area */
+    #reportView { background-color: var(--bg); flex-direction: column; overflow-y: auto; padding: 20px; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); display: none; } #reportView.active { display: flex; }
+    .report-container { max-width: 1100px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 18px; }
+    .report-header { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; box-shadow: var(--shadow); }
+    .report-title-box h2 { font-size: 19px; font-weight: 800; } .report-title-box p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .report-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .stat-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .stat-icon-blue { background: var(--primary-light); color: var(--primary); } .stat-icon-green { background: var(--success-light); color: var(--success); } .stat-icon-red { background: var(--danger-light); color: var(--danger); } .stat-icon-amber { background: var(--warning-light); color: var(--warning); }
+    .stat-info h4 { font-size: 22px; font-weight: 800; line-height: 1; } .stat-info span { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .report-table-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+    .table-responsive { width: 100%; overflow-x: auto; }
+    table.report-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    table.report-table th { background-color: var(--gray-50); color: var(--text-muted); font-weight: 700; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    table.report-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    table.report-table tr:last-child td { border-bottom: none; } table.report-table tr:hover td { background-color: var(--gray-50); }
 
-    .fab-window-header {
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .fab-window-header h3 {
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .fab-close-btn {
-      background: transparent;
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      opacity: 0.8;
-    }
-    .fab-close-btn:hover { opacity: 1; }
-
-    .fab-window-body {
-      padding: 14px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      flex: 1;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .form-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .form-control {
-      min-height: 38px;
-      padding: 6px 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .form-control:focus { border-color: var(--primary); }
-
-    .products-dynamic-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .product-row-item {
-      background: var(--gray-50);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      position: relative;
-    }
-
-    .product-index-badge {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
-      font-size: 11px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .product-thumb-container {
-      width: 52px;
-      height: 52px;
-      border-radius: 8px;
-      border: 1px dashed var(--gray-300);
-      background: var(--card-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    .product-thumb-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .product-thumb-container .thumb-placeholder {
-      font-size: 18px;
-      color: var(--gray-400);
-    }
-
-    .product-fields-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .product-input-name {
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 8px;
-      background: var(--card-bg);
-      color: var(--text);
-      outline: none;
-      width: 100%;
-    }
-
-    .product-input-price {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--primary);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 8px;
-      background: var(--card-bg);
-      outline: none;
-      width: 100%;
-    }
-
-    .product-actions-col {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .action-icon-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: var(--card-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
-    .action-icon-btn:hover { background: var(--gray-200); color: var(--text); }
-    .action-icon-btn.delete-btn:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
-
-    /* Raport Tab */
-    #reportView {
-      background-color: var(--bg);
-      flex-direction: column;
-      overflow-y: auto;
-      padding: 20px;
-      padding-bottom: 90px;
-      display: none;
-    }
-    #reportView.active { display: flex; }
-
-    .report-container {
-      max-width: 1100px;
-      margin: 0 auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .report-header {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .report-title-box h2 {
-      font-size: 19px;
-      font-weight: 800;
-    }
-
-    .report-title-box p {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .report-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .stat-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .stat-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-    .stat-icon-blue { background: var(--primary-light); color: var(--primary); }
-    .stat-icon-green { background: var(--success-light); color: var(--success); }
-    .stat-icon-red { background: var(--danger-light); color: var(--danger); }
-    .stat-icon-amber { background: var(--warning-light); color: var(--warning); }
-
-    .stat-info h4 {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .stat-info span {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .report-table-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .table-responsive {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    table.report-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-    }
-
-    table.report-table th {
-      background-color: var(--gray-50);
-      color: var(--text-muted);
-      font-weight: 700;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    table.report-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    table.report-table tr:last-child td { border-bottom: none; }
-    table.report-table tr:hover td { background-color: var(--gray-50); }
-
-    /* Custom Leaflet Pins */
-    .custom-marker-pin {
-      width: 32px;
-      height: 32px;
-      border-radius: 50% 50% 50% 0;
-      position: absolute;
-      transform: rotate(-45deg);
-      left: 50%;
-      top: 50%;
-      margin: -20px 0 0 -16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-      border: 2px solid #ffffff;
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .custom-marker-pin span {
-      transform: rotate(45deg);
-      color: white;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .pin-pending { background: #64748b; }
-    .pin-completed { background: #10b981 !important; }
-    .pin-unresolved { background: #ef4444 !important; }
-    .pin-active-pending { background: #2563eb; }
+    /* Pins - Acum cu prioritizare logică în JS, CSS rămâne curat */
+    .custom-marker-pin { width: 32px; height: 32px; border-radius: 50% 50% 50% 0; position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -20px 0 0 -16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.3); border: 2px solid #ffffff; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .custom-marker-pin span { transform: rotate(45deg); color: white; font-size: 12px; font-weight: 800; }
+    
+    .pin-pending { background: #64748b; } 
+    .pin-completed { background: #10b981 !important; } 
+    .pin-unresolved { background: #ef4444 !important; } 
+    .pin-active-pending { background: #2563eb; } 
     .pin-external { background: #7c3aed !important; opacity: 0.85; }
+    
+    /* Glow-uri specifice pt starea pinului activ (selectat) */
+    .custom-marker-pin.is-active { box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #2563eb, 0 6px 14px rgba(0,0,0,0.4); transform: rotate(-45deg) scale(1.18); z-index: 1000 !important; }
+    .custom-marker-pin.is-active.pin-completed { box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #10b981, 0 6px 14px rgba(0,0,0,0.4); }
+    .custom-marker-pin.is-active.pin-unresolved { box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #ef4444, 0 6px 14px rgba(0,0,0,0.4); }
 
-    .custom-marker-pin.is-active {
-      box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #2563eb, 0 6px 14px rgba(0,0,0,0.4);
-      transform: rotate(-45deg) scale(1.18);
-      z-index: 1000 !important;
-    }
-
-    .user-gps-dot {
-      width: 18px;
-      height: 18px;
-      background: #2563eb;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(37, 99, 235, 0.8);
-      animation: pulseGps 1.8s infinite;
-    }
-
-    @keyframes pulseGps {
-      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
-      70% { box-shadow: 0 0 0 14px rgba(37, 99, 235, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-    }
-
-    @media (max-width: 768px) {
-      .map-sidebar { display: none; }
-      .brand-info span { display: none; }
-    }
-
-    .reason-dialog {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 20px;
-      max-width: 380px;
-      width: 100%;
-    }
-
-    .reason-options {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin: 16px 0;
-    }
-
-    .reason-chip {
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      font-size: 13px;
-      font-weight: 600;
-      text-align: left;
-      cursor: pointer;
-    }
-    .reason-chip:hover {
-      border-color: var(--danger);
-      background: var(--danger-light);
-    }
+    .user-gps-dot { width: 18px; height: 18px; background: #2563eb; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(37, 99, 235, 0.8); animation: pulseGps 1.8s infinite; }
+    @keyframes pulseGps { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { box-shadow: 0 0 0 14px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
+    @media (max-width: 768px) { .map-sidebar { display: none; } .brand-info span { display: none; } }
+    .reason-dialog { background: var(--card-bg); border-radius: 16px; padding: 20px; max-width: 380px; width: 100%; }
+    .reason-options { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+    .reason-chip { padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; } .reason-chip:hover { border-color: var(--danger); background: var(--danger-light); }
   </style>
 </head>
 <body>
@@ -1407,10 +301,8 @@
         <span class="active-day-pill" id="activeDayHeaderLabel">Ziua 1</span>
         <span style="font-size: 9px; color: var(--text-muted); margin-left: 2px;">▼</span>
       </button>
-
-      <!-- Quick Add Category / Day Button -->
       <button class="btn-quick-add" title="Adaugă Categorie sau Zi nouă" onclick="app.promptAddCategoryOrDay()">+</button>
-
+      
       <!-- Category & Days Dropdown Menu -->
       <div class="week-dropdown-menu" id="weekDropdownMenu">
         <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:6px; border-bottom:1px solid var(--border);">
@@ -1428,18 +320,15 @@
         <button class="nav-tab" id="tabReportBtnDesk" onclick="app.switchTab('report')">📋 Raport</button>
       </div>
 
-      <!-- Toggle all stores button -->
       <button class="toggle-all-stores-btn" id="toggleAllStoresBtnDesk" onclick="app.toggleShowAllStores()">
         <span>👁️</span> <span id="toggleAllStoresLabelDesk">Toate Magazinele</span>
       </button>
-
-      <!-- Hide Profi button (Desktop only) -->
-      <button class="toggle-profi-btn" id="toggleHideProfiBtnDesk" onclick="app.toggleHideProfi()" title="Ascunde sau afișează Profi-urile când sunt afișate toate magazinele">
+      <button class="toggle-profi-btn" id="toggleHideProfiBtnDesk" onclick="app.toggleHideProfi()" title="Ascunde Profi">
         <span>🚫</span> <span id="toggleHideProfiLabelDesk">Fără Profi</span>
       </button>
 
       <div class="header-actions">
-        <button class="icon-btn" id="headerLockBtnDesk" title="Pini Blocați (Apasă pt deblocare)" onclick="app.togglePinLock()">🔒</button>
+        <button class="icon-btn" id="headerLockBtnDesk" title="Pini Blocați" onclick="app.togglePinLock()">🔒</button>
         <button class="icon-btn" id="headerGpsBtnDesk" title="Localizare GPS live" onclick="app.toggleGpsTracking()">📍</button>
         <button class="icon-btn" title="Backup / Restaurare Date" onclick="app.openBackupModal()">💾</button>
         <button class="icon-btn" id="themeToggleBtnDesk" title="Temă Luminoasă / Întunecată" onclick="app.toggleTheme()">🌙</button>
@@ -1580,30 +469,14 @@
   <!-- Bottom Swipeable Dock Bar (Mobile) -->
   <nav class="bottom-dock-bar" id="mobileBottomDock">
     <div class="bottom-dock-scroll">
-      <button class="dock-pill-btn active" id="tabMapBtnMob" onclick="app.switchTab('map')">
-        <span>🗺️</span> <span>Hartă</span>
-      </button>
-      <button class="dock-pill-btn" id="tabReportBtnMob" onclick="app.switchTab('report')">
-        <span>📋</span> <span>Raport</span>
-      </button>
-      <button class="dock-pill-btn" id="dockAllStoresBtnMob" onclick="app.toggleShowAllStores()">
-        <span>👁️</span> <span id="toggleAllStoresLabelMob">Toate Magazinele</span>
-      </button>
-      <button class="dock-pill-btn" id="dockLockBtnMob" onclick="app.togglePinLock()">
-        <span id="dockLockIcon">🔒</span> <span id="dockLockText">Pini Blocați</span>
-      </button>
-      <button class="dock-pill-btn" id="dockGpsBtnMob" onclick="app.toggleGpsTracking()">
-        <span>📍</span> <span>GPS Live</span>
-      </button>
-      <button class="dock-pill-btn" onclick="app.findNearestStoreToGps()">
-        <span>🎯</span> <span>Apropiat</span>
-      </button>
-      <button class="dock-pill-btn" onclick="app.openBackupModal()">
-        <span>💾</span> <span>Backup</span>
-      </button>
-      <button class="dock-pill-btn" onclick="app.toggleTheme()">
-        <span id="dockThemeIcon">🌙</span> <span>Temă</span>
-      </button>
+      <button class="dock-pill-btn active" id="tabMapBtnMob" onclick="app.switchTab('map')"><span>🗺️</span> <span>Hartă</span></button>
+      <button class="dock-pill-btn" id="tabReportBtnMob" onclick="app.switchTab('report')"><span>📋</span> <span>Raport</span></button>
+      <button class="dock-pill-btn" id="dockAllStoresBtnMob" onclick="app.toggleShowAllStores()"><span>👁️</span> <span id="toggleAllStoresLabelMob">Toate Magazinele</span></button>
+      <button class="dock-pill-btn" id="dockLockBtnMob" onclick="app.togglePinLock()"><span id="dockLockIcon">🔒</span> <span id="dockLockText">Pini Blocați</span></button>
+      <button class="dock-pill-btn" id="dockGpsBtnMob" onclick="app.toggleGpsTracking()"><span>📍</span> <span>GPS Live</span></button>
+      <button class="dock-pill-btn" onclick="app.findNearestStoreToGps()"><span>🎯</span> <span>Apropiat</span></button>
+      <button class="dock-pill-btn" onclick="app.openBackupModal()"><span>💾</span> <span>Backup</span></button>
+      <button class="dock-pill-btn" onclick="app.toggleTheme()"><span id="dockThemeIcon">🌙</span> <span>Temă</span></button>
     </div>
   </nav>
 
@@ -1624,30 +497,25 @@
         <label class="form-label">Magazin Curent:</label>
         <select class="form-control" id="fabStoreSelect" onchange="app.onFabStoreChange()"></select>
       </div>
-
       <div class="form-group">
         <label class="form-label">Nume Secțiune / Categorie Raft:</label>
         <input type="text" class="form-control" id="fabSectionName" placeholder="Ex: Raft 1, Promoție Capăt Raft" oninput="app.onSectionNameChange()" />
       </div>
-
       <div class="form-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
           <label class="form-label">Listă Produse & Poze:</label>
           <span style="font-size: 11px; color: var(--text-muted);" id="fabProductCountLabel">0 produse</span>
         </div>
-
         <div class="products-dynamic-list" id="fabProductsList"></div>
-
         <button class="btn btn-secondary btn-sm" style="margin-top: 8px; width: 100%; font-weight: 700;" onclick="app.addNewProductRow()">
           ➕ Adaugă Produs Nou
         </button>
       </div>
-
       <input type="file" id="fabProductPhotoInput" accept="image/*" capture="environment" style="display: none;" onchange="app.handleProductPhotoSelected(event)" />
     </div>
   </div>
 
-  <!-- Assign Pin to Category & Day Modal -->
+  <!-- Assign Pin Modal -->
   <div class="modal-overlay" id="assignModalOverlay" style="align-items: center;" onclick="if(event.target === this) app.closeAssignModal()">
     <div class="reason-dialog" style="max-width: 440px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -1658,19 +526,16 @@
         </div>
         <button class="icon-btn" style="width:28px; height:28px; border-radius:50%;" onclick="app.closeAssignModal()">✕</button>
       </div>
-
       <div style="margin: 16px 0; display:flex; flex-direction:column; gap: 10px;">
         <div class="form-group">
           <label class="form-label">Alege Categoria / Săptămâna:</label>
           <select class="form-control" id="assignCatSelect" onchange="app.onAssignCategoryChange()"></select>
         </div>
-
         <div class="form-group">
           <label class="form-label">Alege Ziua de Lucru:</label>
           <select class="form-control" id="assignDaySelect"></select>
         </div>
       </div>
-
       <div style="display:flex; flex-direction:column; gap:8px;">
         <button class="btn btn-primary" onclick="app.confirmAssignStore()">📥 Asignează în această Zi</button>
         <button class="btn btn-secondary btn-sm" id="btnRemoveFromCurrentDay" style="color:var(--danger);" onclick="app.removeStoreFromActiveDay()">🗑️ Elimină din Ziua Curentă</button>
@@ -1690,30 +555,20 @@
         </div>
         <span class="badge badge-gray" id="modalStatusBadge">Neînceput</span>
       </div>
-
       <div class="btn-group-vertical">
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px;">
           <button class="btn btn-waze" onclick="app.openActiveInWaze()">🚗 Waze</button>
           <button class="btn btn-gmaps" onclick="app.openActiveInGoogleMaps()">Google</button>
           <button class="btn btn-apple" onclick="app.openActiveInAppleMaps()">Apple</button>
         </div>
-
-        <button class="btn btn-secondary" onclick="app.goToNextStore(); app.closeStoreModal();">
-          ➡️ Treci la următorul magazin
-        </button>
+        <button class="btn btn-secondary" onclick="app.goToNextStore(); app.closeStoreModal();">➡️ Treci la următorul magazin</button>
         <div class="btn-group-horizontal">
           <button class="btn btn-success" onclick="app.markActiveAsResolved(); app.closeStoreModal();">✓ Rezolvat</button>
           <button class="btn btn-danger" onclick="app.promptUnresolved(); app.closeStoreModal();">✕ Nerezolvat</button>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="app.openAssignModalForActive(); app.closeStoreModal();">
-          📌 Asignează în altă Categorie / Zi
-        </button>
-        <button class="btn btn-secondary btn-sm" onclick="app.openFabForStore(app.activeStoreId); app.closeStoreModal();">
-          📸 Deschide Listă Produse & Poze
-        </button>
-        <button class="btn btn-secondary btn-sm" style="color: var(--text-muted); font-size: 11px;" onclick="app.resetStoreCoordinates(app.activeStoreId)">
-          🔄 Resetare Pin la Coordonatele Inițiale
-        </button>
+        <button class="btn btn-secondary btn-sm" onclick="app.openAssignModalForActive(); app.closeStoreModal();">📌 Asignează în altă Categorie / Zi</button>
+        <button class="btn btn-secondary btn-sm" onclick="app.openFabForStore(app.activeStoreId); app.closeStoreModal();">📸 Deschide Listă Produse & Poze</button>
+        <button class="btn btn-secondary btn-sm" style="color: var(--text-muted); font-size: 11px;" onclick="app.resetStoreCoordinates(app.activeStoreId)">🔄 Resetare Pin la Coordonatele Inițiale</button>
       </div>
     </div>
   </div>
@@ -1723,7 +578,6 @@
     <div class="reason-dialog" style="max-width: 420px;">
       <h3 style="font-size: 16px; font-weight: 700;">💾 Backup & Restaurare Date</h3>
       <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Toate categoriile, rutele, produsele și fotografiile se pot descărca sau restaura integral.</p>
-      
       <div style="display: flex; flex-direction: column; gap: 10px; margin: 18px 0;">
         <button class="btn btn-primary" onclick="app.exportFullBackup()">📥 Descarcă Salvare JSON</button>
         <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
@@ -1739,7 +593,6 @@
     <div class="reason-dialog">
       <h3 style="font-size: 16px; font-weight: 700;">Motiv Nerezolvare</h3>
       <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">De ce nu s-a finalizat vizita?</p>
-      
       <div class="reason-options">
         <button class="reason-chip" onclick="app.confirmUnresolved('Lipsă stoc produs')">📦 Lipsă stoc produs</button>
         <button class="reason-chip" onclick="app.confirmUnresolved('Magazin închis / În renovare')">🔒 Magazin închis / Renovare</button>
@@ -1765,133 +618,41 @@
   <!-- FIREBASE SCRIPTS + APP LOGIC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
+    // Datele tale Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAWd_QSC7ZsNaowpTItZqV9ha7LqC3dX-w",
       authDomain: "dumanu-munca.firebaseapp.com",
       projectId: "dumanu-munca",
       storageBucket: "dumanu-munca.firebasestorage.app",
       messagingSenderId: "684272170348",
-      appId: "1:684272170348:web:c525efdbdca02fbfe3ef49",
-      measurementId: "G-1JWKRRVJY8"
+      appId: "1:684272170348:web:c525efdbdca02fbfe3ef49"
     };
 
     let firebaseApp = null;
-    let analytics = null;
     let db = null;
 
     try {
       firebaseApp = initializeApp(firebaseConfig);
-      analytics = getAnalytics(firebaseApp);
       db = getFirestore(firebaseApp);
-    } catch (e) {
-      console.warn("Eroare la inițializarea Firebase:", e);
-    }
+    } catch (e) { console.warn("Eroare la inițializarea Firebase:", e); }
 
     const INITIAL_DATA_WEEK_1 = {
       day1: [
-        { id: "d1_1", name: "Mega Image Popești-Leordeni", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Șos. Olteniței 51A-55, Popești-Leordeni", lat: 44.3802, lng: 26.1685, order: 1 },
-        { id: "d1_2", name: "Mega Image Popești-Leordeni 2", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Șos. Olteniței 18-20, Popești-Leordeni", lat: 44.3887, lng: 26.1542, order: 2 },
-        { id: "d1_3", name: "Mega Image Drumul Binelui", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Str. Drumul Fermei 35, Popești-Leordeni", lat: 44.3739, lng: 26.1498, order: 3 },
-        { id: "d1_4", name: "Mega Image Biruinței 3", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Str. Biruinței 47, Popești-Leordeni", lat: 44.3688, lng: 26.1472, order: 4 },
-        { id: "d1_5", name: "Mega Image Amurgului", chain: "Mega Image", city: "Popești-Leordeni", county: "Ilfov", address: "Str. Oituz 46, Popești-Leordeni", lat: 44.3724, lng: 26.1420, order: 5 },
-        { id: "d1_6", name: "Mega Image Monaco Towers", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Berceni 96, Sector 4", lat: 44.3765, lng: 26.1394, order: 6 },
-        { id: "d1_7", name: "Penny Leonida", chain: "Penny", city: "Popești-Leordeni", county: "Ilfov", address: "Șos. Berceni 9, Popești-Leordeni", lat: 44.3708, lng: 26.1354, order: 7 },
-        { id: "d1_8", name: "Mega Image Berceni", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Berceni 41, Sector 4", lat: 44.3872, lng: 26.1298, order: 8 },
-        { id: "d1_9", name: "Mega Image Obregia", chain: "Mega Image", city: "Sector 4", county: "București", address: "Bd. Alexandru Obregia 25, Sector 4", lat: 44.3842, lng: 26.1176, order: 9 },
-        { id: "d1_10", name: "Penny Nițu Vasile", chain: "Penny", city: "Sector 4", county: "București", address: "Str. Nițu Vasile 9, Sector 4", lat: 44.3922, lng: 26.1172, order: 10 },
-        { id: "d1_11", name: "Mega Image Piața Sudului", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Olteniței 208, Sector 4", lat: 44.3929, lng: 26.1235, order: 11 },
-        { id: "d1_12", name: "Mega Image Brâncoveanu", chain: "Mega Image", city: "Sector 4", county: "București", address: "Bd. Constantin Brâncoveanu 45, Sector 4", lat: 44.3934, lng: 26.1025, order: 12 },
-        { id: "d1_13", name: "Mega Image Huedin", chain: "Mega Image", city: "Sector 4", county: "București", address: "Str. Grădiștea 8, Sector 4", lat: 44.3846, lng: 26.1038, order: 13 },
-        { id: "d1_14", name: "Penny Luică", chain: "Penny", city: "Sector 4", county: "București", address: "Str. Luică 23, Sector 4", lat: 44.3828, lng: 26.0954, order: 14 },
-        { id: "d1_15", name: "Mega Image Progresului", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Giurgiului 113-115, Sector 4", lat: 44.3882, lng: 26.0862, order: 15 },
-        { id: "d1_16", name: "Mega Image Giurgiului 2", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Giurgiului 54, Sector 4", lat: 44.3985, lng: 26.0888, order: 16 },
-        { id: "d1_17", name: "Mega Image City Mall", chain: "Mega Image", city: "Sector 4", county: "București", address: "Șos. Olteniței 2, Sector 4", lat: 44.4048, lng: 26.0962, order: 17 },
-        { id: "d1_18", name: "Mega Image Împăratul Traian", chain: "Mega Image", city: "Sector 4", county: "București", address: "Str. Împăratul Traian 32, Sector 4", lat: 44.4172, lng: 26.0965, order: 18 },
-        { id: "d1_19", name: "Mega Image Tineretului", chain: "Mega Image", city: "Sector 4", county: "București", address: "Bd. Tineretului 1, Sector 4", lat: 44.4140, lng: 26.1072, order: 19 },
-        { id: "d1_20", name: "Penny Timpuri Noi", chain: "Penny", city: "Sector 4", county: "București", address: "Str. V.V. Stanciu 213, Sector 4", lat: 44.4152, lng: 26.1152, order: 20 }
+        { id: "d1_1", name: "Mega Image Popești-Leordeni", chain: "Mega Image", city: "Popești-Leordeni", address: "Șos. Olteniței 51A-55", lat: 44.3802, lng: 26.1685, order: 1 },
+        { id: "d1_2", name: "Penny Leonida", chain: "Penny", city: "Popești-Leordeni", address: "Șos. Berceni 9", lat: 44.3708, lng: 26.1354, order: 2 },
+        { id: "d1_3", name: "Mega Image Drumul Binelui", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Drumul Fermei 35", lat: 44.3739, lng: 26.1498, order: 3 },
+        { id: "d1_4", name: "Mega Image Biruinței 3", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Biruinței 47", lat: 44.3688, lng: 26.1472, order: 4 },
+        { id: "d1_5", name: "Mega Image Amurgului", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Oituz 46", lat: 44.3724, lng: 26.1420, order: 5 },
+        { id: "d1_6", name: "Mega Image Monaco Towers", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 96", lat: 44.3765, lng: 26.1394, order: 6 },
+        { id: "d1_7", name: "Mega Image Berceni", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 41", lat: 44.3872, lng: 26.1298, order: 7 },
+        { id: "d1_8", name: "Mega Image Obregia", chain: "Mega Image", city: "Sector 4", address: "Bd. Alexandru Obregia 25", lat: 44.3842, lng: 26.1176, order: 8 },
+        { id: "d1_9", name: "Penny Nițu Vasile", chain: "Penny", city: "Sector 4", address: "Str. Nițu Vasile 9", lat: 44.3922, lng: 26.1172, order: 9 },
+        { id: "d1_10", name: "Mega Image Piața Sudului", chain: "Mega Image", city: "Sector 4", address: "Șos. Olteniței 208", lat: 44.3929, lng: 26.1235, order: 10 }
       ],
       day2: [
-        { id: "d2_1", name: "Mega Image Comuna Berceni", chain: "Mega Image", city: "Berceni", county: "Ilfov", address: "Bd. 1 Mai 66, Berceni", lat: 44.3168, lng: 26.1795, order: 1 },
-        { id: "d2_2", name: "Penny Berceni", chain: "Penny", city: "Berceni", county: "Ilfov", address: "Str. Luica 62-64 / Bd. 1 Mai, Berceni", lat: 44.3125, lng: 26.1830, order: 2 },
-        { id: "d2_3", name: "Penny Vidra", chain: "Penny", city: "Vidra", county: "Ilfov", address: "Str. Principală 91, Vidra", lat: 44.2755, lng: 26.1550, order: 3 },
-        { id: "d2_4", name: "Mega Image Jilava", chain: "Mega Image", city: "Jilava", county: "Ilfov", address: "Șos. Giurgiului 288, Jilava", lat: 44.3335, lng: 26.0795, order: 4 },
-        { id: "d2_5", name: "Penny Măgurele", chain: "Penny", city: "Măgurele", county: "Ilfov", address: "Str. Atomiștilor 373, Măgurele", lat: 44.3485, lng: 26.0335, order: 5 },
-        { id: "d2_6", name: "Mega Image Atomiștilor", chain: "Mega Image", city: "Măgurele", county: "Ilfov", address: "Str. Atomiștilor 411, Măgurele", lat: 44.3460, lng: 26.0290, order: 6 },
-        { id: "d2_7", name: "Penny Bragadiru", chain: "Penny", city: "Bragadiru", county: "Ilfov", address: "Șos. Alexandriei 112, Bragadiru", lat: 44.3685, lng: 25.9960, order: 7 },
-        { id: "d2_8", name: "Mega Image Bragadiru", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Șos. Alexandriei 44, Bragadiru", lat: 44.3780, lng: 26.0125, order: 8 },
-        { id: "d2_9", name: "Penny Plevnei", chain: "Penny", city: "Bragadiru", county: "Ilfov", address: "Str. Plevnei 11, Bragadiru", lat: 44.3820, lng: 26.0090, order: 9 },
-        { id: "d2_10", name: "Mega Image Bragadiru 2 (Speranței)", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Str. Speranței 77, Bragadiru", lat: 44.3835, lng: 26.0195, order: 10 },
-        { id: "d2_11", name: "Mega Image Mărgelelor 2", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Str. Mărgelelor 23, Bragadiru", lat: 44.3875, lng: 26.0260, order: 11 },
-        { id: "d2_12", name: "Mega Image Cartierul Latin", chain: "Mega Image", city: "Bragadiru", county: "Ilfov", address: "Prelungirea Ghencea 53, Bragadiru", lat: 44.4055, lng: 26.0045, order: 12 },
-        { id: "d2_13", name: "PENNY GHENCEA", chain: "Penny", city: "Bragadiru", county: "Ilfov", address: "Prelungirea Ghencea 14, Bragadiru", lat: 44.4072, lng: 26.0160, order: 13 },
-        { id: "d2_14", name: "Mega Image Pucheni", chain: "Mega Image", city: "Sector 5", county: "București", address: "Str. Pucheni 42, Sector 5", lat: 44.3970, lng: 26.0680, order: 14 },
-        { id: "d2_15", name: "Penny Sălaj", chain: "Penny", city: "Sector 5", county: "București", address: "Șos. Sălaj 269, Sector 5", lat: 44.3910, lng: 26.0740, order: 15 },
-        { id: "d2_16", name: "Penny Garun (Năsăud)", chain: "Penny", city: "Sector 5", county: "București", address: "Str. Năsăud 97, Sector 5", lat: 44.4095, lng: 26.0845, order: 16 },
-        { id: "d2_17", name: "Mega Image Sebastian", chain: "Mega Image", city: "Sector 5", county: "București", address: "Str. Mihail Sebastian 22, Sector 5", lat: 44.4215, lng: 26.0780, order: 17 },
-        { id: "d2_18", name: "Mega Image 13 Septembrie", chain: "Mega Image", city: "Sector 5", county: "București", address: "Calea 13 Septembrie 13, Sector 5", lat: 44.4265, lng: 26.0865, order: 18 },
-        { id: "d2_19", name: "Mega Image Regina Maria", chain: "Mega Image", city: "Sector 5", county: "București", address: "Bd. Regina Maria 23-25, Sector 5", lat: 44.4248, lng: 26.1025, order: 19 }
-      ],
-      day3: [
-        { id: "d3_1", name: "Mega Image Autogara Chitila", chain: "Mega Image", city: "Chitila", county: "Ilfov", address: "Șos. Chitilei 18, Chitila", lat: 44.4782, lng: 26.0275, order: 1 },
-        { id: "d3_2", name: "Mega Image Chitila 2", chain: "Mega Image", city: "Chitila", county: "Ilfov", address: "Șos. Banatului 68A, Chitila", lat: 44.5098, lng: 25.9752, order: 2 },
-        { id: "d3_3", name: "Penny Chiajna", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Str. I.L. Caragiale 11B, Chiajna", lat: 44.4602, lng: 25.9798, order: 3 },
-        { id: "d3_4", name: "Mega Image Chiajna", chain: "Mega Image", city: "Chiajna", county: "Ilfov", address: "Str. Preot Sebe Costin 1A, Chiajna", lat: 44.4585, lng: 25.9745, order: 4 },
-        { id: "d3_5", name: "Penny Dudu", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Str. Soarelui 4, Chiajna (Dudu)", lat: 44.4532, lng: 25.9868, order: 5 },
-        { id: "d3_6", name: "Mega Image Drumul Bacriului", chain: "Mega Image", city: "Chiajna", county: "Ilfov", address: "Str. Drumul Bacriului 36, Chiajna", lat: 44.4445, lng: 25.9922, order: 6 },
-        { id: "d3_7", name: "Penny Apeductului", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Str. Apeductului 9, Chiajna", lat: 44.4402, lng: 25.9880, order: 7 },
-        { id: "d3_8", name: "Penny Chiajna Center", chain: "Penny", city: "Chiajna", county: "Ilfov", address: "Strada Serg. Ilie Petre 87, Chiajna", lat: 44.4348, lng: 25.9825, order: 8 },
-        { id: "d3_9", name: "Mega Image Rezervelor 3", chain: "Mega Image", city: "Chiajna", county: "Ilfov", address: "Str. Tineretului 85, Chiajna", lat: 44.4312, lng: 25.9785, order: 9 },
-        { id: "d3_10", name: "Mega Image Ciorogârla", chain: "Mega Image", city: "Ciorogârla", county: "Ilfov", address: "Calea București 136E, Ciorogârla", lat: 44.4452, lng: 25.8825, order: 10 },
-        { id: "d3_11", name: "Mega Image Domnești 2", chain: "Mega Image", city: "Domnești", county: "Ilfov", address: "Tudor Vladimirescu 307, Domnești", lat: 44.4015, lng: 25.9180, order: 11 },
-        { id: "d3_12", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 6", county: "București", address: "Prelungirea Ghencea 32, Sector 6", lat: 44.4125, lng: 26.0210, order: 12 },
-        { id: "d3_13", name: "Profi Valea Oltului", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Valea Oltului 12, Sector 6", lat: 44.4188, lng: 26.0235, order: 13 },
-        { id: "d3_14", name: "Profi Valea Doftanei", chain: "Profi", city: "Sector 6", county: "București", address: "Drumul Valea Doftanei 77, Sector 6", lat: 44.4208, lng: 26.0152, order: 14 },
-        { id: "d3_15", name: "Profi Timișoara 101", chain: "Profi", city: "Sector 6", county: "București", address: "Bld. Timișoara 101, Sector 6", lat: 44.4245, lng: 26.0020, order: 15 },
-        { id: "d3_16", name: "Profi Timișoara 73", chain: "Profi", city: "Sector 6", county: "București", address: "Bld. Timișoara 73, Sector 6", lat: 44.4248, lng: 26.0185, order: 16 },
-        { id: "d3_17", name: "Profi Valea Lungă", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Valea Lungă 7, Sector 6", lat: 44.4282, lng: 26.0120, order: 17 },
-        { id: "d3_18", name: "Profi Iuliu Maniu", chain: "Profi", city: "Sector 6", county: "București", address: "Bld. Iuliu Maniu 109, Sector 6", lat: 44.4342, lng: 26.0145, order: 18 },
-        { id: "d3_19", name: "Profi Bârsănești", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Bărbătești 2, Sector 6", lat: 44.4308, lng: 26.0215, order: 19 },
-        { id: "d3_20", name: "Profi Brașov", chain: "Profi", city: "Sector 6", county: "București", address: "Str. Brașov 24, Sector 6", lat: 44.4230, lng: 26.0355, order: 20 }
-      ],
-      day4: [
-        { id: "d4_1", name: "Mega Image Giulești", chain: "Mega Image", city: "Sector 6", county: "București", address: "Calea Giulești 38-40, Sector 6", lat: 44.4532, lng: 26.0578, order: 1 },
-        { id: "d4_2", name: "Mega Image Piața Crângași", chain: "Mega Image", city: "Sector 6", county: "București", address: "Calea Crângași 29, Sector 6", lat: 44.4520, lng: 26.0465, order: 2 },
-        { id: "d4_3", name: "Penny Crângași (Virtuții)", chain: "Penny", city: "Sector 6", county: "București", address: "Șos. Virtuții 148, Sector 6", lat: 44.4468, lng: 26.0375, order: 3 },
-        { id: "d4_4", name: "Mega Image Uverturii", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Uverturii 83, Sector 6", lat: 44.4398, lng: 26.0175, order: 4 },
-        { id: "d4_5", name: "Mega Image Apusului", chain: "Mega Image", city: "Sector 6", county: "București", address: "Str. Apusului 50, Sector 6", lat: 44.4365, lng: 26.0078, order: 5 },
-        { id: "d4_6", name: "Penny Păcii", chain: "Penny", city: "Sector 6", county: "București", address: "Bd. Iuliu Maniu 220C, Sector 6", lat: 44.4338, lng: 25.9925, order: 6 },
-        { id: "d4_7", name: "Mega Image Mărgelelor", chain: "Mega Image", city: "Sector 6", county: "București", address: "Str. Mărgelelor 6, Sector 6", lat: 44.4305, lng: 25.9865, order: 7 },
-        { id: "d4_8", name: "Mega Image Prelungirea Ghencea 89", chain: "Mega Image", city: "Sector 6", county: "București", address: "Prelungirea Ghencea 89, Sector 6", lat: 44.4098, lng: 26.0025, order: 8 },
-        { id: "d4_9", name: "Mega Image Valea Oltului", chain: "Mega Image", city: "Sector 6", county: "București", address: "Str. Valea Oltului 131-137, Sector 6", lat: 44.4128, lng: 26.0225, order: 9 },
-        { id: "d4_10", name: "Mega Image Bd. Timișoara 56", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Timișoara 56, Sector 6", lat: 44.4252, lng: 26.0125, order: 10 },
-        { id: "d4_11", name: "Mega Image Compozitorilor", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. 1 Mai 28, Sector 6", lat: 44.4238, lng: 26.0385, order: 11 },
-        { id: "d4_12", name: "Mega Image Compozitorilor - Sibiu", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. 1 Mai 18, Sector 6", lat: 44.4248, lng: 26.0465, order: 12 },
-        { id: "d4_13", name: "Mega Image Timișoara Plaza", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Timișoara 26, Sector 6", lat: 44.4285, lng: 26.0360, order: 13 },
-        { id: "d4_14", name: "Mega Image Timișoara 18", chain: "Mega Image", city: "Sector 6", county: "București", address: "Bd. Timișoara 18, Sector 6", lat: 44.4298, lng: 26.0535, order: 14 }
-      ],
-      day5: [
-        { id: "d5_1", name: "Profi Chiajna Tineretului", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Tineretului 40, Chiajna", lat: 44.4465, lng: 25.9755, order: 1 },
-        { id: "d5_2", name: "Profi Weiner Palada", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Weiner Palada 8, Chiajna", lat: 44.4415, lng: 25.9860, order: 2 },
-        { id: "d5_3", name: "Profi Chiajna (Ilie Petre)", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Sergent Ilie Petre 51, Chiajna", lat: 44.4390, lng: 25.9815, order: 3 },
-        { id: "d5_4", name: "Profi Rezervelor", chain: "Profi", city: "Chiajna", county: "Ilfov", address: "Str. Rezervelor 99, Chiajna", lat: 44.4372, lng: 25.9790, order: 4 },
-        { id: "d5_5", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 5", county: "București", address: "Prelungirea Ghencea 47-49, Sector 5", lat: 44.4085, lng: 26.0085, order: 5 },
-        { id: "d5_6", name: "Profi Mărgelelor", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Mărgelelor 32, Bragadiru", lat: 44.3865, lng: 26.0245, order: 6 },
-        { id: "d5_7", name: "Profi Speranței", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Speranței 69, Bragadiru", lat: 44.3830, lng: 26.0185, order: 7 },
-        { id: "d5_8", name: "Profi Bragadiru (Speranței 6-8)", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Speranței 6-8, Bragadiru", lat: 44.3795, lng: 26.0150, order: 8 },
-        { id: "d5_9", name: "Profi Coralului", chain: "Profi", city: "Bragadiru", county: "Ilfov", address: "Str. Coralului 4, Bragadiru", lat: 44.3755, lng: 26.0095, order: 9 },
-        { id: "d5_10", name: "Profi Mărgeanului 62", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Mărgeanului 62, Sector 5", lat: 44.4035, lng: 26.0595, order: 10 },
-        { id: "d5_11", name: "Profi Mărgeanului 16", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Mărgeanului 16, Sector 5", lat: 44.4065, lng: 26.0685, order: 11 },
-        { id: "d5_12", name: "Profi Mărgeanului", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Mărgeanului 12, Sector 5", lat: 44.4070, lng: 26.0695, order: 12 },
-        { id: "d5_13", name: "Profi Bârcă", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Bârcă 2, Sector 5", lat: 44.4105, lng: 26.0650, order: 13 },
-        { id: "d5_14", name: "Profi Sălaj", chain: "Profi", city: "Sector 5", county: "București", address: "Șos. Sălaj 133, Sector 5", lat: 44.4030, lng: 26.0790, order: 14 },
-        { id: "d5_15", name: "Profi Ferentari", chain: "Profi", city: "Sector 5", county: "București", address: "Calea Ferentari 20, Sector 5", lat: 44.4080, lng: 26.0890, order: 15 },
-        { id: "d5_16", name: "Profi Rahova", chain: "Profi", city: "Sector 5", county: "București", address: "Calea Rahovei 22, Sector 5", lat: 44.4185, lng: 26.0875, order: 16 },
-        { id: "d5_17", name: "Profi Ion Urdăreanu", chain: "Profi", city: "Sector 5", county: "București", address: "Str. Ion Urdăreanu 7, Sector 5", lat: 44.4235, lng: 26.0745, order: 17 },
-        { id: "d5_18", name: "Profi 13 Septembrie", chain: "Profi", city: "Sector 5", county: "București", address: "Calea 13 Septembrie 111, Sector 5", lat: 44.4245, lng: 26.0795, order: 18 },
-        { id: "d5_19", name: "Profi Libertății", chain: "Profi", city: "Sector 5", county: "București", address: "B-dul Libertății 2, Sector 5", lat: 44.4278, lng: 26.0915, order: 19 }
+        { id: "d2_1", name: "Mega Image Comuna Berceni", chain: "Mega Image", city: "Berceni", address: "Bd. 1 Mai 66", lat: 44.3168, lng: 26.1795, order: 1 }
       ]
     };
 
@@ -1903,9 +664,11 @@
         this.currentDayId = localStorage.getItem("merch_active_day") || "day1";
         this.showAllStores = localStorage.getItem("merch_show_all_stores") === "true";
         this.hideProfi = localStorage.getItem("merch_hide_profi") === "true";
+        
         this.activeStoreId = null;
         this.assignTargetStore = null;
         this.currentFilter = "all";
+        
         this.map = null;
         this.markers = {};
         this.routePolyline = null;
@@ -1913,15 +676,16 @@
         this.userGpsCircle = null;
         this.userGpsWatchId = null;
         this.userCoords = null;
+        
         this.isPinsLocked = localStorage.getItem("merch_pins_locked") !== "false";
         this.theme = localStorage.getItem("merch_theme") || "light";
+        
         this.storeProductsData = {};
         this.storeLogs = {};
         this.activePhotoUploadTarget = null;
+        
         this.db = db;
         this.cloudSyncTimer = null;
-
-        // Interactive Ctrl + Drag Linking properties
         this.isCtrlDragging = false;
         this.ctrlDragSourceStore = null;
         this.ctrlDragTempLine = null;
@@ -1958,7 +722,9 @@
         const masterMap = new Map();
         Object.values(INITIAL_DATA_WEEK_1).forEach(list => {
           list.forEach(s => {
-            if (!masterMap.has(s.id)) masterMap.set(s.id, { ...s });
+            if (!masterMap.has(s.id)) {
+              masterMap.set(s.id, { ...s, defaultLat: s.lat, defaultLng: s.lng });
+            }
           });
         });
 
@@ -1973,24 +739,16 @@
 
         const savedCategories = localStorage.getItem("merch_categories_v3");
         if (savedCategories) {
-          try {
-            this.categories = JSON.parse(savedCategories);
-          } catch(e) {
-            this.categories = null;
-          }
+          try { this.categories = JSON.parse(savedCategories); } catch(e) { this.categories = null; }
         }
 
         if (!this.categories || Object.keys(this.categories).length === 0) {
           this.categories = {
             cat_week1: {
-              id: "cat_week1",
-              name: "Săptămâna 1",
+              id: "cat_week1", name: "Săptămâna 1",
               days: {
-                day1: { id: "day1", name: "Ziua 1 (Popești & S4)", stores: [...INITIAL_DATA_WEEK_1.day1] },
-                day2: { id: "day2", name: "Ziua 2 (Ilfov SV & S5)", stores: [...INITIAL_DATA_WEEK_1.day2] },
-                day3: { id: "day3", name: "Ziua 3 (Chitila / Chiajna / S6)", stores: [...INITIAL_DATA_WEEK_1.day3] },
-                day4: { id: "day4", name: "Ziua 4 (Giulești & Militari)", stores: [...INITIAL_DATA_WEEK_1.day4] },
-                day5: { id: "day5", name: "Ziua 5 (Chiajna / Rahova)", stores: [...INITIAL_DATA_WEEK_1.day5] }
+                day1: { id: "day1", name: "Ziua 1", stores: [...INITIAL_DATA_WEEK_1.day1] },
+                day2: { id: "day2", name: "Ziua 2", stores: [...INITIAL_DATA_WEEK_1.day2] }
               }
             }
           };
@@ -2004,7 +762,6 @@
         if (!currentCat.days[this.currentDayId]) {
           this.currentDayId = Object.keys(currentCat.days)[0] || "day1";
         }
-
         this.loadActiveDayLogsAndProducts();
       }
 
@@ -2019,6 +776,20 @@
         if (cat && cat.days[this.currentDayId]) {
           cat.days[this.currentDayId].stores = newStores;
         }
+      }
+
+      getAvailableMasterStores() {
+        const currentCat = this.categories[this.currentCatId];
+        if (!currentCat) return this.masterStores;
+        
+        const allocatedToOtherDays = new Set();
+        Object.values(currentCat.days).forEach(day => {
+            if (day.id !== this.currentDayId) {
+                (day.stores || []).forEach(s => allocatedToOtherDays.add(s.id));
+            }
+        });
+        
+        return this.masterStores.filter(s => !allocatedToOtherDays.has(s.id));
       }
 
       loadActiveDayLogsAndProducts() {
@@ -2039,9 +810,7 @@
 
       saveProductsLocally() {
         const key = `${this.currentCatId}_${this.currentDayId}`;
-        try {
-          localStorage.setItem(`merch_products_${key}`, JSON.stringify(this.storeProductsData));
-        } catch(e) {}
+        try { localStorage.setItem(`merch_products_${key}`, JSON.stringify(this.storeProductsData)); } catch(e) {}
       }
 
       saveAll() {
@@ -2051,13 +820,11 @@
         this.scheduleFirebasePush();
       }
 
-      /* FIREBASE SYNC */
       async syncFromFirebase() {
         if (!this.db) {
           this.setCloudBadge("offline", "☁️ Local (Fără Firebase)");
           return;
         }
-
         try {
           this.setCloudBadge("syncing", "⏳ Conectare Firebase...");
           const docRef = doc(this.db, "merchandiser_data", "main_state");
@@ -2065,16 +832,15 @@
 
           if (docSnap.exists()) {
             const data = docSnap.data();
-            if (data.categories && Object.keys(data.categories).length > 0) {
-              this.categories = data.categories;
-              this.saveCategoriesLocally();
-            }
-            if (data.masterStores && Array.isArray(data.masterStores)) {
-              this.masterStores = data.masterStores;
-              localStorage.setItem("merch_master_stores", JSON.stringify(this.masterStores));
-            }
+            if (data.categories) this.categories = data.categories;
+            if (data.masterStores) this.masterStores = data.masterStores;
+            if (data.globalLogs) this.storeLogs = data.globalLogs;
+            if (data.globalProducts) this.storeProductsData = data.globalProducts;
 
-            this.loadActiveDayLogsAndProducts();
+            this.saveCategoriesLocally();
+            this.saveLogsLocally();
+            this.saveProductsLocally();
+            
             this.updateHeaderUI();
             this.renderCategoryMenu();
             this.renderMapMarkers();
@@ -2085,7 +851,6 @@
             this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
           } else {
             await this.pushToFirebase();
-            this.setCloudBadge("synced", "☁️ Firebase Inițializat");
           }
         } catch (error) {
           console.warn("Eroare Firebase:", error);
@@ -2107,8 +872,10 @@
           await setDoc(docRef, {
             categories: this.categories,
             masterStores: this.masterStores,
+            globalLogs: this.storeLogs, 
+            globalProducts: this.storeProductsData, 
             lastUpdated: new Date().toISOString()
-          }, { merge: true });
+          });
           this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
         } catch (error) {
           console.warn("Eroare salvare Firebase:", error);
@@ -2116,7 +883,6 @@
         }
       }
 
-      /* TOGGLE SHOW ALL STORES */
       toggleShowAllStores() {
         this.showAllStores = !this.showAllStores;
         localStorage.setItem("merch_show_all_stores", this.showAllStores);
@@ -2125,9 +891,9 @@
         this.drawRoutePolyline();
 
         if (this.showAllStores) {
-          this.showDragToast("👁️ Sunt afișate magazinele. Ține apăsat CTRL și trage cu mouse-ul pt a uni o rută!");
+          this.showDragToast("👁️ Sunt afișate magazinele disponibile din această săptămână.");
         } else {
-          this.showDragToast("📍 Se afișează doar magazinele din ziua selectată.");
+          this.showDragToast("📍 Se afișează doar traseul din ziua selectată.");
         }
       }
 
@@ -2138,37 +904,19 @@
         const labelMob = document.getElementById("toggleAllStoresLabelMob");
 
         if (this.showAllStores) {
-          if (btnDesk) {
-            btnDesk.classList.add("active");
-            labelDesk.textContent = "Toate (ON)";
-          }
-          if (btnMob) {
-            btnMob.classList.add("active-purple");
-            labelMob.textContent = "Toate (ON)";
-          }
+          if (btnDesk) { btnDesk.classList.add("active"); labelDesk.textContent = "Toate (ON)"; }
+          if (btnMob) { btnMob.classList.add("active-purple"); labelMob.textContent = "Toate (ON)"; }
         } else {
-          if (btnDesk) {
-            btnDesk.classList.remove("active");
-            labelDesk.textContent = "Toate Magazinele";
-          }
-          if (btnMob) {
-            btnMob.classList.remove("active-purple");
-            labelMob.textContent = "Toate Magazinele";
-          }
+          if (btnDesk) { btnDesk.classList.remove("active"); labelDesk.textContent = "Toate Magazinele"; }
+          if (btnMob) { btnMob.classList.remove("active-purple"); labelMob.textContent = "Toate Magazinele"; }
         }
       }
 
-      /* TOGGLE HIDE PROFI (DESKTOP ONLY) */
       toggleHideProfi() {
         this.hideProfi = !this.hideProfi;
         localStorage.setItem("merch_hide_profi", this.hideProfi);
         this.updateHideProfiUI();
         this.renderMapMarkers();
-        if (this.hideProfi) {
-          this.showDragToast("🚫 Magazinele Profi sunt ASCUNSE din modul de afișare general.");
-        } else {
-          this.showDragToast("🛒 Magazinele Profi sunt din nou VIZIBILE pe hartă.");
-        }
       }
 
       updateHideProfiUI() {
@@ -2185,35 +933,15 @@
         }
       }
 
-      /* GET ALLOCATED STORES IN OTHER DAYS OF CURRENT CATEGORY */
-      getStoresAllocatedInOtherDays() {
-        const currentCat = this.categories[this.currentCatId];
-        if (!currentCat || !currentCat.days) return new Set();
-
-        const allocatedIds = new Set();
-        Object.entries(currentCat.days).forEach(([dayId, day]) => {
-          if (dayId !== this.currentDayId && Array.isArray(day.stores)) {
-            day.stores.forEach(s => allocatedIds.add(s.id));
-          }
-        });
-        return allocatedIds;
-      }
-
-      /* CTRL KEY LISTENER FOR VISUAL CROSSHAIR */
       setupCtrlKeyListener() {
         window.addEventListener("keydown", (e) => {
-          if (e.key === "Control" || e.key === "Meta") {
-            document.body.classList.add("ctrl-pressed");
-          }
+          if (e.key === "Control" || e.key === "Meta") document.body.classList.add("ctrl-pressed");
         });
         window.addEventListener("keyup", (e) => {
-          if (e.key === "Control" || e.key === "Meta") {
-            document.body.classList.remove("ctrl-pressed");
-          }
+          if (e.key === "Control" || e.key === "Meta") document.body.classList.remove("ctrl-pressed");
         });
       }
 
-      /* CATEGORIES & DAYS DROPDOWN */
       toggleWeekDropdown(event) {
         if (event) event.stopPropagation();
         const menu = document.getElementById("weekDropdownMenu");
@@ -2228,9 +956,7 @@
       setupClickOutsideHandlers() {
         document.addEventListener("click", (e) => {
           const group = document.querySelector(".route-selector-group");
-          if (group && !group.contains(e.target)) {
-            this.closeWeekDropdown();
-          }
+          if (group && !group.contains(e.target)) this.closeWeekDropdown();
         });
       }
 
@@ -2282,7 +1008,6 @@
               daysList.appendChild(itemBtn);
             });
           }
-
           block.appendChild(daysList);
           listContainer.appendChild(block);
         });
@@ -2308,20 +1033,14 @@
       updateHeaderUI() {
         const cat = this.categories[this.currentCatId];
         const day = cat ? cat.days[this.currentDayId] : null;
-
-        const catLabel = document.getElementById("headerCategoryLabel");
-        const dayLabel = document.getElementById("activeDayHeaderLabel");
-        const sidebarTitle = document.getElementById("sidebarTitle");
-        const repHeading = document.getElementById("reportMainHeading");
-        const sidebarDesc = document.getElementById("sidebarRouteDesc");
-
         const storeCount = (day && day.stores) ? day.stores.length : 0;
 
-        if (catLabel) catLabel.textContent = `📅 ${cat ? cat.name : 'Traseu'}`;
-        if (dayLabel) dayLabel.textContent = `${day ? day.name : 'Ziua'} (${storeCount})`;
-        if (sidebarTitle) sidebarTitle.textContent = `${cat ? cat.name : ''} - ${day ? day.name : ''}`;
-        if (repHeading) repHeading.textContent = `📋 Raport - ${cat ? cat.name : ''} (${day ? day.name : ''})`;
+        document.getElementById("headerCategoryLabel").textContent = `📅 ${cat ? cat.name : 'Traseu'}`;
+        document.getElementById("activeDayHeaderLabel").textContent = `${day ? day.name : 'Ziua'} (${storeCount})`;
+        document.getElementById("sidebarTitle").textContent = `${cat ? cat.name : ''} - ${day ? day.name : ''}`;
+        document.getElementById("reportMainHeading").textContent = `📋 Raport - ${cat ? cat.name : ''} (${day ? day.name : ''})`;
 
+        const sidebarDesc = document.getElementById("sidebarRouteDesc");
         if (sidebarDesc) {
           sidebarDesc.innerHTML = `
             <div>🛣️ <strong>Traseu activ:</strong> ${cat ? cat.name : ''} &bull; ${day ? day.name : ''}</div>
@@ -2331,151 +1050,105 @@
       }
 
       promptAddCategoryOrDay() {
-        const choice = confirm("Apasă OK pentru a crea o CATEGORIE nouă (ex: Săptămâna 2).\nApasă CANCEL pentru a adăuga o ZI NOUĂ în categoria curentă.");
-        if (choice) {
-          this.promptAddCategory();
-        } else {
-          this.promptAddDayToCategory(this.currentCatId);
-        }
+        const choice = confirm("Apasă OK pentru a crea o CATEGORIE nouă.\nApasă CANCEL pentru a adăuga o ZI NOUĂ în categoria curentă.");
+        if (choice) this.promptAddCategory();
+        else this.promptAddDayToCategory(this.currentCatId);
       }
 
       promptAddCategory() {
-        const name = prompt("Introdu numele noii categorii (ex: Săptămâna 2, Ruta Specială, Zona Ilfov):");
+        const name = prompt("Introdu numele noii categorii:");
         if (!name || !name.trim()) return;
 
         const catId = "cat_" + Date.now();
         this.categories[catId] = {
-          id: catId,
-          name: name.trim(),
-          days: {
-            day1: { id: "day1", name: "Luni / Ziua 1", stores: [] }
-          }
+          id: catId, name: name.trim(),
+          days: { day1: { id: "day1", name: "Ziua 1", stores: [] } }
         };
-
         this.saveAll();
         this.selectCategoryAndDay(catId, "day1");
-        this.closeWeekDropdown();
-        alert(`✓ Categoria "${name.trim()}" a fost creată cu succes!`);
       }
 
       promptAddDayToCategory(catId) {
         const cat = this.categories[catId];
         if (!cat) return;
-
-        const dayName = prompt(`Introdu numele noii zile în "${cat.name}" (ex: Marți, Ziua 3, Urgențe):`);
+        const dayName = prompt(`Introdu numele noii zile în "${cat.name}":`);
         if (!dayName || !dayName.trim()) return;
 
         const dayId = "day_" + Date.now();
         if (!cat.days) cat.days = {};
-        cat.days[dayId] = {
-          id: dayId,
-          name: dayName.trim(),
-          stores: []
-        };
+        cat.days[dayId] = { id: dayId, name: dayName.trim(), stores: [] };
 
         this.saveAll();
         this.selectCategoryAndDay(catId, dayId);
-        this.closeWeekDropdown();
-        alert(`✓ Ziua "${dayName.trim()}" a fost adăugată în ${cat.name}!`);
       }
 
       deleteCategory(catId) {
-        if (Object.keys(this.categories).length <= 1) {
-          alert("Trebuie să păstrezi cel puțin o categorie.");
-          return;
-        }
-        const cat = this.categories[catId];
-        if (confirm(`Sigur dorești să ștergi categoria "${cat.name}" și toate zilele din ea?`)) {
+        if (Object.keys(this.categories).length <= 1) { alert("Păstrează cel puțin o categorie."); return; }
+        if (confirm(`Ștergi categoria?`)) {
           delete this.categories[catId];
-          const remainingCatId = Object.keys(this.categories)[0];
-          const remainingDayId = Object.keys(this.categories[remainingCatId].days)[0];
+          const remId = Object.keys(this.categories)[0];
           this.saveAll();
-          this.selectCategoryAndDay(remainingCatId, remainingDayId);
+          this.selectCategoryAndDay(remId, Object.keys(this.categories[remId].days)[0]);
         }
       }
 
       deleteDay(catId, dayId) {
         const cat = this.categories[catId];
-        if (!cat || !cat.days) return;
-
-        if (Object.keys(cat.days).length <= 1) {
-          alert("O categorie trebuie să conțină cel puțin o zi.");
-          return;
-        }
-
-        if (confirm(`Ștergi ziua "${cat.days[dayId].name}"?`)) {
+        if (Object.keys(cat.days).length <= 1) { alert("Trebuie să ai minim o zi."); return; }
+        if (confirm(`Ștergi ziua?`)) {
           delete cat.days[dayId];
           this.saveAll();
-          if (this.currentDayId === dayId) {
-            const nextDayId = Object.keys(cat.days)[0];
-            this.selectCategoryAndDay(catId, nextDayId);
-          } else {
-            this.renderCategoryMenu();
-            this.updateHeaderUI();
-          }
+          if (this.currentDayId === dayId) this.selectCategoryAndDay(catId, Object.keys(cat.days)[0]);
+          else { this.renderCategoryMenu(); this.updateHeaderUI(); }
         }
       }
 
-      /* MAP SETUP & MARKERS */
       initMap() {
-        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-          maxZoom: 20,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-          attribution: '&copy; Google Maps'
-        });
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] });
+        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] });
+        const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
 
-        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-          maxZoom: 20,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-          attribution: '&copy; Google Maps'
-        });
-
-        const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; OpenStreetMap'
-        });
-
-        this.map = L.map('map', { 
-          zoomControl: false,
-          layers: [googleHybrid] 
-        }).setView([44.420, 26.040], 12);
-
+        this.map = L.map('map', { zoomControl: false, layers: [googleHybrid] }).setView([44.420, 26.040], 12);
         L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
+        L.control.layers({ "🛰️ Google Satelit": googleHybrid, "🗺️ Google Străzi": googleStreets, "🌍 OpenStreetMap": osmStandard }, null, { position: 'topleft' }).addTo(this.map);
 
-        const baseMaps = {
-          "🛰️ Google Satelit": googleHybrid,
-          "🗺️ Google Străzi": googleStreets,
-          "🌍 OpenStreetMap": osmStandard
-        };
-        L.control.layers(baseMaps, null, { position: 'topleft' }).addTo(this.map);
+        this.map.on('click', () => {
+           this.closeQuickCard();
+        });
 
         this.renderMapMarkers();
         this.drawRoutePolyline();
       }
 
+      // ==========================================
+      // BUG REZOLVAT: LOGICA CULORII LA PINURI 
+      // ==========================================
       createPinIcon(store, index, isExternal = false) {
         const log = this.storeLogs[store.id];
         const isActive = this.activeStoreId === store.id;
-
+        
         let colorClass = "pin-pending";
         let label = (index !== null && index !== undefined) ? (index + 1) : "•";
 
-        if (isExternal) {
-          colorClass = "pin-external";
-          label = "🏪";
-        } else if (log && log.status === "completed") {
-          colorClass = "pin-completed";
-        } else if (log && log.status === "unresolved") {
-          colorClass = "pin-unresolved";
-        } else if (isActive) {
-          colorClass = "pin-active-pending";
+        // Setează forma/baza pentru cele externe (mov și iconiță magazin)
+        if (isExternal) { 
+            colorClass = "pin-external"; 
+            label = "🏪"; 
         }
-
-        const activeClass = isActive ? "is-active" : "";
+        
+        // DAR Suprascrie culoarea DACĂ magazinul are un status! 
+        // Astfel, și cele externe/mov se vor face Verzi dacă le bifezi ca Rezolvate.
+        if (log && log.status === "completed") { 
+            colorClass = "pin-completed"; 
+        } else if (log && log.status === "unresolved") { 
+            colorClass = "pin-unresolved"; 
+        } else if (isActive && !isExternal) { 
+            colorClass = "pin-active-pending"; 
+        }
 
         return L.divIcon({
           className: 'custom-leaflet-marker',
-          html: `<div class="custom-marker-pin ${colorClass} ${activeClass}"><span>${label}</span></div>`,
+          html: `<div class="custom-marker-pin ${colorClass} ${isActive ? "is-active" : ""}"><span>${label}</span></div>`,
           iconSize: [32, 32],
           iconAnchor: [16, 32]
         });
@@ -2489,21 +1162,14 @@
         const activeIds = new Set(activeDayStores.map(s => s.id));
 
         let storesToRender = [];
-        const otherDaysAllocated = this.getStoresAllocatedInOtherDays();
-
         if (this.showAllStores) {
-          storesToRender = this.masterStores.filter(s => {
-            // Exclude stores already allocated in other days of this week/category
-            if (otherDaysAllocated.has(s.id)) {
-              return false;
-            }
-            // Desktop Hide Profi logic:
-            if (this.hideProfi) {
+          storesToRender = this.getAvailableMasterStores(); 
+          if (this.hideProfi) {
+            storesToRender = storesToRender.filter(s => {
               const isProfi = (s.chain && s.chain.toLowerCase().includes("profi")) || s.name.toLowerCase().includes("profi");
               return !isProfi || activeIds.has(s.id);
-            }
-            return true;
-          });
+            });
+          }
         } else {
           storesToRender = this.getFilteredStores();
         }
@@ -2514,17 +1180,14 @@
           const icon = this.createPinIcon(store, originalIndex >= 0 ? originalIndex : null, isExternal);
 
           const marker = L.marker([store.lat, store.lng], {
-            icon: icon,
-            draggable: !this.isPinsLocked
+            icon: icon, draggable: !this.isPinsLocked
           }).addTo(this.map);
 
-          // Click handling
           marker.on('click', () => {
             if (this.isCtrlDragging) return;
             this.setActiveStore(store.id, false);
           });
 
-          // PC: Intercept mousedown when Ctrl key is held down to initiate Route Link Drag
           marker.on('mousedown', (e) => {
             if (e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
               L.DomEvent.stopPropagation(e);
@@ -2533,22 +1196,16 @@
             }
           });
 
-          // PC: Right Click (contextmenu)
           marker.on('contextmenu', (e) => {
             L.DomEvent.preventDefault(e);
             this.openAssignModal(store);
           });
 
-          // Mobile: Touch Long Press detection
-          let touchTimer = null;
-          let touchMoved = false;
-          let startPos = null;
-
+          let touchTimer = null, touchMoved = false, startPos = null;
           marker.on('touchstart', (e) => {
             touchMoved = false;
             const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null;
             if (touch) startPos = { x: touch.clientX, y: touch.clientY };
-
             touchTimer = setTimeout(() => {
               if (!touchMoved) {
                 if (navigator.vibrate) navigator.vibrate(60);
@@ -2556,23 +1213,17 @@
               }
             }, 550);
           });
-
           marker.on('touchmove', (e) => {
             const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null;
             if (touch && startPos) {
-              const dist = Math.hypot(touch.clientX - startPos.x, touch.clientY - startPos.y);
-              if (dist > 8) {
+              if (Math.hypot(touch.clientX - startPos.x, touch.clientY - startPos.y) > 8) {
                 touchMoved = true;
                 clearTimeout(touchTimer);
               }
             }
           });
+          marker.on('touchend touchcancel', () => clearTimeout(touchTimer));
 
-          marker.on('touchend touchcancel', () => {
-            clearTimeout(touchTimer);
-          });
-
-          // Standard pin dragging when unlocked
           marker.on('dragend', (e) => {
             if (this.isCtrlDragging) return;
             const newPos = e.target.getLatLng();
@@ -2580,26 +1231,43 @@
             store.lng = parseFloat(newPos.lng.toFixed(6));
 
             const mStore = this.masterStores.find(s => s.id === store.id);
-            if (mStore) {
-              mStore.lat = store.lat;
-              mStore.lng = store.lng;
-            }
+            if (mStore) { mStore.lat = store.lat; mStore.lng = store.lng; }
 
             this.saveAll();
             this.drawRoutePolyline();
-            this.showDragToast(`📍 Poziția magazinului "${store.name}" a fost salvată!`);
+            this.showDragToast(`📍 Poziția magazinului a fost salvată!`);
           });
 
           this.markers[store.id] = marker;
         });
+      }
 
-        if (storesToRender.length > 0 && !this.activeStoreId) {
-          const group = new L.featureGroup(Object.values(this.markers));
-          this.map.fitBounds(group.getBounds().pad(0.1));
+      resetStoreCoordinates(storeId) {
+        if (!storeId) return;
+        const store = this.masterStores.find(s => s.id === storeId);
+        if (store && store.defaultLat && store.defaultLng) {
+            if (confirm(`Ești sigur că vrei să resetezi poziția acestui magazin la coordonatele inițiale?`)) {
+                store.lat = store.defaultLat;
+                store.lng = store.defaultLng;
+                
+                const activeStore = this.currentStores.find(s => s.id === storeId);
+                if (activeStore) {
+                    activeStore.lat = store.defaultLat;
+                    activeStore.lng = store.defaultLng;
+                }
+
+                this.saveAll();
+                this.renderMapMarkers();
+                this.drawRoutePolyline();
+                this.map.panTo([store.lat, store.lng], { animate: true });
+                this.closeStoreModal();
+                this.showDragToast("🔄 Coordonatele au fost resetate la valorile inițiale.");
+            }
+        } else {
+            alert("Nu am găsit coordonatele inițiale pentru acest magazin.");
         }
       }
 
-      /* CTRL + DRAG TO LINK STORES INTO ROUTE */
       startCtrlRouteDrag(sourceStore, e) {
         if (this.isCtrlDragging) return;
         this.isCtrlDragging = true;
@@ -2607,22 +1275,13 @@
         this.map.dragging.disable();
 
         const startPt = [sourceStore.lat, sourceStore.lng];
-        this.ctrlDragTempLine = L.polyline([startPt, startPt], {
-          color: '#f59e0b',
-          weight: 4,
-          dashArray: '6, 6',
-          opacity: 0.9,
-          zIndexOffset: 3000
-        }).addTo(this.map);
-
+        this.ctrlDragTempLine = L.polyline([startPt, startPt], { color: '#f59e0b', weight: 4, dashArray: '6, 6', opacity: 0.9, zIndexOffset: 3000 }).addTo(this.map);
         this.showDragToast(`🔗 Trage către magazinul pe care vrei să-l unești după "${sourceStore.name}"!`);
 
         const onMouseMove = (ev) => {
           if (!this.isCtrlDragging) return;
           const latLng = this.map.mouseEventToLatLng(ev);
-          if (this.ctrlDragTempLine) {
-            this.ctrlDragTempLine.setLatLngs([startPt, [latLng.lat, latLng.lng]]);
-          }
+          if (this.ctrlDragTempLine) this.ctrlDragTempLine.setLatLngs([startPt, [latLng.lat, latLng.lng]]);
         };
 
         const onMouseUp = (ev) => {
@@ -2630,16 +1289,11 @@
           window.removeEventListener('mouseup', onMouseUp);
           this.map.dragging.enable();
 
-          if (this.ctrlDragTempLine) {
-            this.map.removeLayer(this.ctrlDragTempLine);
-            this.ctrlDragTempLine = null;
-          }
+          if (this.ctrlDragTempLine) { this.map.removeLayer(this.ctrlDragTempLine); this.ctrlDragTempLine = null; }
           this.isCtrlDragging = false;
 
           const targetStore = this.findStoreUnderCursor(ev.clientX, ev.clientY, sourceStore.id);
-          if (targetStore) {
-            this.connectStoresInRoute(sourceStore, targetStore);
-          }
+          if (targetStore) this.connectStoresInRoute(sourceStore, targetStore);
           this.ctrlDragSourceStore = null;
         };
 
@@ -2648,52 +1302,33 @@
       }
 
       findStoreUnderCursor(clientX, clientY, excludeId) {
-        let closest = null;
-        let minDistancePx = 45; // Pixel hit-box radius around pin
-
-        const listToCheck = this.showAllStores ? this.masterStores : this.currentStores;
+        let closest = null, minDistancePx = 45;
+        const listToCheck = this.showAllStores ? this.getAvailableMasterStores() : this.currentStores;
+        
         listToCheck.forEach(s => {
           if (s.id === excludeId) return;
           const pt = this.map.latLngToContainerPoint([s.lat, s.lng]);
           const mapRect = this.map.getContainer().getBoundingClientRect();
-          const screenX = mapRect.left + pt.x;
-          const screenY = mapRect.top + pt.y;
-          const dist = Math.hypot(clientX - screenX, clientY - screenY);
-          if (dist < minDistancePx) {
-            minDistancePx = dist;
-            closest = s;
-          }
+          const dist = Math.hypot(clientX - (mapRect.left + pt.x), clientY - (mapRect.top + pt.y));
+          if (dist < minDistancePx) { minDistancePx = dist; closest = s; }
         });
         return closest;
       }
 
       connectStoresInRoute(sourceStore, targetStore) {
         let stores = [...this.currentStores];
-
-        // Ensure sourceStore is in current day
         let srcIdx = stores.findIndex(s => s.id === sourceStore.id);
-        if (srcIdx === -1) {
-          stores.push({ ...sourceStore });
-          srcIdx = stores.length - 1;
-        }
+        if (srcIdx === -1) { stores.push({ ...sourceStore }); srcIdx = stores.length - 1; }
 
-        // Remove targetStore if already in current list to reposition it
         const targetIdx = stores.findIndex(s => s.id === targetStore.id);
-        if (targetIdx !== -1) {
-          stores.splice(targetIdx, 1);
-          srcIdx = stores.findIndex(s => s.id === sourceStore.id);
-        }
+        if (targetIdx !== -1) { stores.splice(targetIdx, 1); srcIdx = stores.findIndex(s => s.id === sourceStore.id); }
 
-        // Insert target directly after source
         stores.splice(srcIdx + 1, 0, { ...targetStore });
-
-        // Renumber order
         stores.forEach((s, idx) => { s.order = idx + 1; });
         this.currentStores = stores;
 
         this.saveAll();
         this.updateHeaderUI();
-        this.renderCategoryMenu();
         this.renderSidebarList();
         this.renderMapMarkers();
         this.drawRoutePolyline();
@@ -2702,33 +1337,22 @@
       }
 
       drawRoutePolyline() {
-        if (this.routePolyline) {
-          this.map.removeLayer(this.routePolyline);
-        }
+        if (this.routePolyline) this.map.removeLayer(this.routePolyline);
         const latLngs = this.currentStores.map(s => [s.lat, s.lng]);
         if (latLngs.length > 1) {
-          this.routePolyline = L.polyline(latLngs, {
-            color: '#2563eb',
-            weight: 4,
-            opacity: 0.75,
-            dashArray: '8, 8'
-          }).addTo(this.map);
+          this.routePolyline = L.polyline(latLngs, { color: '#2563eb', weight: 4, opacity: 0.75, dashArray: '8, 8' }).addTo(this.map);
         }
       }
 
       showDragToast(msg) {
         const toast = document.getElementById("mapDragToast");
-        const toastText = document.getElementById("mapDragToastText");
-        if (!toast) return;
-        toastText.textContent = msg;
+        document.getElementById("mapDragToastText").textContent = msg;
         toast.style.display = "flex";
         setTimeout(() => { toast.style.display = "none"; }, 3500);
       }
 
-      /* ASSIGN PIN TO CATEGORY & DAY MODAL */
       openAssignModal(store) {
         this.assignTargetStore = store;
-        const modal = document.getElementById("assignModalOverlay");
         document.getElementById("assignStoreTitle").textContent = store.name;
         document.getElementById("assignStoreAddress").textContent = store.address;
 
@@ -2736,32 +1360,26 @@
         catSelect.innerHTML = "";
         Object.values(this.categories).forEach(cat => {
           const opt = document.createElement("option");
-          opt.value = cat.id;
-          opt.textContent = cat.name;
+          opt.value = cat.id; opt.textContent = cat.name;
           if (cat.id === this.currentCatId) opt.selected = true;
           catSelect.appendChild(opt);
         });
 
         this.onAssignCategoryChange();
-
         const isInCurrent = this.currentStores.some(s => s.id === store.id);
         document.getElementById("btnRemoveFromCurrentDay").style.display = isInCurrent ? "block" : "none";
-
-        modal.classList.add("active");
+        document.getElementById("assignModalOverlay").classList.add("active");
       }
 
       onAssignCategoryChange() {
-        const catId = document.getElementById("assignCatSelect").value;
-        const cat = this.categories[catId];
+        const cat = this.categories[document.getElementById("assignCatSelect").value];
         const daySelect = document.getElementById("assignDaySelect");
         daySelect.innerHTML = "";
-
         if (cat && cat.days) {
           Object.values(cat.days).forEach(day => {
             const opt = document.createElement("option");
-            opt.value = day.id;
-            opt.textContent = `${day.name} (${(day.stores || []).length} magazine)`;
-            if (day.id === this.currentDayId && catId === this.currentCatId) opt.selected = true;
+            opt.value = day.id; opt.textContent = `${day.name} (${(day.stores || []).length} magazine)`;
+            if (day.id === this.currentDayId && cat.id === this.currentCatId) opt.selected = true;
             daySelect.appendChild(opt);
           });
         }
@@ -2771,65 +1389,42 @@
         if (!this.assignTargetStore) return;
         const catId = document.getElementById("assignCatSelect").value;
         const dayId = document.getElementById("assignDaySelect").value;
+        const targetDay = this.categories[catId].days[dayId];
 
-        const cat = this.categories[catId];
-        if (!cat || !cat.days[dayId]) {
-          alert("Zi sau categorie invalidă.");
-          return;
-        }
-
-        const targetDay = cat.days[dayId];
         if (!targetDay.stores) targetDay.stores = [];
-
-        const existingIdx = targetDay.stores.findIndex(s => s.id === this.assignTargetStore.id);
-        if (existingIdx >= 0) {
-          alert(`Magazinul "${this.assignTargetStore.name}" se află deja în ${targetDay.name}!`);
+        if (targetDay.stores.findIndex(s => s.id === this.assignTargetStore.id) >= 0) {
+          alert(`Magazinul se află deja în ${targetDay.name}!`);
         } else {
-          targetDay.stores.push({
-            ...this.assignTargetStore,
-            order: targetDay.stores.length + 1
-          });
+          this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id);
+          
+          targetDay.stores.push({ ...this.assignTargetStore, order: targetDay.stores.length + 1 });
           this.saveAll();
-          alert(`✓ Magazinul "${this.assignTargetStore.name}" a fost adăugat în ${cat.name} -> ${targetDay.name}!`);
+          alert(`✓ Magazinul a fost mutat în -> ${targetDay.name}!`);
         }
-
         this.closeAssignModal();
         this.updateHeaderUI();
-        this.renderCategoryMenu();
         this.renderMapMarkers();
         this.drawRoutePolyline();
         this.renderSidebarList();
       }
 
       removeStoreFromActiveDay() {
-        if (!this.assignTargetStore) return;
-        const storeName = this.assignTargetStore.name;
-        if (confirm(`Elimini magazinul "${storeName}" din ziua curentă?`)) {
+        if (confirm(`Elimini magazinul din ziua curentă?`)) {
           this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id);
           this.saveAll();
           this.closeAssignModal();
           this.updateHeaderUI();
-          this.renderCategoryMenu();
           this.renderMapMarkers();
           this.drawRoutePolyline();
           this.renderSidebarList();
-          this.renderReport();
-          alert(`✓ Magazinul a fost eliminat din ziua curentă.`);
         }
       }
 
-      closeAssignModal() {
-        document.getElementById("assignModalOverlay").classList.remove("active");
-        this.assignTargetStore = null;
-      }
-
+      closeAssignModal() { document.getElementById("assignModalOverlay").classList.remove("active"); this.assignTargetStore = null; }
       openAssignModalForActive() {
-        if (!this.activeStoreId) return;
-        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
-        if (store) this.openAssignModal(store);
+        if (this.activeStoreId) this.openAssignModal(this.masterStores.find(s => s.id === this.activeStoreId));
       }
 
-      /* FILTER & SIDEBAR */
       setStoreFilter(filterType, element) {
         this.currentFilter = filterType;
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -2845,8 +1440,7 @@
           if (this.currentFilter === "pending") return !log || (log.status !== "completed" && log.status !== "unresolved");
           if (this.currentFilter === "completed") return log && log.status === "completed";
           if (store.chain && store.chain.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
-          if (store.name.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
-          return false;
+          return store.name.toLowerCase().includes(this.currentFilter.toLowerCase());
         });
       }
 
@@ -2856,15 +1450,8 @@
         container.innerHTML = "";
 
         const storesList = this.getFilteredStores();
-        let resolvedCount = 0;
-
         if (storesList.length === 0) {
-          container.innerHTML = `
-            <div style="text-align:center; padding:30px 14px; color:var(--text-muted); font-size:12px;">
-              Nu există magazine în această zi.<br/><br/>
-              Activează butonul <strong>"Toate Magazinele"</strong> și unește magazine ținând apăsat <strong>Ctrl</strong> și trăgând cu mouse-ul!
-            </div>
-          `;
+          container.innerHTML = `<div style="text-align:center; padding:30px 14px; color:var(--text-muted); font-size:12px;">Activează "Toate Magazinele" și trage cu Ctrl pe PC pt a uni rute.</div>`;
         }
 
         storesList.forEach((store) => {
@@ -2872,7 +1459,6 @@
           const log = this.storeLogs[store.id];
           const isResolved = log && log.status === "completed";
           const isUnresolved = log && log.status === "unresolved";
-          if (isResolved) resolvedCount++;
 
           const card = document.createElement("div");
           card.className = `store-card ${isResolved ? 'completed' : ''} ${isUnresolved ? 'unresolved' : ''} ${this.activeStoreId === store.id ? 'active' : ''}`;
@@ -2892,148 +1478,114 @@
               <div class="store-card-address">${store.address}</div>
             </div>
           `;
-
           card.onclick = () => this.setActiveStore(store.id, false);
-          card.oncontextmenu = (e) => {
-            e.preventDefault();
-            this.openAssignModal(store);
-          };
+          card.oncontextmenu = (e) => { e.preventDefault(); this.openAssignModal(store); };
           container.appendChild(card);
         });
 
         const totalResolved = this.currentStores.filter(s => this.storeLogs[s.id] && this.storeLogs[s.id].status === "completed").length;
-        const badge = document.getElementById("sidebarProgressBadge");
-        if (badge) badge.textContent = `${totalResolved}/${this.currentStores.length} Vizitate`;
+        document.getElementById("sidebarProgressBadge").textContent = `${totalResolved}/${this.currentStores.length} Vizitate`;
       }
 
       setActiveStore(id, openSheet = false) {
         this.activeStoreId = id;
-        const store = this.masterStores.find(s => s.id === id) || this.currentStores.find(s => s.id === id);
+        const store = this.masterStores.find(s => s.id === id);
         if (!store) return;
-
         const index = this.currentStores.findIndex(s => s.id === id);
         const log = this.storeLogs[id] || { status: "pending" };
 
         this.renderMapMarkers();
         this.map.panTo([store.lat, store.lng], { animate: true, duration: 0.4 });
 
-        const quickCard = document.getElementById("mobileQuickCard");
-        const mqcOrder = document.getElementById("mqcOrder");
-        const mqcName = document.getElementById("mqcName");
-        const mqcAddress = document.getElementById("mqcAddress");
-        const mqcStatusBadge = document.getElementById("mqcStatusBadge");
-
-        if (mqcOrder) mqcOrder.textContent = (index >= 0) ? `OPRIREA ${index + 1} DIN ${this.currentStores.length}` : `MAGAZIN EXTERN (Din afara zilei)`;
-        if (mqcName) mqcName.textContent = store.name;
-        if (mqcAddress) mqcAddress.textContent = store.address;
+        document.getElementById("mqcOrder").textContent = (index >= 0) ? `OPRIREA ${index + 1} DIN ${this.currentStores.length}` : `MAGAZIN EXTERN`;
+        document.getElementById("mqcName").textContent = store.name;
+        document.getElementById("mqcAddress").textContent = store.address;
         
-        if (mqcStatusBadge) {
-          if (log.status === "completed") {
-            mqcStatusBadge.className = "badge badge-success";
-            mqcStatusBadge.textContent = `Rezolvat (${log.time || 'OK'})`;
-          } else if (log.status === "unresolved") {
-            mqcStatusBadge.className = "badge badge-danger";
-            mqcStatusBadge.textContent = "Nerezolvat";
-          } else {
-            mqcStatusBadge.className = "badge badge-gray";
-            mqcStatusBadge.textContent = "Neînceput";
-          }
+        const mqcStatusBadge = document.getElementById("mqcStatusBadge");
+        const quickCard = document.getElementById("mobileQuickCard");
+        quickCard.classList.remove("completed", "unresolved");
+
+        if (log.status === "completed") { 
+            mqcStatusBadge.className = "badge badge-success"; 
+            mqcStatusBadge.textContent = "Rezolvat"; 
+            quickCard.classList.add("completed"); 
+        }
+        else if (log.status === "unresolved") { 
+            mqcStatusBadge.className = "badge badge-danger"; 
+            mqcStatusBadge.textContent = "Nerezolvat"; 
+            quickCard.classList.add("unresolved"); 
+        }
+        else { 
+            mqcStatusBadge.className = "badge badge-gray"; 
+            mqcStatusBadge.textContent = "Neînceput"; 
         }
 
-        if (quickCard) quickCard.style.display = "block";
-
-        document.querySelectorAll('.store-card').forEach(card => {
-          card.classList.toggle('active', card.dataset.id === id);
-        });
-
-        const fabSelect = document.getElementById("fabStoreSelect");
-        if (fabSelect) fabSelect.value = id;
+        quickCard.style.display = "block";
+        document.querySelectorAll('.store-card').forEach(card => card.classList.toggle('active', card.dataset.id === id));
+        document.getElementById("fabStoreSelect").value = id;
         this.renderFabProductsForm();
 
-        if (openSheet) {
-          this.openStoreModal(store, index >= 0 ? index : 0, log);
-        }
+        if (openSheet) this.openStoreModal(store, index >= 0 ? index : 0, log);
       }
 
-      closeQuickCard() {
-        const quickCard = document.getElementById("mobileQuickCard");
-        if (quickCard) quickCard.style.display = "none";
-      }
+      closeQuickCard() { document.getElementById("mobileQuickCard").style.display = "none"; }
 
       openActiveStoreModal() {
         if (!this.activeStoreId) return;
-        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
+        const store = this.masterStores.find(s => s.id === this.activeStoreId);
         const idx = this.currentStores.findIndex(s => s.id === this.activeStoreId);
-        const log = this.storeLogs[this.activeStoreId] || { status: "pending" };
-        this.openStoreModal(store, idx >= 0 ? idx : 0, log);
+        this.openStoreModal(store, idx >= 0 ? idx : 0, this.storeLogs[this.activeStoreId] || { status: "pending" });
       }
 
       openStoreModal(store, index, log) {
-        document.getElementById("modalOrderBadge").textContent = `Oprirea ${index + 1} din ${this.currentStores.length}`;
+        document.getElementById("modalOrderBadge").textContent = `Oprirea ${index + 1}`;
         document.getElementById("modalStoreTitle").textContent = store.name;
         document.getElementById("modalStoreAddress").textContent = store.address;
         
         const badge = document.getElementById("modalStatusBadge");
-        if (log.status === "completed") {
-          badge.className = "badge badge-success";
-          badge.textContent = `Rezolvat la ${log.time}`;
-        } else if (log.status === "unresolved") {
-          badge.className = "badge badge-danger";
-          badge.textContent = `Nerezolvat (${log.reason || 'Problemă'})`;
-        } else {
-          badge.className = "badge badge-gray";
-          badge.textContent = "Neînceput";
+        const actionSheet = document.querySelector(".action-sheet");
+        actionSheet.classList.remove("completed", "unresolved");
+
+        if (log.status === "completed") { 
+            badge.className = "badge badge-success"; 
+            badge.textContent = `Rezolvat la ${log.time}`; 
+            actionSheet.classList.add("completed");
+        }
+        else if (log.status === "unresolved") { 
+            badge.className = "badge badge-danger"; 
+            badge.textContent = `Nerezolvat`; 
+            actionSheet.classList.add("unresolved");
+        }
+        else { 
+            badge.className = "badge badge-gray"; 
+            badge.textContent = "Neînceput"; 
         }
 
         document.getElementById("storeModalOverlay").classList.add("active");
       }
+      closeStoreModal() { document.getElementById("storeModalOverlay").classList.remove("active"); }
 
-      closeStoreModal() {
-        document.getElementById("storeModalOverlay").classList.remove("active");
-      }
-
-      /* PIN LOCK & UNLOCK */
       togglePinLock() {
         this.isPinsLocked = !this.isPinsLocked;
         localStorage.setItem("merch_pins_locked", this.isPinsLocked);
         this.updatePinLockUI();
-
         Object.values(this.markers).forEach(marker => {
-          if (marker.dragging) {
-            if (this.isPinsLocked) marker.dragging.disable();
-            else marker.dragging.enable();
-          }
+          if (marker.dragging) { if (this.isPinsLocked) marker.dragging.disable(); else marker.dragging.enable(); }
         });
-
-        if (this.isPinsLocked) {
-          this.showDragToast("🔒 Pinii au fost BLOCAȚI.");
-        } else {
-          this.showDragToast("🔓 Pinii au fost DEBLOCAȚI! Poți trage acum pinul pe hartă.");
-        }
       }
 
       updatePinLockUI() {
         const btnDesk = document.getElementById("headerLockBtnDesk");
-        const iconMob = document.getElementById("dockLockIcon");
-        const textMob = document.getElementById("dockLockText");
-        const pillMob = document.getElementById("dockLockBtnMob");
-
         if (this.isPinsLocked) {
-          if (btnDesk) {
-            btnDesk.innerHTML = "🔒";
-            btnDesk.classList.remove("unlocked-btn");
-          }
-          if (iconMob) iconMob.textContent = "🔒";
-          if (textMob) textMob.textContent = "Pini Blocați";
-          if (pillMob) pillMob.classList.remove("unlocked-pill");
+          if (btnDesk) { btnDesk.innerHTML = "🔒"; btnDesk.classList.remove("unlocked-btn"); }
+          document.getElementById("dockLockIcon").textContent = "🔒";
+          document.getElementById("dockLockText").textContent = "Pini Blocați";
+          document.getElementById("dockLockBtnMob").classList.remove("unlocked-pill");
         } else {
-          if (btnDesk) {
-            btnDesk.innerHTML = "🔓";
-            btnDesk.classList.add("unlocked-btn");
-          }
-          if (iconMob) iconMob.textContent = "🔓";
-          if (textMob) textMob.textContent = "Pini Deblocați";
-          if (pillMob) pillMob.classList.add("unlocked-pill");
+          if (btnDesk) { btnDesk.innerHTML = "🔓"; btnDesk.classList.add("unlocked-btn"); }
+          document.getElementById("dockLockIcon").textContent = "🔓";
+          document.getElementById("dockLockText").textContent = "Pini Deblocați";
+          document.getElementById("dockLockBtnMob").classList.add("unlocked-pill");
         }
       }
 
@@ -3042,78 +1594,39 @@
         localStorage.setItem("merch_theme", this.theme);
         this.applyTheme(this.theme);
       }
-
       applyTheme(t) {
         document.documentElement.setAttribute("data-theme", t);
-        const btnDesk = document.getElementById("themeToggleBtnDesk");
-        const iconMob = document.getElementById("dockThemeIcon");
-        if (btnDesk) btnDesk.innerHTML = t === "dark" ? "☀️" : "🌙";
-        if (iconMob) iconMob.textContent = t === "dark" ? "☀️" : "🌙";
+        document.getElementById("themeToggleBtnDesk").innerHTML = t === "dark" ? "☀️" : "🌙";
+        document.getElementById("dockThemeIcon").textContent = t === "dark" ? "☀️" : "🌙";
       }
 
       switchTab(tab) {
         const isMap = tab === "map";
-        
-        const deskMap = document.getElementById("tabMapBtnDesk");
-        const deskRep = document.getElementById("tabReportBtnDesk");
-        if (deskMap) deskMap.classList.toggle("active", isMap);
-        if (deskRep) deskRep.classList.toggle("active", !isMap);
-
-        const mobMap = document.getElementById("tabMapBtnMob");
-        const mobRep = document.getElementById("tabReportBtnMob");
-        if (mobMap) mobMap.classList.toggle("active", isMap);
-        if (mobRep) mobRep.classList.toggle("active", !isMap);
-
+        document.getElementById("tabMapBtnDesk").classList.toggle("active", isMap);
+        document.getElementById("tabReportBtnDesk").classList.toggle("active", !isMap);
+        document.getElementById("tabMapBtnMob").classList.toggle("active", isMap);
+        document.getElementById("tabReportBtnMob").classList.toggle("active", !isMap);
         document.getElementById("mapView").classList.toggle("active", isMap);
         document.getElementById("reportView").classList.toggle("active", !isMap);
-
-        if (isMap && this.map) {
-          setTimeout(() => this.map.invalidateSize(), 200);
-        } else {
-          this.renderReport();
-        }
+        if (isMap && this.map) setTimeout(() => this.map.invalidateSize(), 200); else this.renderReport();
       }
 
       toggleGpsTracking() {
-        const headerBtn = document.getElementById("headerGpsBtnDesk");
-        const mapBtn = document.getElementById("mapGpsBtn");
-        const dockBtn = document.getElementById("dockGpsBtnMob");
-
         if (this.userGpsWatchId) {
           navigator.geolocation.clearWatch(this.userGpsWatchId);
           this.userGpsWatchId = null;
           if (this.userGpsMarker) this.map.removeLayer(this.userGpsMarker);
           if (this.userGpsCircle) this.map.removeLayer(this.userGpsCircle);
-          this.userGpsMarker = null;
-          this.userGpsCircle = null;
-          if (headerBtn) headerBtn.classList.remove("active-btn");
-          if (mapBtn) mapBtn.classList.remove("active-btn");
-          if (dockBtn) dockBtn.classList.remove("active");
-          alert("📍 GPS dezactivat.");
+          this.userGpsMarker = null; this.userGpsCircle = null;
           return;
         }
-
-        if (!navigator.geolocation) {
-          alert("Dispozitivul nu suportă GPS.");
-          return;
-        }
-
-        if (headerBtn) headerBtn.classList.add("active-btn");
-        if (mapBtn) mapBtn.classList.add("active-btn");
-        if (dockBtn) dockBtn.classList.add("active");
-
+        if (!navigator.geolocation) return alert("Dispozitivul nu suportă GPS.");
         this.userGpsWatchId = navigator.geolocation.watchPosition(
           (pos) => {
             const { latitude, longitude, accuracy } = pos.coords;
             this.userCoords = { lat: latitude, lng: longitude };
-
             if (!this.userGpsMarker) {
-              const dotIcon = L.divIcon({
-                className: 'custom-gps-icon',
-                html: '<div class="user-gps-dot"></div>',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-              });
+              const dotIcon = L.divIcon({ className: 'custom-gps-icon', html: '<div class="user-gps-dot"></div>', iconSize: [20, 20], iconAnchor: [10, 10] });
               this.userGpsMarker = L.marker([latitude, longitude], { icon: dotIcon, zIndexOffset: 2000 }).addTo(this.map);
               this.userGpsCircle = L.circle([latitude, longitude], { radius: accuracy, color: '#2563eb', weight: 1, fillOpacity: 0.15 }).addTo(this.map);
               this.map.panTo([latitude, longitude]);
@@ -3123,124 +1636,55 @@
               this.userGpsCircle.setRadius(accuracy);
             }
           },
-          (err) => {
-            alert("Permite accesul la locație în browser.");
-            if (headerBtn) headerBtn.classList.remove("active-btn");
-            if (mapBtn) mapBtn.classList.remove("active-btn");
-            if (dockBtn) dockBtn.classList.remove("active");
-          },
+          (err) => alert("Permite accesul la locație în browser."),
           { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
         );
       }
 
       findNearestStoreToGps() {
         if (!this.userCoords) {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                this.userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                this.locateClosestUnvisitedStore();
-              },
-              () => alert("Activează mai întâi GPS-ul!")
-            );
-          } else {
-            alert("GPS indisponibil.");
-          }
+          if (navigator.geolocation) navigator.geolocation.getCurrentPosition(
+            (pos) => { this.userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; this.locateClosestUnvisitedStore(); },
+            () => alert("Activează mai întâi GPS-ul!")
+          );
           return;
         }
         this.locateClosestUnvisitedStore();
       }
-
       locateClosestUnvisitedStore() {
-        const unvisited = this.currentStores.filter(s => {
-          const log = this.storeLogs[s.id];
-          return !log || (log.status !== "completed" && log.status !== "unresolved");
-        });
-
-        if (unvisited.length === 0) {
-          alert("🎉 Toate magazinele din această zi au fost vizitate!");
-          return;
-        }
-
+        const unvisited = this.currentStores.filter(s => !this.storeLogs[s.id] || (this.storeLogs[s.id].status !== "completed" && this.storeLogs[s.id].status !== "unresolved"));
+        if (unvisited.length === 0) return alert("🎉 Toate magazinele au fost vizitate!");
         const haversineDist = (p1, p2) => {
-          const R = 6371;
-          const dLat = (p2.lat - p1.lat) * Math.PI / 180;
-          const dLng = (p2.lng - p1.lng) * Math.PI / 180;
-          const a = Math.sin(dLat/2)**2 + Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) * Math.sin(dLng/2)**2;
-          return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const a = Math.sin((p2.lat - p1.lat)*Math.PI/360)**2 + Math.cos(p1.lat*Math.PI/180) * Math.cos(p2.lat*Math.PI/180) * Math.sin((p2.lng - p1.lng)*Math.PI/360)**2;
+          return 2 * 6371 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         };
-
-        let closest = null;
-        let minDist = Infinity;
-
-        unvisited.forEach(s => {
-          const d = haversineDist(this.userCoords, s);
-          if (d < minDist) {
-            minDist = d;
-            closest = s;
-          }
-        });
-
-        if (closest) {
-          this.setActiveStore(closest.id, false);
-          alert(`🎯 Cel mai apropiat magazin:\n${closest.name} (~${minDist.toFixed(2)} km)`);
-        }
+        let closest = null, minDist = Infinity;
+        unvisited.forEach(s => { const d = haversineDist(this.userCoords, s); if (d < minDist) { minDist = d; closest = s; } });
+        if (closest) { this.setActiveStore(closest.id, false); alert(`🎯 Magazin:\n${closest.name} (~${minDist.toFixed(2)} km)`); }
       }
 
       launchNavigation(webUrl, nativeSchemeUrl) {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        const targetUrl = (isIOS && nativeSchemeUrl) ? nativeSchemeUrl : webUrl;
-        
-        const link = document.createElement("a");
-        link.href = targetUrl;
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => {
-          if (link.parentNode) link.parentNode.removeChild(link);
-        }, 400);
+        const link = document.createElement("a"); link.href = (isIOS && nativeSchemeUrl) ? nativeSchemeUrl : webUrl; link.style.display = "none";
+        document.body.appendChild(link); link.click(); setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 400);
       }
-
-      openActiveInWaze() {
-        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
-        if (!store) return;
-        this.launchNavigation(`https://waze.com/ul?ll=${store.lat},${store.lng}&navigate=yes`, `waze://?ll=${store.lat},${store.lng}&navigate=yes`);
-      }
-
-      openActiveInGoogleMaps() {
-        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
-        if (!store) return;
-        this.launchNavigation(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`, `comgooglemaps://?daddr=${store.lat},${store.lng}&directionsmode=driving`);
-      }
-
-      openActiveInAppleMaps() {
-        const store = this.masterStores.find(s => s.id === this.activeStoreId) || this.currentStores.find(s => s.id === this.activeStoreId);
-        if (!store) return;
-        this.launchNavigation(`https://maps.apple.com/?daddr=${store.lat},${store.lng}`, `maps://?daddr=${store.lat},${store.lng}&dirflg=d`);
-      }
+      openActiveInWaze() { const s = this.masterStores.find(x => x.id === this.activeStoreId); if (s) this.launchNavigation(`https://waze.com/ul?ll=${s.lat},${s.lng}&navigate=yes`, `waze://?ll=${s.lat},${s.lng}&navigate=yes`); }
+      openActiveInGoogleMaps() { const s = this.masterStores.find(x => x.id === this.activeStoreId); if (s) this.launchNavigation(`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`, `comgooglemaps://?daddr=${s.lat},${s.lng}&directionsmode=driving`); }
+      openActiveInAppleMaps() { const s = this.masterStores.find(x => x.id === this.activeStoreId); if (s) this.launchNavigation(`https://maps.apple.com/?daddr=${s.lat},${s.lng}`, `maps://?daddr=${s.lat},${s.lng}&dirflg=d`); }
 
       goToNextStore() {
-        const currentIndex = this.currentStores.findIndex(s => s.id === this.activeStoreId);
-        if (currentIndex < this.currentStores.length - 1) {
-          const nextStore = this.currentStores[currentIndex + 1];
-          this.setActiveStore(nextStore.id, false);
-        } else {
-          alert(`🎉 Felicitări! Ai finalizat toate magazinele de astăzi.`);
-        }
+        const idx = this.currentStores.findIndex(s => s.id === this.activeStoreId);
+        if (idx < this.currentStores.length - 1) this.setActiveStore(this.currentStores[idx + 1].id, false);
       }
 
       markActiveAsResolved() {
         if (!this.activeStoreId) return;
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
-
-        this.storeLogs[this.activeStoreId] = {
-          status: "completed",
-          time: timeStr,
-          timestamp: Date.now()
-        };
+        this.storeLogs[this.activeStoreId] = { status: "completed", time: new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }), timestamp: Date.now() };
         this.saveAll();
-        this.updateUIAfterStatusChange();
+        
+        this.renderMapMarkers(); 
+        this.renderSidebarList(); 
+        this.setActiveStore(this.activeStoreId, false);
       }
 
       promptUnresolved() {
@@ -3250,127 +1694,64 @@
 
       confirmUnresolved(reason) {
         if (!this.activeStoreId) return;
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
-
-        this.storeLogs[this.activeStoreId] = {
-          status: "unresolved",
-          reason: reason,
-          time: timeStr,
-          timestamp: Date.now()
-        };
+        this.storeLogs[this.activeStoreId] = { status: "unresolved", reason: reason, time: new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }), timestamp: Date.now() };
         this.saveAll();
         document.getElementById("reasonModalOverlay").classList.remove("active");
-        this.updateUIAfterStatusChange();
-      }
-
-      updateUIAfterStatusChange() {
-        this.renderMapMarkers();
-        this.renderSidebarList();
-        this.setActiveStore(this.activeStoreId, false);
-        this.renderReport();
+        this.renderMapMarkers(); this.renderSidebarList(); this.setActiveStore(this.activeStoreId, false);
       }
 
       reorderRoute(strategy) {
-        if (strategy === "retur") {
-          this.currentStores = [...this.currentStores].reverse().map((s, idx) => ({ ...s, order: idx + 1 }));
-        }
+        if (strategy === "retur") this.currentStores = [...this.currentStores].reverse().map((s, idx) => ({ ...s, order: idx + 1 }));
         this.saveAll();
-        this.renderSidebarList();
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
-        if (this.currentStores.length > 0) this.setActiveStore(this.currentStores[0].id, false);
+        this.renderSidebarList(); this.renderMapMarkers(); this.drawRoutePolyline();
       }
 
-      /* FORM & PHOTOS */
+      /* FAB / POZE */
       setupDraggableFab() {
         const fab = document.getElementById("floatingFab");
         if (!fab) return;
-
-        let isDragging = false;
-        let startX = 0, startY = 0;
-        let initialLeft = 0, initialTop = 0;
-        let dragDistance = 0;
+        let isDragging = false, startX = 0, startY = 0, initialLeft = 0, initialTop = 0, dragDistance = 0;
 
         const onStart = (e) => {
-          isDragging = true;
-          dragDistance = 0;
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          startX = clientX;
-          startY = clientY;
-
-          const rect = fab.getBoundingClientRect();
-          initialLeft = rect.left;
-          initialTop = rect.top;
-
+          isDragging = true; dragDistance = 0;
+          startX = e.touches ? e.touches[0].clientX : e.clientX; startY = e.touches ? e.touches[0].clientY : e.clientY;
+          const rect = fab.getBoundingClientRect(); initialLeft = rect.left; initialTop = rect.top;
           fab.style.transition = "none";
           document.addEventListener(e.touches ? 'touchmove' : 'mousemove', onMove, { passive: false });
           document.addEventListener(e.touches ? 'touchend' : 'mouseup', onEnd);
         };
-
         const onMove = (e) => {
-          if (!isDragging) return;
-          e.preventDefault();
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          const deltaX = clientX - startX;
-          const deltaY = clientY - startY;
-          dragDistance = Math.hypot(deltaX, deltaY);
-
-          let newLeft = initialLeft + deltaX;
-          let newTop = initialTop + deltaY;
-
-          const maxX = window.innerWidth - fab.offsetWidth - 10;
-          const maxY = window.innerHeight - fab.offsetHeight - 85;
-          newLeft = Math.max(10, Math.min(newLeft, maxX));
-          newTop = Math.max(90, Math.min(newTop, maxY));
-
-          fab.style.left = `${newLeft}px`;
-          fab.style.top = `${newTop}px`;
-          fab.style.bottom = "auto";
-          fab.style.right = "auto";
+          if (!isDragging) return; e.preventDefault();
+          const dx = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+          const dy = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+          dragDistance = Math.hypot(dx, dy);
+          let newLeft = Math.max(10, Math.min(initialLeft + dx, window.innerWidth - fab.offsetWidth - 10));
+          let newTop = Math.max(90, Math.min(initialTop + dy, window.innerHeight - fab.offsetHeight - 85));
+          fab.style.left = `${newLeft}px`; fab.style.top = `${newTop}px`; fab.style.bottom = "auto"; fab.style.right = "auto";
         };
-
         const onEnd = () => {
-          if (!isDragging) return;
-          isDragging = false;
+          if (!isDragging) return; isDragging = false;
           fab.style.transition = "transform 0.15s ease-out, box-shadow 0.15s";
-
-          document.removeEventListener('touchmove', onMove);
-          document.removeEventListener('touchend', onEnd);
-          document.removeEventListener('mousemove', onMove);
-          document.removeEventListener('mouseup', onEnd);
-
-          if (dragDistance < 8) {
-            this.toggleFabWindow();
-          }
+          document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onEnd);
+          document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onEnd);
+          if (dragDistance < 8) this.toggleFabWindow();
         };
-
-        fab.addEventListener('touchstart', onStart, { passive: false });
-        fab.addEventListener('mousedown', onStart);
+        fab.addEventListener('touchstart', onStart, { passive: false }); fab.addEventListener('mousedown', onStart);
       }
 
       toggleFabWindow() {
-        const win = document.getElementById("fabWindow");
-        win.classList.toggle("active");
+        const win = document.getElementById("fabWindow"); win.classList.toggle("active");
         if (win.classList.contains("active")) {
           this.populateFabDropdown();
-          if (this.activeStoreId) {
-            document.getElementById("fabStoreSelect").value = this.activeStoreId;
-          }
+          if (this.activeStoreId) document.getElementById("fabStoreSelect").value = this.activeStoreId;
           this.renderFabProductsForm();
         }
       }
-
-      closeFabWindow() {
-        document.getElementById("fabWindow").classList.remove("active");
-      }
+      closeFabWindow() { document.getElementById("fabWindow").classList.remove("active"); }
 
       openFabForStore(storeId) {
         this.activeStoreId = storeId;
-        const win = document.getElementById("fabWindow");
-        win.classList.add("active");
+        document.getElementById("fabWindow").classList.add("active");
         this.populateFabDropdown();
         document.getElementById("fabStoreSelect").value = storeId;
         this.renderFabProductsForm();
@@ -3378,133 +1759,70 @@
 
       populateFabDropdown() {
         const select = document.getElementById("fabStoreSelect");
-        if (!select) return;
         select.innerHTML = "";
-        this.currentStores.forEach((store, idx) => {
-          const opt = document.createElement("option");
-          opt.value = store.id;
-          opt.textContent = `${idx + 1}. ${store.name}`;
-          select.appendChild(opt);
+        this.currentStores.forEach((s, idx) => {
+          const opt = document.createElement("option"); opt.value = s.id; opt.textContent = `${idx + 1}. ${s.name}`; select.appendChild(opt);
         });
       }
 
       onFabStoreChange() {
-        const selId = document.getElementById("fabStoreSelect").value;
-        this.setActiveStore(selId, false);
+        this.setActiveStore(document.getElementById("fabStoreSelect").value, false);
         this.renderFabProductsForm();
       }
 
       getOrCreateStoreData(storeId) {
-        if (!this.storeProductsData[storeId]) {
-          this.storeProductsData[storeId] = {
-            sectionName: "Raft Principal",
-            items: [
-              { id: "p_" + Date.now() + "_1", name: "", price: "", photoUrl: "" }
-            ]
-          };
-        }
+        if (!this.storeProductsData[storeId]) this.storeProductsData[storeId] = { sectionName: "Raft Principal", items: [{ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" }] };
         return this.storeProductsData[storeId];
       }
 
       onSectionNameChange() {
-        const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
-        const data = this.getOrCreateStoreData(storeId);
-        data.sectionName = document.getElementById("fabSectionName").value;
+        this.getOrCreateStoreData(document.getElementById("fabStoreSelect").value || this.activeStoreId).sectionName = document.getElementById("fabSectionName").value;
         this.saveAll();
-        this.renderReport();
       }
 
       renderFabProductsForm() {
         const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
         if (!storeId) return;
         const data = this.getOrCreateStoreData(storeId);
-
         document.getElementById("fabSectionName").value = data.sectionName || "";
+        
         const listContainer = document.getElementById("fabProductsList");
         listContainer.innerHTML = "";
-
         data.items.forEach((item, idx) => {
-          const row = document.createElement("div");
-          row.className = "product-row-item";
-          row.dataset.id = item.id;
-
-          const photoHtml = item.photoUrl 
-            ? `<img src="${item.photoUrl}" onclick="event.stopPropagation(); app.zoomPhoto('${item.photoUrl}')" />` 
-            : `<span class="thumb-placeholder">📷</span>`;
-
+          const row = document.createElement("div"); row.className = "product-row-item";
+          const photoHtml = item.photoUrl ? `<img src="${item.photoUrl}" onclick="event.stopPropagation(); app.zoomPhoto('${item.photoUrl}')" />` : `<span class="thumb-placeholder">📷</span>`;
           row.innerHTML = `
             <div class="product-index-badge">${idx + 1}</div>
-            <div class="product-thumb-container" onclick="app.triggerProductPhotoUpload('${storeId}', '${item.id}')" title="Încarcă Poză">
-              ${photoHtml}
-            </div>
+            <div class="product-thumb-container" onclick="app.triggerProductPhotoUpload('${storeId}', '${item.id}')">${photoHtml}</div>
             <div class="product-fields-col">
-              <input type="text" class="product-input-name" placeholder="Denumire Produs" value="${item.name || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'name', this.value)" />
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <input type="number" step="0.01" class="product-input-price" placeholder="Preț" value="${item.price || ''}" oninput="app.updateProductField('${storeId}', '${item.id}', 'price', this.value)" />
-                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">RON</span>
-              </div>
+              <input type="text" class="product-input-name" placeholder="Denumire Produs" value="${item.name}" oninput="app.updateProductField('${storeId}', '${item.id}', 'name', this.value)" />
+              <div style="display:flex; align-items:center; gap:4px;"><input type="number" step="0.01" class="product-input-price" placeholder="Preț" value="${item.price}" oninput="app.updateProductField('${storeId}', '${item.id}', 'price', this.value)" /><span>RON</span></div>
             </div>
             <div class="product-actions-col">
-              <button class="action-icon-btn" onclick="app.moveProductRow('${storeId}', ${idx}, -1)">⬆️</button>
-              <button class="action-icon-btn" onclick="app.moveProductRow('${storeId}', ${idx}, 1)">⬇️</button>
               <button class="action-icon-btn delete-btn" onclick="app.deleteProductRow('${storeId}', '${item.id}')">🗑️</button>
             </div>
           `;
-
           listContainer.appendChild(row);
         });
-
         document.getElementById("fabProductCountLabel").textContent = `${data.items.length} produse`;
         this.updateTotalPhotosBadge();
       }
 
       addNewProductRow() {
-        const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
-        const data = this.getOrCreateStoreData(storeId);
-        data.items.push({
-          id: "p_" + Date.now() + "_" + Math.floor(Math.random()*1000),
-          name: "",
-          price: "",
-          photoUrl: ""
-        });
-        this.saveAll();
-        this.renderFabProductsForm();
-        this.renderReport();
+        this.getOrCreateStoreData(document.getElementById("fabStoreSelect").value || this.activeStoreId).items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" });
+        this.saveAll(); this.renderFabProductsForm();
       }
 
       updateProductField(storeId, itemId, field, value) {
-        const data = this.getOrCreateStoreData(storeId);
-        const item = data.items.find(it => it.id === itemId);
-        if (item) {
-          item[field] = value;
-          this.saveAll();
-          this.renderReport();
-        }
-      }
-
-      moveProductRow(storeId, fromIndex, direction) {
-        const data = this.getOrCreateStoreData(storeId);
-        const toIndex = fromIndex + direction;
-        if (toIndex < 0 || toIndex >= data.items.length) return;
-
-        const temp = data.items[fromIndex];
-        data.items[fromIndex] = data.items[toIndex];
-        data.items[toIndex] = temp;
-
-        this.saveAll();
-        this.renderFabProductsForm();
-        this.renderReport();
+        const item = this.getOrCreateStoreData(storeId).items.find(it => it.id === itemId);
+        if (item) { item[field] = value; this.saveAll(); }
       }
 
       deleteProductRow(storeId, itemId) {
         const data = this.getOrCreateStoreData(storeId);
         data.items = data.items.filter(it => it.id !== itemId);
-        if (data.items.length === 0) {
-          data.items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" });
-        }
-        this.saveAll();
-        this.renderFabProductsForm();
-        this.renderReport();
+        if (data.items.length === 0) data.items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" });
+        this.saveAll(); this.renderFabProductsForm();
       }
 
       triggerProductPhotoUpload(storeId, productId) {
@@ -3512,30 +1830,20 @@
         document.getElementById("fabProductPhotoInput").click();
       }
 
-      compressImageFile(file, maxWidth = 600, quality = 0.65) {
+      compressImageFile(file, maxWidth = 400, quality = 0.5) { 
         return new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
               const canvas = document.createElement("canvas");
-              let width = img.width;
-              let height = img.height;
-
+              let width = img.width, height = img.height;
               if (width > maxWidth || height > maxWidth) {
-                if (width > height) {
-                  height = Math.round((height * maxWidth) / width);
-                  width = maxWidth;
-                } else {
-                  width = Math.round((width * maxWidth) / height);
-                  height = maxWidth;
-                }
+                if (width > height) { height = Math.round((height * maxWidth) / width); width = maxWidth; } 
+                else { width = Math.round((width * maxWidth) / height); height = maxWidth; }
               }
-
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext("2d");
-              ctx.drawImage(img, 0, 0, width, height);
+              canvas.width = width; canvas.height = height;
+              canvas.getContext("2d").drawImage(img, 0, 0, width, height);
               resolve(canvas.toDataURL("image/jpeg", quality));
             };
             img.src = e.target.result;
@@ -3547,236 +1855,119 @@
       async handleProductPhotoSelected(event) {
         const file = event.target.files[0];
         if (!file || !this.activePhotoUploadTarget) return;
-
         const { storeId, productId } = this.activePhotoUploadTarget;
         const compressedBase64 = await this.compressImageFile(file);
-
-        const data = this.getOrCreateStoreData(storeId);
-        const item = data.items.find(it => it.id === productId);
-        if (item) {
-          item.photoUrl = compressedBase64;
-          this.saveAll();
-          this.renderFabProductsForm();
-          this.renderReport();
-        }
-
+        const item = this.getOrCreateStoreData(storeId).items.find(it => it.id === productId);
+        if (item) { item.photoUrl = compressedBase64; this.saveAll(); this.renderFabProductsForm(); }
         event.target.value = "";
       }
 
       updateTotalPhotosBadge() {
         let count = 0;
-        Object.values(this.storeProductsData).forEach(data => {
-          if (data && data.items) {
-            data.items.forEach(it => { if (it.photoUrl) count++; });
-          }
-        });
+        Object.values(this.storeProductsData).forEach(data => { if (data && data.items) data.items.forEach(it => { if (it.photoUrl) count++; }); });
         const badge = document.getElementById("fabPhotosBadge");
-        if (badge) {
-          badge.style.display = count > 0 ? "flex" : "none";
-          badge.textContent = count;
-        }
+        if (badge) { badge.style.display = count > 0 ? "flex" : "none"; badge.textContent = count; }
       }
 
-      zoomPhoto(src) {
-        const modal = document.getElementById("photoZoomModal");
-        const img = document.getElementById("zoomImg");
-        img.src = src;
-        modal.classList.add("active");
-      }
+      zoomPhoto(src) { document.getElementById("zoomImg").src = src; document.getElementById("photoZoomModal").classList.add("active"); }
 
-      /* REPORT TAB */
+      /* RAPOARTE */
       renderReport() {
         const tbody = document.getElementById("reportBodyRows");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        let total = this.currentStores.length;
-        let resolved = 0;
-        let unresolved = 0;
-        let pending = 0;
+        if (!tbody) return; tbody.innerHTML = "";
+        let resolved = 0, unresolved = 0, pending = 0;
 
         this.currentStores.forEach((store, idx) => {
           const log = this.storeLogs[store.id];
           const data = this.storeProductsData[store.id] || { sectionName: "-", items: [] };
 
-          let statusText = `<span class="badge badge-gray">Neînceput</span>`;
-          let timeText = "-";
-
+          let statusText = `<span class="badge badge-gray">Neînceput</span>`, timeText = "-";
           if (log) {
-            if (log.status === "completed") {
-              resolved++;
-              statusText = `<span class="badge badge-success">✓ Rezolvat</span>`;
-              timeText = log.time || "-";
-            } else if (log.status === "unresolved") {
-              unresolved++;
-              statusText = `<span class="badge badge-danger">✕ Nerezolvat</span>`;
-              timeText = log.time || "-";
-            }
-          } else {
-            pending++;
-          }
+            if (log.status === "completed") { resolved++; statusText = `<span class="badge badge-success">✓ Rezolvat</span>`; timeText = log.time || "-"; } 
+            else if (log.status === "unresolved") { unresolved++; statusText = `<span class="badge badge-danger">✕ Nerezolvat</span>`; timeText = log.time || "-"; }
+          } else pending++;
 
-          let productsHtml = "-";
           const validItems = data.items.filter(it => it.name || it.price || it.photoUrl);
-          if (validItems.length > 0) {
-            productsHtml = `<div style="display:flex; flex-direction:column; gap:6px;">` + validItems.map((it, i) => `
-              <div style="display:flex; align-items:center; gap:8px; background:var(--gray-50); padding:4px 8px; border-radius:6px;">
-                <span style="font-weight:800; color:var(--primary); font-size:11px;">#${i+1}</span>
-                ${it.photoUrl ? `<img src="${it.photoUrl}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="app.zoomPhoto('${it.photoUrl}')" />` : ''}
-                <div style="flex:1;">
-                  <strong>${it.name || 'Produs'}</strong>
-                  ${it.price ? `<span style="color:var(--success); font-weight:700; margin-left:6px;">${it.price} RON</span>` : ''}
-                </div>
-              </div>
-            `).join("") + `</div>`;
-          }
+          let productsHtml = validItems.length > 0 ? `<div style="display:flex; flex-direction:column; gap:6px;">` + validItems.map((it, i) => `
+            <div style="display:flex; align-items:center; gap:8px; background:var(--gray-50); padding:4px 8px; border-radius:6px;">
+              <span style="font-weight:800; color:var(--primary); font-size:11px;">#${i+1}</span>
+              ${it.photoUrl ? `<img src="${it.photoUrl}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="app.zoomPhoto('${it.photoUrl}')" />` : ''}
+              <div style="flex:1;"><strong>${it.name || 'Produs'}</strong>${it.price ? `<span style="color:var(--success); font-weight:700; margin-left:6px;">${it.price} RON</span>` : ''}</div>
+            </div>`).join("") + `</div>` : "-";
 
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><strong>${idx + 1}</strong></td>
-            <td>
-              <strong>${store.name}</strong><br/>
-              <span style="font-size:11px; color:var(--text-muted);">${store.address}</span>
-            </td>
-            <td>${timeText}</td>
-            <td>${statusText}</td>
-            <td><strong>${data.sectionName || '-'}</strong></td>
-            <td>${productsHtml}</td>
-          `;
+          tr.innerHTML = `<td><strong>${idx + 1}</strong></td><td><strong>${store.name}</strong><br/><span style="font-size:11px; color:var(--text-muted);">${store.address}</span></td><td>${timeText}</td><td>${statusText}</td><td><strong>${data.sectionName || '-'}</strong></td><td>${productsHtml}</td>`;
           tbody.appendChild(tr);
         });
 
-        document.getElementById("statTotalStores").textContent = total;
+        document.getElementById("statTotalStores").textContent = this.currentStores.length;
         document.getElementById("statResolvedStores").textContent = resolved;
         document.getElementById("statUnresolvedStores").textContent = unresolved;
         document.getElementById("statPendingStores").textContent = pending;
       }
 
       copyWhatsAppReport() {
-        const dateStr = new Date().toLocaleDateString('ro-RO');
-        const cat = this.categories[this.currentCatId];
-        const day = cat ? cat.days[this.currentDayId] : null;
-        const dayLabel = `${cat ? cat.name.toUpperCase() : ''} - ${day ? day.name.toUpperCase() : ''}`;
-
-        let text = `📊 *RAPORT MERCHANDISER - ${dayLabel}*\n📅 Data: ${dateStr}\n🚗 Plecare din Brănești (A2)\n\n`;
-
+        let text = `📊 *RAPORT MERCHANDISER*\n📅 Data: ${new Date().toLocaleDateString('ro-RO')}\n\n`;
         let resolved = 0, unresolved = 0;
-
         this.currentStores.forEach((store, idx) => {
           const log = this.storeLogs[store.id];
-          const data = this.storeProductsData[store.id] || { sectionName: "", items: [] };
-          const validItems = data.items.filter(it => it.name || it.price || it.photoUrl);
-
-          if (log && log.status === "completed") {
-            resolved++;
-            text += `✅ *${idx + 1}. ${store.name}* (Ora: ${log.time})\n`;
-          } else if (log && log.status === "unresolved") {
-            unresolved++;
-            text += `❌ *${idx + 1}. ${store.name}* - Motiv: ${log.reason || 'Nerezolvat'}\n`;
-          } else {
-            text += `⏳ *${idx + 1}. ${store.name}* - În așteptare\n`;
-          }
-
-          if (data.sectionName) text += `   📂 Secțiune: ${data.sectionName}\n`;
-          if (validItems.length > 0) {
-            validItems.forEach((it, i) => {
-              text += `   ${i+1}. ${it.name || 'Produs'} - ${it.price ? it.price + ' RON' : 'Fără preț'} ${it.photoUrl ? '📸 [Foto]' : ''}\n`;
-            });
-          }
+          if (log && log.status === "completed") { resolved++; text += `✅ *${idx + 1}. ${store.name}* (${log.time})\n`; } 
+          else if (log && log.status === "unresolved") { unresolved++; text += `❌ *${idx + 1}. ${store.name}* (${log.reason || 'Problemă'})\n`; } 
+          else { text += `⏳ *${idx + 1}. ${store.name}* - În așteptare\n`; }
         });
-
         text += `\n📈 *Sumar:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.currentStores.length - resolved - unresolved} Rămase`;
-
-        navigator.clipboard.writeText(text).then(() => {
-          alert(`✓ Raportul complet pentru WhatsApp a fost copiat în Clipboard!`);
-        });
+        navigator.clipboard.writeText(text).then(() => alert(`✓ Raportul copiat în Clipboard!`));
       }
 
       exportCSV() {
-        let csv = "\uFEFFNr,Magazin,Oras,Adresa,Ora Vizita,Status,Sectiune,Produse Detaliate\n";
-        
+        let csv = "\uFEFFNr,Magazin,Adresa,Ora Vizita,Status,Sectiune,Produse\n";
         this.currentStores.forEach((store, idx) => {
           const log = this.storeLogs[store.id] || {};
+          const status = log.status === "completed" ? "Rezolvat" : (log.status === "unresolved" ? "Nerezolvat" : "Neinceput");
           const data = this.storeProductsData[store.id] || { sectionName: "", items: [] };
-          const validItems = data.items.filter(it => it.name || it.price);
-
-          let status = log.status === "completed" ? "Rezolvat" : (log.status === "unresolved" ? "Nerezolvat" : "Neinceput");
-          let productsStr = validItems.map((it, i) => `${i+1}. ${it.name} (${it.price} RON)`).join(" | ").replace(/"/g, '""');
-
-          csv += `"${idx + 1}","${store.name}","${store.city}","${store.address}","${log.time || ''}","${status}","${data.sectionName || ''}","${productsStr}"\n`;
+          const productsStr = data.items.filter(it => it.name || it.price).map((it, i) => `${i+1}. ${it.name} (${it.price} RON)`).join(" | ").replace(/"/g, '""');
+          csv += `"${idx + 1}","${store.name}","${store.address}","${log.time || ''}","${status}","${data.sectionName || ''}","${productsStr}"\n`;
         });
-
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `Raport_${this.currentCatId}_${this.currentDayId}_${new Date().toISOString().slice(0,10)}.csv`;
-        link.click();
+        const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+        link.download = `Raport_${new Date().toISOString().slice(0,10)}.csv`; link.click();
       }
 
       openBackupModal() { document.getElementById("backupModalOverlay").classList.add("active"); }
       closeBackupModal() { document.getElementById("backupModalOverlay").classList.remove("active"); }
 
       exportFullBackup() {
-        const backupData = {
-          exportDate: new Date().toISOString(),
-          activeCategory: this.currentCatId,
-          activeDay: this.currentDayId,
-          categories: this.categories,
-          masterStores: this.masterStores
-        };
-
-        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
         const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `Backup_Complet_Merchandiser_${new Date().toISOString().slice(0,10)}.json`;
-        link.click();
+        link.href = URL.createObjectURL(new Blob([JSON.stringify({ exportDate: new Date().toISOString(), categories: this.categories, masterStores: this.masterStores, logs: this.storeLogs, products: this.storeProductsData }, null, 2)], { type: "application/json" }));
+        link.download = `Backup_Merchandiser_${new Date().toISOString().slice(0,10)}.json`; link.click();
       }
 
       importBackupFile(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
+        if (!event.target.files[0]) return;
         const reader = new FileReader();
-        reader.onload = async (e) => {
+        reader.onload = (e) => {
           try {
             const data = JSON.parse(e.target.result);
             if (data.categories) this.categories = data.categories;
             if (data.masterStores) this.masterStores = data.masterStores;
+            if (data.logs) this.storeLogs = data.logs;
+            if (data.products) this.storeProductsData = data.products;
             this.saveAll();
-            alert("✓ Toate datele au fost restaurate cu succes!");
-            location.reload();
-          } catch(err) {
-            alert("Fișier JSON invalid.");
-          }
+            alert("✓ Datele au fost restaurate!"); location.reload();
+          } catch(err) { alert("Fișier JSON invalid."); }
         };
-        reader.readAsText(file);
+        reader.readAsText(event.target.files[0]);
       }
 
-      async resetDayProgress() {
-        if (confirm(`⚠️ Ești sigur că vrei să resetezi progresul pentru această zi?`)) {
-          this.storeLogs = {};
-          this.storeProductsData = {};
-          this.saveAll();
-          this.renderSidebarList();
-          this.renderMapMarkers();
-          this.renderReport();
-          this.renderFabProductsForm();
-          this.closeQuickCard();
-          alert(`✓ Progresul a fost resetat!`);
+      resetDayProgress() {
+        if (confirm(`⚠️ Resetezi progresul (poze, prețuri, status) pentru această zi?`)) {
+          this.currentStores.forEach(s => { delete this.storeLogs[s.id]; delete this.storeProductsData[s.id]; });
+          this.saveAll(); location.reload();
         }
       }
     }
 
     window.app = new MerchandiserApp();
-    window.addEventListener("DOMContentLoaded", () => {
-      window.app.init();
-    });
-
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden && window.app && window.app.map) {
-        setTimeout(() => window.app.map.invalidateSize(true), 150);
-      }
-    });
+    window.addEventListener("DOMContentLoaded", () => window.app.init());
   </script>
 </body>
 </html>
