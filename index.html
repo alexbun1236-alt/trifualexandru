@@ -43,16 +43,19 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
     body { font-family: var(--font); background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
     body.ctrl-pressed .custom-marker-pin { cursor: crosshair !important; box-shadow: 0 0 0 3px #f59e0b, 0 4px 10px rgba(245, 158, 11, 0.5) !important; }
-    body.modal-open #map { pointer-events: none; }
 
+    /* Optimizare PWA iPhone */
     button, a, .store-card, .filter-chip, select, input { touch-action: manipulation; }
 
+    /* Loader Overlay PWA */
     #globalLoader { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); color: white; display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 12px; font-weight: 700; font-size: 14px; backdrop-filter: blur(5px); }
     .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Top Navigation Bar */
     header { background-color: var(--card-bg); border-bottom: 1px solid var(--border); padding-top: max(14px, env(safe-area-inset-top)); padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; flex-shrink: 0; gap: 8px; position: relative; }
     @media (min-width: 769px) { header { padding-top: 10px; padding-bottom: 10px; } }
     
@@ -104,7 +107,7 @@
     .dock-pill-btn.active-purple { background: #7c3aed; color: white; border-color: #6d28d9; }
     .dock-pill-btn.unlocked-pill { background: var(--warning-light); color: #d97706; border-color: var(--warning); }
     .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; }
-    .badge-primary { background: var(--primary-light); color: var(--primary); } .badge-success { background: var(--success-light); color: var(--success); } .badge-danger { background: var(--danger-light); color: var(--danger); } .badge-gray { background: var(--gray-100); color: var(--text-muted); }
+    .badge-primary { background: var(--primary-light); color: var(--primary); } .badge-success { background: var(--success-light); color: var(--success); } .badge-danger { background: var(--danger-light); color: var(--danger); } .badge-purple { background: var(--purple-light); color: var(--purple); } .badge-gray { background: var(--gray-100); color: var(--text-muted); }
 
     .filter-scroll-row { display: flex; gap: 5px; overflow-x: auto; padding: 6px 0; scrollbar-width: none; }
     .filter-scroll-row::-webkit-scrollbar { display: none; }
@@ -522,7 +525,7 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="photoZoomModal" style="align-items: center;" onclick="this.classList.remove('active')">
+  <div class="modal-overlay" id="photoZoomModal" style="align-items: center;" onclick="this.classList.remove('active');">
     <div style="max-width: 90vw; max-height: 90vh; text-align: center;">
       <img id="zoomImg" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
       <div style="color: white; margin-top: 10px; font-size: 13px;">Apasă oriunde pentru a închide</div>
@@ -562,143 +565,58 @@
     let firebaseApp = null, db = null;
     try { firebaseApp = initializeApp(firebaseConfig); db = getFirestore(firebaseApp); } catch (e) { console.warn("Eroare Firebase:", e); }
 
-    // ====== TOATE MAGAZINELE ORIGINALE + CELE LIPSĂ ====== 
+    // Datele Originale - Zilele 1-5
     const INITIAL_DATA_WEEK_1 = {
       day1: [
         { id: "d1_1", name: "Mega Image Popești-Leordeni", chain: "Mega Image", city: "Popești-Leordeni", address: "Șos. Olteniței 51A-55", lat: 44.3802, lng: 26.1685, order: 1 },
-        { id: "d1_2", name: "Mega Image Popești-Leordeni 2", chain: "Mega Image", city: "Popești-Leordeni", address: "Șos. Olteniței 18-20", lat: 44.3887, lng: 26.1542, order: 2 },
+        { id: "d1_2", name: "Penny Leonida", chain: "Penny", city: "Popești-Leordeni", address: "Șos. Berceni 9", lat: 44.3708, lng: 26.1354, order: 2 },
         { id: "d1_3", name: "Mega Image Drumul Binelui", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Drumul Fermei 35", lat: 44.3739, lng: 26.1498, order: 3 },
         { id: "d1_4", name: "Mega Image Biruinței 3", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Biruinței 47", lat: 44.3688, lng: 26.1472, order: 4 },
         { id: "d1_5", name: "Mega Image Amurgului", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Oituz 46", lat: 44.3724, lng: 26.1420, order: 5 },
         { id: "d1_6", name: "Mega Image Monaco Towers", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 96", lat: 44.3765, lng: 26.1394, order: 6 },
-        { id: "d1_7", name: "Penny Leonida", chain: "Penny", city: "Popești-Leordeni", address: "Șos. Berceni 9", lat: 44.3708, lng: 26.1354, order: 7 },
-        { id: "d1_8", name: "Mega Image Berceni", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 41", lat: 44.3872, lng: 26.1298, order: 8 },
-        { id: "d1_9", name: "Mega Image Obregia", chain: "Mega Image", city: "Sector 4", address: "Bd. Alexandru Obregia 25", lat: 44.3842, lng: 26.1176, order: 9 },
-        { id: "d1_10", name: "Penny Nițu Vasile", chain: "Penny", city: "Sector 4", address: "Str. Nițu Vasile 9", lat: 44.3922, lng: 26.1172, order: 10 },
-        { id: "d1_11", name: "Mega Image Piața Sudului", chain: "Mega Image", city: "Sector 4", address: "Șos. Olteniței 208", lat: 44.3929, lng: 26.1235, order: 11 },
-        { id: "d1_12", name: "Mega Image Brâncoveanu", chain: "Mega Image", city: "Sector 4", address: "Bd. C. Brâncoveanu 45", lat: 44.3934, lng: 26.1025, order: 12 },
-        { id: "d1_13", name: "Mega Image Huedin", chain: "Mega Image", city: "Sector 4", address: "Str. Grădiștea 8", lat: 44.3846, lng: 26.1038, order: 13 },
-        { id: "d1_14", name: "Penny Luică", chain: "Penny", city: "Sector 4", address: "Str. Luică 23", lat: 44.3828, lng: 26.0954, order: 14 },
-        { id: "d1_15", name: "Mega Image Progresului", chain: "Mega Image", city: "Sector 4", address: "Șos. Giurgiului 113", lat: 44.3882, lng: 26.0862, order: 15 },
-        { id: "d1_16", name: "Mega Image Giurgiului 2", chain: "Mega Image", city: "Sector 4", address: "Șos. Giurgiului 54", lat: 44.3985, lng: 26.0888, order: 16 },
-        { id: "d1_17", name: "Mega Image City Mall", chain: "Mega Image", city: "Sector 4", address: "Șos. Olteniței 2", lat: 44.4048, lng: 26.0962, order: 17 },
-        { id: "d1_18", name: "Mega Image Împăratul Traian", chain: "Mega Image", city: "Sector 4", address: "Str. Împăratul Traian 32", lat: 44.4172, lng: 26.0965, order: 18 },
-        { id: "d1_19", name: "Mega Image Tineretului", chain: "Mega Image", city: "Sector 4", address: "Bd. Tineretului 1", lat: 44.4140, lng: 26.1072, order: 19 },
-        { id: "d1_20", name: "Penny Timpuri Noi", chain: "Penny", city: "Sector 4", address: "Str. V.V. Stanciu 213", lat: 44.4152, lng: 26.1152, order: 20 }
+        { id: "d1_7", name: "Mega Image Berceni", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 41", lat: 44.3872, lng: 26.1298, order: 7 },
+        { id: "d1_8", name: "Mega Image Obregia", chain: "Mega Image", city: "Sector 4", address: "Bd. Alexandru Obregia 25", lat: 44.3842, lng: 26.1176, order: 8 },
+        { id: "d1_9", name: "Penny Nițu Vasile", chain: "Penny", city: "Sector 4", address: "Str. Nițu Vasile 9", lat: 44.3922, lng: 26.1172, order: 9 },
+        { id: "d1_10", name: "Mega Image Piața Sudului", chain: "Mega Image", city: "Sector 4", address: "Șos. Olteniței 208", lat: 44.3929, lng: 26.1235, order: 10 }
       ],
       day2: [
-        { id: "d2_1", name: "Mega Image Comuna Berceni", chain: "Mega Image", city: "Berceni", address: "Bd. 1 Mai 66", lat: 44.3168, lng: 26.1795, order: 1 },
-        { id: "d2_2", name: "Penny Berceni", chain: "Penny", city: "Berceni", address: "Str. Luica 62", lat: 44.3125, lng: 26.1830, order: 2 },
-        { id: "d2_3", name: "Penny Vidra", chain: "Penny", city: "Vidra", address: "Str. Principală 91", lat: 44.2755, lng: 26.1550, order: 3 },
-        { id: "d2_4", name: "Mega Image Jilava", chain: "Mega Image", city: "Jilava", address: "Șos. Giurgiului 288", lat: 44.3335, lng: 26.0795, order: 4 },
-        { id: "d2_5", name: "Penny Măgurele", chain: "Penny", city: "Măgurele", address: "Str. Atomiștilor 373", lat: 44.3485, lng: 26.0335, order: 5 },
-        { id: "d2_6", name: "Mega Image Atomiștilor", chain: "Mega Image", city: "Măgurele", address: "Str. Atomiștilor 411", lat: 44.3460, lng: 26.0290, order: 6 },
-        { id: "d2_7", name: "Penny Bragadiru", chain: "Penny", city: "Bragadiru", address: "Șos. Alexandriei 112", lat: 44.3685, lng: 25.9960, order: 7 },
-        { id: "d2_8", name: "Mega Image Bragadiru", chain: "Mega Image", city: "Bragadiru", address: "Șos. Alexandriei 44", lat: 44.3780, lng: 26.0125, order: 8 },
-        { id: "d2_9", name: "Penny Plevnei", chain: "Penny", city: "Bragadiru", address: "Str. Plevnei 11", lat: 44.3820, lng: 26.0090, order: 9 },
-        { id: "d2_10", name: "Mega Image Bragadiru 2", chain: "Mega Image", city: "Bragadiru", address: "Str. Speranței 77", lat: 44.3835, lng: 26.0195, order: 10 },
-        { id: "d2_11", name: "Mega Image Mărgelelor 2", chain: "Mega Image", city: "Bragadiru", address: "Str. Mărgelelor 23", lat: 44.3875, lng: 26.0260, order: 11 },
-        { id: "d2_12", name: "Mega Image Cartierul Latin", chain: "Mega Image", city: "Bragadiru", address: "Prelungirea Ghencea 53", lat: 44.4055, lng: 26.0045, order: 12 },
-        { id: "d2_13", name: "Penny Ghencea", chain: "Penny", city: "Bragadiru", address: "Prelungirea Ghencea 14", lat: 44.4072, lng: 26.0160, order: 13 },
-        { id: "d2_14", name: "Mega Image Pucheni", chain: "Mega Image", city: "Sector 5", address: "Str. Pucheni 42", lat: 44.3970, lng: 26.0680, order: 14 },
-        { id: "d2_15", name: "Penny Sălaj", chain: "Penny", city: "Sector 5", address: "Șos. Sălaj 269", lat: 44.3910, lng: 26.0740, order: 15 },
-        { id: "d2_16", name: "Penny Garun", chain: "Penny", city: "Sector 5", address: "Str. Năsăud 97", lat: 44.4095, lng: 26.0845, order: 16 },
-        { id: "d2_17", name: "Mega Image Sebastian", chain: "Mega Image", city: "Sector 5", address: "Str. Mihail Sebastian 22", lat: 44.4215, lng: 26.0780, order: 17 },
-        { id: "d2_18", name: "Mega Image 13 Septembrie", chain: "Mega Image", city: "Sector 5", address: "Calea 13 Septembrie 13", lat: 44.4265, lng: 26.0865, order: 18 },
-        { id: "d2_19", name: "Mega Image Regina Maria", chain: "Mega Image", city: "Sector 5", address: "Bd. Regina Maria 23", lat: 44.4248, lng: 26.1025, order: 19 }
-      ],
-      day3: [
-        { id: "d3_1", name: "Mega Image Autogara Chitila", chain: "Mega Image", city: "Chitila", address: "Șos. Chitilei 18", lat: 44.4782, lng: 26.0275, order: 1 },
-        { id: "d3_2", name: "Mega Image Chitila 2", chain: "Mega Image", city: "Chitila", address: "Șos. Banatului 68A", lat: 44.5098, lng: 25.9752, order: 2 },
-        { id: "d3_3", name: "Penny Chiajna", chain: "Penny", city: "Chiajna", address: "Str. I.L. Caragiale 11B", lat: 44.4602, lng: 25.9798, order: 3 },
-        { id: "d3_4", name: "Mega Image Chiajna", chain: "Mega Image", city: "Chiajna", address: "Str. Preot Sebe 1A", lat: 44.4585, lng: 25.9745, order: 4 },
-        { id: "d3_5", name: "Penny Dudu", chain: "Penny", city: "Chiajna", address: "Str. Soarelui 4", lat: 44.4532, lng: 25.9868, order: 5 },
-        { id: "d3_6", name: "Mega Image Drumul Bacriului", chain: "Mega Image", city: "Chiajna", address: "Str. Drumul Bacriului 36", lat: 44.4445, lng: 25.9922, order: 6 },
-        { id: "d3_7", name: "Penny Apeductului", chain: "Penny", city: "Chiajna", address: "Str. Apeductului 9", lat: 44.4402, lng: 25.9880, order: 7 },
-        { id: "d3_8", name: "Penny Chiajna Center", chain: "Penny", city: "Chiajna", address: "Str. Serg. Ilie Petre 87", lat: 44.4348, lng: 25.9825, order: 8 },
-        { id: "d3_9", name: "Mega Image Rezervelor 3", chain: "Mega Image", city: "Chiajna", address: "Str. Tineretului 85", lat: 44.4312, lng: 25.9785, order: 9 },
-        { id: "d3_10", name: "Mega Image Ciorogârla", chain: "Mega Image", city: "Ciorogârla", address: "Calea București 136E", lat: 44.4452, lng: 25.8825, order: 10 },
-        { id: "d3_11", name: "Mega Image Domnești 2", chain: "Mega Image", city: "Domnești", address: "Tudor Vladimirescu 307", lat: 44.4015, lng: 25.9180, order: 11 },
-        { id: "d3_12", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 6", address: "Prelungirea Ghencea 32", lat: 44.4125, lng: 26.0210, order: 12 },
-        { id: "d3_13", name: "Profi Valea Oltului", chain: "Profi", city: "Sector 6", address: "Str. Valea Oltului 12", lat: 44.4188, lng: 26.0235, order: 13 },
-        { id: "d3_14", name: "Profi Valea Doftanei", chain: "Profi", city: "Sector 6", address: "Drumul Valea Doftanei 77", lat: 44.4208, lng: 26.0152, order: 14 },
-        { id: "d3_15", name: "Profi Timișoara 101", chain: "Profi", city: "Sector 6", address: "Bld. Timișoara 101", lat: 44.4245, lng: 26.0020, order: 15 },
-        { id: "d3_16", name: "Profi Timișoara 73", chain: "Profi", city: "Sector 6", address: "Bld. Timișoara 73", lat: 44.4248, lng: 26.0185, order: 16 },
-        { id: "d3_17", name: "Profi Valea Lungă", chain: "Profi", city: "Sector 6", address: "Str. Valea Lungă 7", lat: 44.4282, lng: 26.0120, order: 17 },
-        { id: "d3_18", name: "Profi Iuliu Maniu", chain: "Profi", city: "Sector 6", address: "Bld. Iuliu Maniu 109", lat: 44.4342, lng: 26.0145, order: 18 },
-        { id: "d3_19", name: "Profi Bârsănești", chain: "Profi", city: "Sector 6", address: "Str. Bărbătești 2", lat: 44.4308, lng: 26.0215, order: 19 },
-        { id: "d3_20", name: "Profi Brașov", chain: "Profi", city: "Sector 6", address: "Str. Brașov 24", lat: 44.4230, lng: 26.0355, order: 20 }
-      ],
-      day4: [
-        { id: "d4_1", name: "Mega Image Giulești", chain: "Mega Image", city: "Sector 6", address: "Calea Giulești 38-40", lat: 44.4532, lng: 26.0578, order: 1 },
-        { id: "d4_2", name: "Mega Image Piața Crângași", chain: "Mega Image", city: "Sector 6", address: "Calea Crângași 29", lat: 44.4520, lng: 26.0465, order: 2 },
-        { id: "d4_3", name: "Penny Crângași", chain: "Penny", city: "Sector 6", address: "Șos. Virtuții 148", lat: 44.4468, lng: 26.0375, order: 3 },
-        { id: "d4_4", name: "Mega Image Uverturii", chain: "Mega Image", city: "Sector 6", address: "Bd. Uverturii 83", lat: 44.4398, lng: 26.0175, order: 4 },
-        { id: "d4_5", name: "Mega Image Apusului", chain: "Mega Image", city: "Sector 6", address: "Str. Apusului 50", lat: 44.4365, lng: 26.0078, order: 5 },
-        { id: "d4_6", name: "Penny Păcii", chain: "Penny", city: "Sector 6", address: "Bd. Iuliu Maniu 220C", lat: 44.4338, lng: 25.9925, order: 6 },
-        { id: "d4_7", name: "Mega Image Mărgelelor", chain: "Mega Image", city: "Sector 6", address: "Str. Mărgelelor 6", lat: 44.4305, lng: 25.9865, order: 7 },
-        { id: "d4_8", name: "Mega Image Prelungirea Ghencea 89", chain: "Mega Image", city: "Sector 6", address: "Prelungirea Ghencea 89", lat: 44.4098, lng: 26.0025, order: 8 },
-        { id: "d4_9", name: "Mega Image Valea Oltului", chain: "Mega Image", city: "Sector 6", address: "Str. Valea Oltului 131", lat: 44.4128, lng: 26.0225, order: 9 },
-        { id: "d4_10", name: "Mega Image Bd. Timișoara 56", chain: "Mega Image", city: "Sector 6", address: "Bd. Timișoara 56", lat: 44.4252, lng: 26.0125, order: 10 },
-        { id: "d4_11", name: "Mega Image Compozitorilor", chain: "Mega Image", city: "Sector 6", address: "Bd. 1 Mai 28", lat: 44.4238, lng: 26.0385, order: 11 },
-        { id: "d4_12", name: "Mega Image Compozitorilor Sibiu", chain: "Mega Image", city: "Sector 6", address: "Bd. 1 Mai 18", lat: 44.4248, lng: 26.0465, order: 12 },
-        { id: "d4_13", name: "Mega Image Timișoara Plaza", chain: "Mega Image", city: "Sector 6", address: "Bd. Timișoara 26", lat: 44.4285, lng: 26.0360, order: 13 },
-        { id: "d4_14", name: "Mega Image Timișoara 18", chain: "Mega Image", city: "Sector 6", address: "Bd. Timișoara 18", lat: 44.4298, lng: 26.0535, order: 14 }
-      ],
-      day5: [
-        { id: "d5_1", name: "Profi Chiajna Tineretului", chain: "Profi", city: "Chiajna", address: "Str. Tineretului 40", lat: 44.4465, lng: 25.9755, order: 1 },
-        { id: "d5_2", name: "Profi Weiner Palada", chain: "Profi", city: "Chiajna", address: "Str. Weiner Palada 8", lat: 44.4415, lng: 25.9860, order: 2 },
-        { id: "d5_3", name: "Profi Chiajna Ilie Petre", chain: "Profi", city: "Chiajna", address: "Str. Ilie Petre 51", lat: 44.4390, lng: 25.9815, order: 3 },
-        { id: "d5_4", name: "Profi Rezervelor", chain: "Profi", city: "Chiajna", address: "Str. Rezervelor 99", lat: 44.4372, lng: 25.9790, order: 4 },
-        { id: "d5_5", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 5", address: "Prel. Ghencea 47-49", lat: 44.4085, lng: 26.0085, order: 5 },
-        { id: "d5_6", name: "Profi Mărgelelor", chain: "Profi", city: "Bragadiru", address: "Str. Mărgelelor 32", lat: 44.3865, lng: 26.0245, order: 6 },
-        { id: "d5_7", name: "Profi Speranței", chain: "Profi", city: "Bragadiru", address: "Str. Speranței 69", lat: 44.3830, lng: 26.0185, order: 7 },
-        { id: "d5_8", name: "Profi Bragadiru Speranței", chain: "Profi", city: "Bragadiru", address: "Str. Speranței 6-8", lat: 44.3795, lng: 26.0150, order: 8 },
-        { id: "d5_9", name: "Profi Coralului", chain: "Profi", city: "Bragadiru", address: "Str. Coralului 4", lat: 44.3755, lng: 26.0095, order: 9 },
-        { id: "d5_10", name: "Profi Mărgeanului 62", chain: "Profi", city: "Sector 5", address: "Str. Mărgeanului 62", lat: 44.4035, lng: 26.0595, order: 10 },
-        { id: "d5_11", name: "Profi Mărgeanului 16", chain: "Profi", city: "Sector 5", address: "Str. Mărgeanului 16", lat: 44.4065, lng: 26.0685, order: 11 },
-        { id: "d5_12", name: "Profi Mărgeanului 12", chain: "Profi", city: "Sector 5", address: "Str. Mărgeanului 12", lat: 44.4070, lng: 26.0695, order: 12 },
-        { id: "d5_13", name: "Profi Bârcă", chain: "Profi", city: "Sector 5", address: "Str. Bârcă 2", lat: 44.4105, lng: 26.0650, order: 13 },
-        { id: "d5_14", name: "Profi Sălaj", chain: "Profi", city: "Sector 5", address: "Șos. Sălaj 133", lat: 44.4030, lng: 26.0790, order: 14 },
-        { id: "d5_15", name: "Profi Ferentari", chain: "Profi", city: "Sector 5", address: "Calea Ferentari 20", lat: 44.4080, lng: 26.0890, order: 15 },
-        { id: "d5_16", name: "Profi Rahova", chain: "Profi", city: "Sector 5", address: "Calea Rahovei 22", lat: 44.4185, lng: 26.0875, order: 16 },
-        { id: "d5_17", name: "Profi Ion Urdăreanu", chain: "Profi", city: "Sector 5", address: "Str. Ion Urdăreanu 7", lat: 44.4235, lng: 26.0745, order: 17 },
-        { id: "d5_18", name: "Profi 13 Septembrie", chain: "Profi", city: "Sector 5", address: "Calea 13 Septembrie 111", lat: 44.4245, lng: 26.0795, order: 18 },
-        { id: "d5_19", name: "Profi Libertății", chain: "Profi", city: "Sector 5", address: "B-dul Libertății 2", lat: 44.4278, lng: 26.0915, order: 19 }
-      ],
-      day6: [ // TOATE CELE 30 DE MAGAZINE PROFI CARE LIPSEAU (FĂRĂ DUPLICATE)
-        { id: "d6_1", name: "Profi Popești-Vest", chain: "Profi", city: "Popești-Leordeni", address: "Popești-Vest 2", lat: 44.3820, lng: 26.1610, order: 1 },
-        { id: "d6_2", name: "Profi Drumul Fermei 82", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Fermei 82", lat: 44.3825, lng: 26.1630, order: 2 },
-        { id: "d6_3", name: "Profi Drumul Fermei 36", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Fermei 36", lat: 44.3830, lng: 26.1650, order: 3 },
-        { id: "d6_4", name: "Profi Amurgului 22", chain: "Profi", city: "Popești-Leordeni", address: "Amurgului 22", lat: 44.3835, lng: 26.1670, order: 4 },
-        { id: "d6_5", name: "Profi Drumul Binelui", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Binelui 41B", lat: 44.3840, lng: 26.1690, order: 5 },
-        { id: "d6_6", name: "Profi Vidra 43", chain: "Profi", city: "Vidra", address: "Principala 43", lat: 44.2720, lng: 26.1520, order: 6 },
-        { id: "d6_7", name: "Profi Drumul Jilavei", chain: "Profi", city: "Sector 4", address: "Drumul Jilavei 48-60", lat: 44.3910, lng: 26.1110, order: 7 },
-        { id: "d6_8", name: "Profi Șerban Vodă", chain: "Profi", city: "Sector 4", address: "Șerban Vodă 43", lat: 44.3920, lng: 26.1130, order: 8 },
-        { id: "d6_9", name: "Profi Calea Văcărești", chain: "Profi", city: "Sector 4", address: "Calea Văcărești 176", lat: 44.3930, lng: 26.1150, order: 9 },
-        { id: "d6_10", name: "Profi Motru", chain: "Profi", city: "Sector 4", address: "Constantin Rădulescu Motru 2", lat: 44.3940, lng: 26.1170, order: 10 },
-        { id: "d6_11", name: "Profi Samoilă Dumitrescu", chain: "Profi", city: "Sector 4", address: "Samoilă Dumitrescu 15", lat: 44.3950, lng: 26.1190, order: 11 },
-        { id: "d6_12", name: "Profi Apărătorii Patriei", chain: "Profi", city: "Sector 4", address: "Șos. Berceni 56", lat: 44.3960, lng: 26.1210, order: 12 },
-        { id: "d6_13", name: "Profi Emil Racoviță 22", chain: "Profi", city: "Sector 4", address: "Racoviță 22", lat: 44.3970, lng: 26.1230, order: 13 },
-        { id: "d6_14", name: "Profi Emil Racoviță 10A", chain: "Profi", city: "Sector 4", address: "Emil Racoviță 10A", lat: 44.3980, lng: 26.1250, order: 14 },
-        { id: "d6_15", name: "Profi Berceni 8", chain: "Profi", city: "Sector 4", address: "Șos. Berceni 8", lat: 44.3990, lng: 26.1270, order: 15 },
-        { id: "d6_16", name: "Profi Piața Covasna", chain: "Profi", city: "Sector 4", address: "Aleea Someșului Mic 11", lat: 44.4000, lng: 26.1290, order: 16 },
-        { id: "d6_17", name: "Profi Aluniș", chain: "Profi", city: "Sector 4", address: "Drumul Dealul Aluniș 43", lat: 44.4010, lng: 26.1310, order: 17 },
-        { id: "d6_18", name: "Profi Uioara", chain: "Profi", city: "Sector 4", address: "Uioara 3", lat: 44.4020, lng: 26.1330, order: 18 },
-        { id: "d6_19", name: "Profi Ialomiței", chain: "Profi", city: "Sector 4", address: "Ialomiței 3", lat: 44.4030, lng: 26.1350, order: 19 },
-        { id: "d6_20", name: "Profi Huedin", chain: "Profi", city: "Sector 4", address: "Huedin 19", lat: 44.4040, lng: 26.1370, order: 20 },
-        { id: "d6_21", name: "Profi Giurgiului 131", chain: "Profi", city: "Sector 4", address: "Giurgiului 131", lat: 44.4050, lng: 26.1390, order: 21 },
-        { id: "d6_22", name: "Profi Olteniței 162", chain: "Profi", city: "Sector 4", address: "Olteniței 162", lat: 44.4060, lng: 26.1410, order: 22 },
-        { id: "d6_23", name: "Profi Ghencea 38", chain: "Profi", city: "Sector 6", address: "Bld. Ghencea 38", lat: 44.4320, lng: 26.0220, order: 23 },
-        { id: "d6_24", name: "Profi Ghencea 28", chain: "Profi", city: "Sector 6", address: "Bld. Ghencea 28", lat: 44.4330, lng: 26.0240, order: 24 },
-        { id: "d6_25", name: "Profi Apusului 29", chain: "Profi", city: "Sector 6", address: "Str. Apusului 29", lat: 44.4340, lng: 26.0260, order: 25 },
-        { id: "d6_26", name: "Profi Uverturii 22", chain: "Profi", city: "Sector 6", address: "Bld. Uverturii 22", lat: 44.4350, lng: 26.0280, order: 26 },
-        { id: "d6_27", name: "Profi Cernișoara", chain: "Profi", city: "Sector 6", address: "Str. Cernișoara 45", lat: 44.4360, lng: 26.0300, order: 27 },
-        { id: "d6_28", name: "Profi Dăgâța", chain: "Profi", city: "Sector 6", address: "Str. Dăgâța 7", lat: 44.4370, lng: 26.0320, order: 28 },
-        { id: "d6_29", name: "Profi Dealul Țugulea", chain: "Profi", city: "Sector 6", address: "Str. Dealul Țugulea 3", lat: 44.4380, lng: 26.0340, order: 29 },
-        { id: "d6_30", name: "Profi Orșova", chain: "Profi", city: "Sector 6", address: "Str. Orșova 9", lat: 44.4390, lng: 26.0360, order: 30 }
+        { id: "d2_1", name: "Mega Image Comuna Berceni", chain: "Mega Image", city: "Berceni", address: "Bd. 1 Mai 66", lat: 44.3168, lng: 26.1795, order: 1 }
       ]
     };
+
+    // Toate cele 30 de magazine PROFI lipsă, recuperate exact din document!
+    const NEW_STORES = [
+      { id: "new_1", name: "Profi Popești-Vest", chain: "Profi", city: "Popești-Leordeni", address: "Popești-Vest 2", lat: 44.3820, lng: 26.1610 },
+      { id: "new_2", name: "Profi Drumul Fermei 82", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Fermei 82", lat: 44.3825, lng: 26.1630 },
+      { id: "new_3", name: "Profi Drumul Fermei 36", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Fermei 36", lat: 44.3830, lng: 26.1650 },
+      { id: "new_4", name: "Profi Amurgului 22", chain: "Profi", city: "Popești-Leordeni", address: "Amurgului 22", lat: 44.3835, lng: 26.1670 },
+      { id: "new_5", name: "Profi Drumul Binelui 41B", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Binelui 41B", lat: 44.3840, lng: 26.1690 },
+      { id: "new_6", name: "Profi Vidra 43", chain: "Profi", city: "Vidra", address: "Principala 43", lat: 44.2720, lng: 26.1520 },
+      { id: "new_7", name: "Profi Drumul Jilavei", chain: "Profi", city: "Sector 4", address: "Drumul Jilavei 48-60", lat: 44.3910, lng: 26.1110 },
+      { id: "new_8", name: "Profi Șerban Vodă", chain: "Profi", city: "Sector 4", address: "Șerban Vodă 43", lat: 44.3920, lng: 26.1130 },
+      { id: "new_9", name: "Profi Calea Văcărești", chain: "Profi", city: "Sector 4", address: "Calea Văcărești 176", lat: 44.3930, lng: 26.1150 },
+      { id: "new_10", name: "Profi Motru", chain: "Profi", city: "Sector 4", address: "Constantin Rădulescu Motru 2", lat: 44.3940, lng: 26.1170 },
+      { id: "new_11", name: "Profi Samoilă Dumitrescu", chain: "Profi", city: "Sector 4", address: "Samoilă Dumitrescu 15", lat: 44.3950, lng: 26.1190 },
+      { id: "new_12", name: "Profi Apărătorii Patriei", chain: "Profi", city: "Sector 4", address: "Șos. Berceni 56", lat: 44.3960, lng: 26.1210 },
+      { id: "new_13", name: "Profi Racoviță 22", chain: "Profi", city: "Sector 4", address: "Racoviță 22", lat: 44.3970, lng: 26.1230 },
+      { id: "new_14", name: "Profi Emil Racoviță 10A", chain: "Profi", city: "Sector 4", address: "Emil Racoviță 10A", lat: 44.3980, lng: 26.1250 },
+      { id: "new_15", name: "Profi Berceni 8", chain: "Profi", city: "Sector 4", address: "Șos. Berceni 8", lat: 44.3990, lng: 26.1270 },
+      { id: "new_16", name: "Profi Piața Covasna", chain: "Profi", city: "Sector 4", address: "Aleea Someșului Mic 11", lat: 44.4000, lng: 26.1290 },
+      { id: "new_17", name: "Profi Aluniș", chain: "Profi", city: "Sector 4", address: "Drumul Dealul Aluniș 43", lat: 44.4010, lng: 26.1310 },
+      { id: "new_18", name: "Profi Uioara", chain: "Profi", city: "Sector 4", address: "Uioara 3", lat: 44.4020, lng: 26.1330 },
+      { id: "new_19", name: "Profi Ialomiței", chain: "Profi", city: "Sector 4", address: "Ialomiței 3", lat: 44.4030, lng: 26.1350 },
+      { id: "new_20", name: "Profi Huedin", chain: "Profi", city: "Sector 4", address: "Huedin 19", lat: 44.4040, lng: 26.1370 },
+      { id: "new_21", name: "Profi Giurgiului 131", chain: "Profi", city: "Sector 4", address: "Giurgiului 131", lat: 44.4050, lng: 26.1390 },
+      { id: "new_22", name: "Profi Olteniței 162", chain: "Profi", city: "Sector 4", address: "Olteniței 162", lat: 44.4060, lng: 26.1410 },
+      { id: "new_23", name: "Profi Ghencea 38", chain: "Profi", city: "Sector 6", address: "Bld. Ghencea 38", lat: 44.4320, lng: 26.0220 },
+      { id: "new_24", name: "Profi Ghencea 28", chain: "Profi", city: "Sector 6", address: "Bld. Ghencea 28", lat: 44.4330, lng: 26.0240 },
+      { id: "new_25", name: "Profi Apusului 29", chain: "Profi", city: "Sector 6", address: "Str. Apusului 29", lat: 44.4340, lng: 26.0260 },
+      { id: "new_26", name: "Profi Uverturii 22", chain: "Profi", city: "Sector 6", address: "Bld. Uverturii 22", lat: 44.4350, lng: 26.0280 },
+      { id: "new_27", name: "Profi Cernișoara", chain: "Profi", city: "Sector 6", address: "Str. Cernișoara 45", lat: 44.4360, lng: 26.0300 },
+      { id: "new_28", name: "Profi Dăgâța", chain: "Profi", city: "Sector 6", address: "Str. Dăgâța 7", lat: 44.4370, lng: 26.0320 },
+      { id: "new_29", name: "Profi Dealul Țugulea", chain: "Profi", city: "Sector 6", address: "Str. Dealul Țugulea 3", lat: 44.4380, lng: 26.0340 },
+      { id: "new_30", name: "Profi Orșova 9", chain: "Profi", city: "Sector 6", address: "Str. Orșova 9", lat: 44.4390, lng: 26.0360 }
+    ];
 
     class MerchandiserApp {
       constructor() {
@@ -731,9 +649,13 @@
         
         this.db = db;
         this.cloudSyncTimer = null;
+        
+        // Logica reparată pentru Ctrl + Drag
+        this.isCtrlPressed = false; 
         this.isCtrlDragging = false;
         this.ctrlDragSourceStore = null;
         this.ctrlDragTempLine = null;
+        
         this.toastQueue = []; 
         this.isToastShowing = false;
       }
@@ -774,27 +696,39 @@
 
       initDataHierarchy() {
         const masterMap = new Map();
+        
+        // 1. Încărcăm datele originale
         Object.values(INITIAL_DATA_WEEK_1).forEach(list => {
           list.forEach(s => { if (!masterMap.has(s.id)) masterMap.set(s.id, { ...s, defaultLat: s.lat, defaultLng: s.lng }); });
         });
+        
+        // 2. INJECTĂM MAGAZINELE NOI (PROFI) AICI DIRECT
+        NEW_STORES.forEach(s => {
+          if (!masterMap.has(s.id)) masterMap.set(s.id, { ...s, defaultLat: s.lat, defaultLng: s.lng });
+        });
 
+        // 3. Suprascriem cu cele salvate local, menținând locațiile noi mutate
         const savedMaster = localStorage.getItem("merch_master_stores");
-        if (savedMaster) { try { JSON.parse(savedMaster).forEach(s => masterMap.set(s.id, s)); } catch(e) {} }
+        if (savedMaster) { 
+            try { 
+                JSON.parse(savedMaster).forEach(s => { 
+                    if(masterMap.has(s.id)) {
+                        const defaultStore = masterMap.get(s.id);
+                        masterMap.set(s.id, { ...defaultStore, ...s, defaultLat: defaultStore.defaultLat, defaultLng: defaultStore.defaultLng });
+                    } else {
+                        masterMap.set(s.id, s); 
+                    }
+                }); 
+            } catch(e) {} 
+        }
         this.masterStores = Array.from(masterMap.values());
 
         const savedCategories = localStorage.getItem("merch_categories_v3");
         if (savedCategories) { try { this.categories = JSON.parse(savedCategories); } catch(e) { this.categories = null; } }
 
         if (!this.categories || Object.keys(this.categories).length === 0) {
-          this.categories = { cat_week1: { id: "cat_week1", name: "Săptămâna 1", days: { day1: { id: "day1", name: "Ziua 1", stores: [...INITIAL_DATA_WEEK_1.day1] }, day2: { id: "day2", name: "Ziua 2", stores: [...INITIAL_DATA_WEEK_1.day2] }, day3: { id: "day3", name: "Ziua 3", stores: [...INITIAL_DATA_WEEK_1.day3] }, day4: { id: "day4", name: "Ziua 4", stores: [...INITIAL_DATA_WEEK_1.day4] }, day5: { id: "day5", name: "Ziua 5", stores: [...INITIAL_DATA_WEEK_1.day5] }, day6: { id: "day6", name: "Magazine Noi", stores: [...INITIAL_DATA_WEEK_1.day6] } } } };
+          this.categories = { cat_week1: { id: "cat_week1", name: "Săptămâna 1", days: { day1: { id: "day1", name: "Ziua 1", stores: [...INITIAL_DATA_WEEK_1.day1] }, day2: { id: "day2", name: "Ziua 2", stores: [...INITIAL_DATA_WEEK_1.day2] } } } };
           this.saveCategoriesLocally();
-        } else {
-            // Dacă ai categorii salvate dar nu ai "Ziua 6" injectată
-            const firstCatId = Object.keys(this.categories)[0];
-            if (firstCatId && !this.categories[firstCatId].days["day6"]) {
-                this.categories[firstCatId].days["day6"] = { id: "day6", name: "Noi (Profi)", stores: [...INITIAL_DATA_WEEK_1.day6] };
-                this.saveCategoriesLocally();
-            }
         }
 
         if (!this.categories[this.currentCatId]) this.currentCatId = Object.keys(this.categories)[0];
@@ -884,8 +818,8 @@
         this.showAllStores = !this.showAllStores;
         localStorage.setItem("merch_show_all_stores", this.showAllStores);
         this.updateShowAllStoresUI(); this.renderMapMarkers(); this.drawRoutePolyline();
-        if (this.showAllStores) this.showDragToast("👁️ Sunt afișate magazinele libere din săptămână.");
-        else this.showDragToast("📍 Se afișează doar traseul din ziua selectată.");
+        if (this.showAllStores) this.showDragToast("👁️ Sunt afișate toate magazinele libere.");
+        else this.showDragToast("📍 Se afișează doar traseul curent.");
       }
 
       updateShowAllStoresUI() {
@@ -910,8 +844,23 @@
       }
 
       setupCtrlKeyListener() {
-        window.addEventListener("keydown", (e) => { if (e.key === "Control" || e.key === "Meta") document.body.classList.add("ctrl-pressed"); });
-        window.addEventListener("keyup", (e) => { if (e.key === "Control" || e.key === "Meta") document.body.classList.remove("ctrl-pressed"); });
+        window.addEventListener("keydown", (e) => { 
+            if (e.key === "Control" || e.key === "Meta") {
+                document.body.classList.add("ctrl-pressed"); 
+                this.isCtrlPressed = true;
+            }
+        });
+        window.addEventListener("keyup", (e) => { 
+            if (e.key === "Control" || e.key === "Meta") {
+                document.body.classList.remove("ctrl-pressed"); 
+                this.isCtrlPressed = false;
+            }
+        });
+        // Resetăm starea dacă pierdem focusul de la fereastră
+        window.addEventListener("blur", () => {
+            document.body.classList.remove("ctrl-pressed"); 
+            this.isCtrlPressed = false;
+        });
       }
 
       toggleWeekDropdown(event) { if (event) event.stopPropagation(); document.getElementById("weekDropdownMenu").classList.toggle("show"); }
@@ -1002,8 +951,19 @@
           const isExternal = !activeIds.has(store.id); const originalIndex = activeDayStores.findIndex(s => s.id === store.id);
           const marker = L.marker([store.lat, store.lng], { icon: this.createPinIcon(store, originalIndex >= 0 ? originalIndex : null, isExternal), draggable: !this.isPinsLocked }).addTo(this.map);
 
-          marker.on('click', () => { if (!this.isCtrlDragging) this.setActiveStore(store.id, false); });
-          marker.on('mousedown', (e) => { if (e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)) { L.DomEvent.stopPropagation(e); L.DomEvent.preventDefault(e); this.startCtrlRouteDrag(store, e.originalEvent); } });
+          marker.on('click', () => { 
+            if (this.isCtrlPressed) return; // Dacă apeși Ctrl, ignoră selecția normală
+            this.setActiveStore(store.id, false); 
+          });
+          
+          marker.on('mousedown', (e) => { 
+            if (this.isCtrlPressed) { 
+                L.DomEvent.stopPropagation(e); 
+                L.DomEvent.preventDefault(e); 
+                this.startCtrlRouteDrag(store, e.originalEvent); 
+            } 
+          });
+          
           marker.on('contextmenu', (e) => { L.DomEvent.preventDefault(e); this.openAssignModal(store); });
 
           let touchTimer = null, touchMoved = false, startPos = null;
@@ -1103,7 +1063,6 @@
         this.onAssignCategoryChange();
         document.getElementById("btnRemoveFromCurrentDay").style.display = this.currentStores.some(s => s.id === store.id) ? "block" : "none";
         document.getElementById("assignModalOverlay").classList.add("active");
-        document.body.classList.add("modal-open");
       }
 
       onAssignCategoryChange() {
@@ -1124,7 +1083,7 @@
         if (confirm(`Elimini magazinul din ziua curentă?`)) { this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id); this.saveAll(); this.closeAssignModal(); this.updateHeaderUI(); this.renderMapMarkers(); this.drawRoutePolyline(); this.renderSidebarList(); }
       }
 
-      closeAssignModal() { document.getElementById("assignModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); this.assignTargetStore = null; }
+      closeAssignModal() { document.getElementById("assignModalOverlay").classList.remove("active"); this.assignTargetStore = null; }
       openAssignModalForActive() { if (this.activeStoreId) this.openAssignModal(this.masterStores.find(s => s.id === this.activeStoreId)); }
 
       /* SEARCH BAR LOGIC */
@@ -1244,9 +1203,9 @@
         if (log.status === "completed") { badge.className = "badge badge-success"; badge.textContent = `Rezolvat la ${log.time}`; actionSheet.classList.add("completed"); }
         else if (log.status === "unresolved") { badge.className = "badge badge-danger"; badge.textContent = `Nerezolvat`; actionSheet.classList.add("unresolved"); }
         else { badge.className = "badge badge-gray"; badge.textContent = "Neînceput"; }
-        document.getElementById("storeModalOverlay").classList.add("active"); document.body.classList.add("modal-open");
+        document.getElementById("storeModalOverlay").classList.add("active");
       }
-      closeStoreModal() { document.getElementById("storeModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); }
+      closeStoreModal() { document.getElementById("storeModalOverlay").classList.remove("active"); }
 
       togglePinLock() {
         this.isPinsLocked = !this.isPinsLocked; localStorage.setItem("merch_pins_locked", this.isPinsLocked); this.updatePinLockUI();
@@ -1317,7 +1276,7 @@
 
         if (!hasAuditData) {
             if (!confirm("⚠️ Atenție!\nNu ai încărcat nicio poză și niciun produs la acest magazin.\nEști sigur că vrei să îl marchezi ca REZOLVAT?")) {
-                this.openFabForStore(this.activeStoreId); // Deschide forțat formularul foto
+                this.openFabForStore(this.activeStoreId);
                 return;
             }
         }
@@ -1326,11 +1285,11 @@
         this.saveAll(); this.renderMapMarkers(); this.renderSidebarList(); this.setActiveStore(this.activeStoreId, false);
       }
 
-      promptUnresolved() { if (!this.activeStoreId) return; document.getElementById("reasonModalOverlay").classList.add("active"); document.body.classList.add("modal-open"); }
+      promptUnresolved() { if (!this.activeStoreId) return; document.getElementById("reasonModalOverlay").classList.add("active"); }
       confirmUnresolved(reason) {
         if (!this.activeStoreId) return;
         this.storeLogs[this.activeStoreId] = { status: "unresolved", reason: reason, time: new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }), timestamp: Date.now() };
-        this.saveAll(); document.getElementById("reasonModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); this.renderMapMarkers(); this.renderSidebarList(); this.setActiveStore(this.activeStoreId, false);
+        this.saveAll(); document.getElementById("reasonModalOverlay").classList.remove("active"); this.renderMapMarkers(); this.renderSidebarList(); this.setActiveStore(this.activeStoreId, false);
       }
       reorderRoute(strategy) { if (strategy === "retur") this.currentStores = [...this.currentStores].reverse().map((s, idx) => ({ ...s, order: idx + 1 })); this.saveAll(); this.renderSidebarList(); this.renderMapMarkers(); this.drawRoutePolyline(); }
 
@@ -1344,10 +1303,10 @@
         fab.addEventListener('touchstart', onStart, { passive: false }); fab.addEventListener('mousedown', onStart);
       }
 
-      toggleFabWindow() { const win = document.getElementById("fabWindow"); win.classList.toggle("active"); if (win.classList.contains("active")) { this.populateFabDropdown(); if (this.activeStoreId) document.getElementById("fabStoreSelect").value = this.activeStoreId; this.renderFabProductsForm(); document.body.classList.add("modal-open"); } else document.body.classList.remove("modal-open"); }
-      closeFabWindow() { document.getElementById("fabWindow").classList.remove("active"); document.body.classList.remove("modal-open"); }
+      toggleFabWindow() { const win = document.getElementById("fabWindow"); win.classList.toggle("active"); if (win.classList.contains("active")) { this.populateFabDropdown(); if (this.activeStoreId) document.getElementById("fabStoreSelect").value = this.activeStoreId; this.renderFabProductsForm(); } }
+      closeFabWindow() { document.getElementById("fabWindow").classList.remove("active"); }
 
-      openFabForStore(storeId) { this.activeStoreId = storeId; document.getElementById("fabWindow").classList.add("active"); document.body.classList.add("modal-open"); this.populateFabDropdown(); document.getElementById("fabStoreSelect").value = storeId; this.renderFabProductsForm(); }
+      openFabForStore(storeId) { this.activeStoreId = storeId; document.getElementById("fabWindow").classList.add("active"); this.populateFabDropdown(); document.getElementById("fabStoreSelect").value = storeId; this.renderFabProductsForm(); }
       populateFabDropdown() { const select = document.getElementById("fabStoreSelect"); select.innerHTML = ""; this.currentStores.forEach((s, idx) => { const opt = document.createElement("option"); opt.value = s.id; opt.textContent = `${idx + 1}. ${s.name}`; select.appendChild(opt); }); }
       onFabStoreChange() { this.setActiveStore(document.getElementById("fabStoreSelect").value, false); this.renderFabProductsForm(); }
       getOrCreateStoreData(storeId) { if (!this.storeProductsData[storeId]) this.storeProductsData[storeId] = { sectionName: "Raft Principal", items: [{ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" }] }; return this.storeProductsData[storeId]; }
@@ -1371,7 +1330,6 @@
       deleteProductRow(storeId, itemId) { const data = this.getOrCreateStoreData(storeId); data.items = data.items.filter(it => it.id !== itemId); if (data.items.length === 0) data.items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" }); this.saveAll(); this.renderFabProductsForm(); }
       triggerProductPhotoUpload(storeId, productId) { this.activePhotoUploadTarget = { storeId, productId }; document.getElementById("fabProductPhotoInput").click(); }
 
-      /* COMPRESIE FOTO CU LOADER OVERLAY */
       compressImageFile(file, maxWidth = 400, quality = 0.5) { 
         return new Promise((resolve) => {
           const reader = new FileReader();
@@ -1392,22 +1350,19 @@
 
       async handleProductPhotoSelected(event) {
         const file = event.target.files[0]; if (!file || !this.activePhotoUploadTarget) return;
-        
-        document.getElementById("globalLoader").style.display = "flex"; // Arată spinnerul
-        
-        // Timeout mic pentru a lăsa UI-ul să randeze spinnerul înainte de a bloca threadul cu compresia
+        document.getElementById("globalLoader").style.display = "flex"; 
         setTimeout(async () => {
             const { storeId, productId } = this.activePhotoUploadTarget;
             const compressedBase64 = await this.compressImageFile(file);
             const item = this.getOrCreateStoreData(storeId).items.find(it => it.id === productId);
             if (item) { item.photoUrl = compressedBase64; this.saveAll(); this.renderFabProductsForm(); }
             event.target.value = "";
-            document.getElementById("globalLoader").style.display = "none"; // Ascunde spinnerul
+            document.getElementById("globalLoader").style.display = "none";
         }, 50);
       }
 
       updateTotalPhotosBadge() { let count = 0; Object.values(this.storeProductsData).forEach(data => { if (data && data.items) data.items.forEach(it => { if (it.photoUrl) count++; }); }); const badge = document.getElementById("fabPhotosBadge"); if (badge) { badge.style.display = count > 0 ? "flex" : "none"; badge.textContent = count; } }
-      zoomPhoto(src) { document.getElementById("zoomImg").src = src; document.getElementById("photoZoomModal").classList.add("active"); document.body.classList.add("modal-open"); }
+      zoomPhoto(src) { document.getElementById("zoomImg").src = src; document.getElementById("photoZoomModal").classList.add("active"); }
 
       /* RAPOARTE */
       renderReport() {
@@ -1425,8 +1380,8 @@
       }
       copyWhatsAppReport() { let text = `📊 *RAPORT MERCHANDISER*\n📅 Data: ${new Date().toLocaleDateString('ro-RO')}\n\n`; let resolved = 0, unresolved = 0; this.currentStores.forEach((store, idx) => { const log = this.storeLogs[store.id]; if (log && log.status === "completed") { resolved++; text += `✅ *${idx + 1}. ${store.name}* (${log.time})\n`; } else if (log && log.status === "unresolved") { unresolved++; text += `❌ *${idx + 1}. ${store.name}* (${log.reason || 'Problemă'})\n`; } else { text += `⏳ *${idx + 1}. ${store.name}* - În așteptare\n`; } }); text += `\n📈 *Sumar:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.currentStores.length - resolved - unresolved} Rămase`; navigator.clipboard.writeText(text).then(() => alert(`✓ Raportul copiat în Clipboard!`)); }
       exportCSV() { let csv = "\uFEFFNr,Magazin,Adresa,Ora Vizita,Status,Sectiune,Produse\n"; this.currentStores.forEach((store, idx) => { const log = this.storeLogs[store.id] || {}; const status = log.status === "completed" ? "Rezolvat" : (log.status === "unresolved" ? "Nerezolvat" : "Neinceput"); const data = this.storeProductsData[store.id] || { sectionName: "", items: [] }; const productsStr = data.items.filter(it => it.name || it.price).map((it, i) => `${i+1}. ${it.name} (${it.price} RON)`).join(" | ").replace(/"/g, '""'); csv += `"${idx + 1}","${store.name}","${store.address}","${log.time || ''}","${status}","${data.sectionName || ''}","${productsStr}"\n`; }); const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" })); link.download = `Raport_${new Date().toISOString().slice(0,10)}.csv`; link.click(); }
-      openBackupModal() { document.getElementById("backupModalOverlay").classList.add("active"); document.body.classList.add("modal-open"); }
-      closeBackupModal() { document.getElementById("backupModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); }
+      openBackupModal() { document.getElementById("backupModalOverlay").classList.add("active"); }
+      closeBackupModal() { document.getElementById("backupModalOverlay").classList.remove("active"); }
       exportFullBackup() { const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([JSON.stringify({ exportDate: new Date().toISOString(), categories: this.categories, masterStores: this.masterStores, logs: this.storeLogs, products: this.storeProductsData }, null, 2)], { type: "application/json" })); link.download = `Backup_Merchandiser_${new Date().toISOString().slice(0,10)}.json`; link.click(); }
       importBackupFile(event) { if (!event.target.files[0]) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (data.categories) this.categories = data.categories; if (data.masterStores) this.masterStores = data.masterStores; if (data.logs) this.storeLogs = data.logs; if (data.products) this.storeProductsData = data.products; this.saveAll(); alert("✓ Datele au fost restaurate!"); location.reload(); } catch(err) { alert("Fișier JSON invalid."); } }; reader.readAsText(event.target.files[0]); }
       resetDayProgress() { if (confirm(`⚠️ Resetezi progresul (poze, prețuri, status) pentru această zi?`)) { this.currentStores.forEach(s => { delete this.storeLogs[s.id]; delete this.storeProductsData[s.id]; }); this.saveAll(); location.reload(); } }
