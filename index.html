@@ -43,40 +43,34 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    
     body { font-family: var(--font); background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
     body.ctrl-pressed .custom-marker-pin { cursor: crosshair !important; box-shadow: 0 0 0 3px #f59e0b, 0 4px 10px rgba(245, 158, 11, 0.5) !important; }
+    body.modal-open #map { pointer-events: none; }
 
-    /* Optimizare PWA iPhone: Previne delay-ul de click pe butoane */
     button, a, .store-card, .filter-chip, select, input { touch-action: manipulation; }
 
-    /* Top Navigation Bar cu Safe Area pentru Dynamic Island (iPhone 15 Pro Max) */
-    header { 
-        background-color: var(--card-bg); 
-        border-bottom: 1px solid var(--border); 
-        padding-top: max(14px, env(safe-area-inset-top)); 
-        padding-left: max(10px, env(safe-area-inset-left)); 
-        padding-right: max(10px, env(safe-area-inset-right)); 
-        padding-bottom: 8px; 
-        display: flex; align-items: center; justify-content: space-between; z-index: 1000; flex-shrink: 0; gap: 8px; position: relative; 
-    }
+    #globalLoader { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); color: white; display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 12px; font-weight: 700; font-size: 14px; backdrop-filter: blur(5px); }
+    .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    header { background-color: var(--card-bg); border-bottom: 1px solid var(--border); padding-top: max(14px, env(safe-area-inset-top)); padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; flex-shrink: 0; gap: 8px; position: relative; }
     @media (min-width: 769px) { header { padding-top: 10px; padding-bottom: 10px; } }
     
     .brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .brand-logo { width: 32px; height: 32px; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 16px; box-shadow: 0 2px 4px rgba(37,99,235,0.3); flex-shrink: 0; }
     .brand-info h1 { font-size: 13px; font-weight: 700; line-height: 1.2; }
     .brand-status-line { display: flex; align-items: center; gap: 6px; font-size: 10px; }
-    .cloud-badge { font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
-    .cloud-synced { color: var(--success); } .cloud-syncing { color: var(--warning); } .cloud-offline { color: var(--text-muted); }
+    .cloud-badge { font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 4px; transition: all 0.3s; }
+    .cloud-synced { color: var(--success); background: var(--success-light); } 
+    .cloud-syncing { color: var(--warning); background: var(--warning-light); } 
+    .cloud-offline { color: white; background: var(--danger); }
 
-    /* Week & Category Container */
     .route-selector-group { display: flex; align-items: center; gap: 6px; position: relative; min-width: 0; flex-shrink: 1; }
     .week-dropdown-btn { display: inline-flex; align-items: center; gap: 6px; background-color: var(--gray-100); border: 1px solid var(--border); padding: 5px 9px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--text); cursor: pointer; transition: all 0.2s; max-width: 320px; min-width: 0; overflow: hidden; white-space: nowrap; }
     .week-dropdown-btn:hover { background-color: var(--gray-200); border-color: var(--primary); }
     #headerCategoryLabel { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; flex-shrink: 1; }
     .active-day-pill { background: var(--primary); color: white; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; flex-shrink: 1; display: inline-block; line-height: 1.2; }
     .btn-quick-add { width: 30px; height: 30px; border-radius: 8px; background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary); font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-    .btn-quick-add:hover { background: var(--primary); color: white; }
     .week-dropdown-menu { position: absolute; top: calc(100% + 6px); left: 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); width: 290px; max-height: 420px; overflow-y: auto; padding: 8px; z-index: 2500; display: none; flex-direction: column; gap: 8px; }
     .week-dropdown-menu.show { display: flex; }
     .category-block { border: 1px solid var(--border); border-radius: 8px; padding: 6px; background: var(--gray-50); }
@@ -87,7 +81,6 @@
     .week-menu-item:hover { background: var(--gray-100); color: var(--primary); }
     .week-menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; }
 
-    /* Desktop Controls */
     .toggle-all-stores-btn { display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--gray-100); color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
     .toggle-all-stores-btn.active { background: #7c3aed; color: white; border-color: #6d28d9; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35); }
     .toggle-profi-btn { display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--gray-100); color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
@@ -99,17 +92,10 @@
     .nav-tab.active { background-color: var(--card-bg); color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .header-actions { display: flex; align-items: center; gap: 6px; }
     .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background-color: var(--card-bg); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: all 0.2s; flex-shrink: 0; }
-    .icon-btn:hover { background-color: var(--gray-100); }
     .icon-btn.active-btn { background-color: var(--primary-light); color: var(--primary); border-color: var(--primary); }
     .icon-btn.unlocked-btn { background-color: var(--warning-light); color: #d97706; border-color: var(--warning); }
 
-    /* Mobile Dock Bar - PWA SafeArea Adjustment */
-    .bottom-dock-bar { 
-        position: fixed; bottom: 0; left: 0; right: 0; z-index: 1500; background: var(--card-bg); border-top: 1px solid var(--border); 
-        padding-top: 8px; 
-        padding-bottom: max(16px, env(safe-area-inset-bottom)); 
-        padding-left: 10px; padding-right: 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 6px; 
-    }
+    .bottom-dock-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1500; background: var(--card-bg); border-top: 1px solid var(--border); padding-top: 8px; padding-bottom: max(16px, env(safe-area-inset-bottom)); padding-left: 10px; padding-right: 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 6px; }
     @media (min-width: 769px) { .bottom-dock-bar { display: none; } }
     .bottom-dock-scroll { display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
     .bottom-dock-scroll::-webkit-scrollbar { display: none; }
@@ -118,9 +104,8 @@
     .dock-pill-btn.active-purple { background: #7c3aed; color: white; border-color: #6d28d9; }
     .dock-pill-btn.unlocked-pill { background: var(--warning-light); color: #d97706; border-color: var(--warning); }
     .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; }
-    .badge-primary { background: var(--primary-light); color: var(--primary); } .badge-success { background: var(--success-light); color: var(--success); } .badge-danger { background: var(--danger-light); color: var(--danger); } .badge-purple { background: var(--purple-light); color: var(--purple); } .badge-gray { background: var(--gray-100); color: var(--text-muted); }
+    .badge-primary { background: var(--primary-light); color: var(--primary); } .badge-success { background: var(--success-light); color: var(--success); } .badge-danger { background: var(--danger-light); color: var(--danger); } .badge-gray { background: var(--gray-100); color: var(--text-muted); }
 
-    /* Layout & Map */
     .filter-scroll-row { display: flex; gap: 5px; overflow-x: auto; padding: 6px 0; scrollbar-width: none; }
     .filter-scroll-row::-webkit-scrollbar { display: none; }
     .filter-chip { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
@@ -130,62 +115,52 @@
     .view-panel.active { display: flex; }
     #mapView { flex-direction: row; }
     #map { flex: 1; height: 100%; width: 100%; z-index: 1; }
-    
-    /* Evităm ca panoul de zoom al hărții să intre sub Dock */
     .leaflet-bottom { bottom: calc(65px + env(safe-area-inset-bottom, 0px)) !important; }
 
     .map-sidebar { width: 380px; height: 100%; background-color: var(--card-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 8px rgba(0,0,0,0.05); flex-shrink: 0; }
     .sidebar-header { padding: 12px 14px; border-bottom: 1px solid var(--border); }
     .sidebar-header h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .search-input { width: 100%; padding: 8px 12px; margin-top: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 12px; outline: none; transition: border-color 0.2s; }
+    .search-input:focus { border-color: var(--primary); }
+
     .route-info-box { background: var(--gray-50); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 11px; line-height: 1.4; margin-top: 6px; }
     .route-stats-row { display: flex; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); font-weight: 600; font-size: 11px; }
     .store-list-container { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
-    .store-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: all 0.2s; display: flex; gap: 10px; align-items: flex-start; position: relative; }
-    .store-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+    
+    .store-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s, transform 0.1s; display: flex; gap: 10px; align-items: flex-start; position: relative; }
+    .store-card.dragging { opacity: 0.5; transform: scale(0.98); }
+    .store-card.drag-over { border-top: 3px solid var(--primary); }
+    .store-card:hover { border-color: var(--primary); }
     .store-card.active { border-color: var(--primary); background-color: var(--primary-light); }
     .store-card.completed { border-color: var(--success); background-color: #f0fdf4; }
     [data-theme="dark"] .store-card.completed { background-color: #064e3b33; }
     .store-card.unresolved { border-color: var(--danger); background-color: #fef2f2; }
     [data-theme="dark"] .store-card.unresolved { background-color: #7f1d1d33; }
-    .store-card-num { width: 26px; height: 26px; border-radius: 50%; background: var(--gray-100); color: var(--text); font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .store-card-num { width: 26px; height: 26px; border-radius: 50%; background: var(--gray-100); color: var(--text); font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: grab; }
     .store-card.completed .store-card-num { background: var(--success) !important; color: white !important; }
     .store-card.unresolved .store-card-num { background: var(--danger) !important; color: white !important; }
-    .store-card-content { flex: 1; min-width: 0; }
+    .store-card-content { flex: 1; min-width: 0; pointer-events: none; }
     .store-card-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
     .store-card-address { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
 
-    /* Map UI */
     .map-fab-stack { position: absolute; top: 14px; right: 14px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
     .map-action-bubble { width: 42px; height: 42px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.2s; }
     .map-action-bubble:hover { transform: scale(1.06); }
     .map-action-bubble.active-btn { background: var(--primary); color: white; border-color: var(--primary); }
-    .map-toast-alert { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.92); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; z-index: 2000; box-shadow: 0 4px 14px rgba(0,0,0,0.3); display: none; align-items: center; gap: 6px; animation: fadeInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .map-toast-alert { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; z-index: 2000; box-shadow: 0 4px 14px rgba(0,0,0,0.3); display: none; align-items: center; gap: 6px; animation: fadeInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes fadeInDown { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-    /* Quick Card & Action Sheet - OPITMIZAT iPhone 15 Pro Max Safe Area */
-    .mobile-quick-card { 
-        position: absolute; 
-        bottom: calc(75px + env(safe-area-inset-bottom, 0px)); 
-        left: 12px; right: 12px; background: var(--card-bg); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); z-index: 1400; display: none; transition: background-color 0.3s, border-color 0.3s; animation: slideUpQuick 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
-    }
+    .mobile-quick-card { position: absolute; bottom: calc(75px + env(safe-area-inset-bottom, 0px)); left: 12px; right: 12px; background: var(--card-bg); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); z-index: 1400; display: none; transition: background-color 0.3s, border-color 0.3s; animation: slideUpQuick 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes slideUpQuick { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
     .mobile-quick-card.completed, .action-sheet.completed { border-color: var(--success); background-color: #f0fdf4; }
     [data-theme="dark"] .mobile-quick-card.completed, [data-theme="dark"] .action-sheet.completed { background-color: #064e3b33; }
     .mobile-quick-card.unresolved, .action-sheet.unresolved { border-color: var(--danger); background-color: #fef2f2; }
     [data-theme="dark"] .mobile-quick-card.unresolved, [data-theme="dark"] .action-sheet.unresolved { background-color: #7f1d1d33; }
 
-    /* Modals & Buttons */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
     .modal-overlay.active { display: flex; }
-    
-    .action-sheet { 
-        background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; 
-        padding: 18px 20px max(28px, env(safe-area-inset-bottom)) 20px; 
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.15); transition: background-color 0.3s, border-color 0.3s; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto; 
-    }
+    .action-sheet { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 18px 20px max(28px, env(safe-area-inset-bottom)) 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); transition: background-color 0.3s, border-color 0.3s; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    
     .sheet-handle { width: 40px; height: 5px; background: var(--gray-300); border-radius: 3px; margin: 0 auto 14px auto; }
     .sheet-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
     .sheet-title { font-size: 16px; font-weight: 700; line-height: 1.3; }
@@ -202,23 +177,12 @@
     .btn-danger { background: var(--danger); color: white; flex: 1; } .btn-danger:hover { background: var(--danger-dark); }
     .btn-sm { min-height: 34px; padding: 5px 10px; font-size: 11px; border-radius: 8px; }
 
-    /* FAB - iPhone SafeArea Fix */
-    .floating-fab { 
-        position: fixed; 
-        bottom: calc(75px + env(safe-area-inset-bottom, 0px)); 
-        right: 18px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(37,99,235,0.45); cursor: grab; z-index: 1450; border: 2.5px solid white; user-select: none; touch-action: none; transition: transform 0.15s ease-out, box-shadow 0.15s; 
-    }
+    .floating-fab { position: fixed; bottom: calc(75px + env(safe-area-inset-bottom, 0px)); right: 18px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(37,99,235,0.45); cursor: grab; z-index: 1450; border: 2.5px solid white; user-select: none; touch-action: none; transition: transform 0.15s ease-out, box-shadow 0.15s; }
     .floating-fab:active { cursor: grabbing; transform: scale(1.08); box-shadow: 0 12px 30px rgba(37,99,235,0.6); }
     .fab-badge { position: absolute; top: -2px; right: -2px; background: var(--danger); color: white; font-size: 10px; font-weight: 800; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid white; pointer-events: none; }
-    
-    .fab-window { 
-        position: fixed; 
-        bottom: calc(75px + env(safe-area-inset-bottom, 0px)); 
-        right: 16px; width: 410px; max-width: calc(100vw - 24px); max-height: 580px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 12px 30px rgba(0,0,0,0.18); z-index: 2500; display: none; flex-direction: column; overflow: hidden; animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
-    }
+    .fab-window { position: fixed; bottom: calc(75px + env(safe-area-inset-bottom, 0px)); right: 16px; width: 410px; max-width: calc(100vw - 24px); max-height: 580px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 12px 30px rgba(0,0,0,0.18); z-index: 2500; display: none; flex-direction: column; overflow: hidden; animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     .fab-window.active { display: flex; }
     @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    
     .fab-window-header { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
     .fab-window-header h3 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
     .fab-close-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; opacity: 0.8; } .fab-close-btn:hover { opacity: 1; }
@@ -238,7 +202,7 @@
     .product-actions-col { display: flex; flex-direction: column; gap: 4px; align-items: center; }
     .action-icon-btn { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: var(--text-muted); transition: all 0.2s; } .action-icon-btn:hover { background: var(--gray-200); color: var(--text); } .action-icon-btn.delete-btn:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
 
-    /* Reports - Ajustat pt PWA Bottom Safe Area */
+    /* Reports Tab */
     #reportView { background-color: var(--bg); flex-direction: column; overflow-y: auto; padding: 20px; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); display: none; } #reportView.active { display: flex; }
     .report-container { max-width: 1100px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 18px; }
     .report-header { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; box-shadow: var(--shadow); }
@@ -256,17 +220,10 @@
     table.report-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
     table.report-table tr:last-child td { border-bottom: none; } table.report-table tr:hover td { background-color: var(--gray-50); }
 
-    /* Pins - Acum cu prioritizare logică în JS, CSS rămâne curat */
+    /* Pins pe Hartă */
     .custom-marker-pin { width: 32px; height: 32px; border-radius: 50% 50% 50% 0; position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -20px 0 0 -16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.3); border: 2px solid #ffffff; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .custom-marker-pin span { transform: rotate(45deg); color: white; font-size: 12px; font-weight: 800; }
-    
-    .pin-pending { background: #64748b; } 
-    .pin-completed { background: #10b981 !important; } 
-    .pin-unresolved { background: #ef4444 !important; } 
-    .pin-active-pending { background: #2563eb; } 
-    .pin-external { background: #7c3aed !important; opacity: 0.85; }
-    
-    /* Glow-uri specifice pt starea pinului activ (selectat) */
+    .pin-pending { background: #64748b; } .pin-completed { background: #10b981 !important; } .pin-unresolved { background: #ef4444 !important; } .pin-active-pending { background: #2563eb; } .pin-external { background: #7c3aed !important; opacity: 0.85; }
     .custom-marker-pin.is-active { box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #2563eb, 0 6px 14px rgba(0,0,0,0.4); transform: rotate(-45deg) scale(1.18); z-index: 1000 !important; }
     .custom-marker-pin.is-active.pin-completed { box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #10b981, 0 6px 14px rgba(0,0,0,0.4); }
     .custom-marker-pin.is-active.pin-unresolved { box-shadow: 0 0 0 3.5px #ffffff, 0 0 0 6.5px #ef4444, 0 6px 14px rgba(0,0,0,0.4); }
@@ -281,7 +238,12 @@
 </head>
 <body>
 
-  <!-- Top Header Safe Area -->
+  <!-- Loading Overlay -->
+  <div id="globalLoader">
+    <div class="spinner"></div>
+    <span id="loaderText">Se procesează imaginea...</span>
+  </div>
+
   <header>
     <div class="brand">
       <div class="brand-logo">M</div>
@@ -289,21 +251,19 @@
         <h1>Merchandiser Pro</h1>
         <div class="brand-status-line">
           <span id="routeOriginStatus">Start: Brănești (A2)</span>
-          <span id="cloudSyncStatus" class="cloud-badge cloud-offline">☁️ Conectare Firebase...</span>
+          <span id="cloudSyncStatus" class="cloud-badge cloud-offline">☁️ Verificare rețea...</span>
         </div>
       </div>
     </div>
 
-    <!-- Category & Day Selector Group -->
     <div class="route-selector-group">
       <button class="week-dropdown-btn" id="weekDropdownTriggerBtn" onclick="app.toggleWeekDropdown(event)">
-        <span id="headerCategoryLabel">📅 Săptămâna 1</span>
-        <span class="active-day-pill" id="activeDayHeaderLabel">Ziua 1</span>
+        <span id="headerCategoryLabel">📅 Traseu</span>
+        <span class="active-day-pill" id="activeDayHeaderLabel">Ziua</span>
         <span style="font-size: 9px; color: var(--text-muted); margin-left: 2px;">▼</span>
       </button>
       <button class="btn-quick-add" title="Adaugă Categorie sau Zi nouă" onclick="app.promptAddCategoryOrDay()">+</button>
       
-      <!-- Category & Days Dropdown Menu -->
       <div class="week-dropdown-menu" id="weekDropdownMenu">
         <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:6px; border-bottom:1px solid var(--border);">
           <span style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Trasee & Zile</span>
@@ -313,20 +273,17 @@
       </div>
     </div>
 
-    <!-- Desktop Toolbar -->
     <div class="desktop-header-tools">
       <div class="nav-tabs">
         <button class="nav-tab active" id="tabMapBtnDesk" onclick="app.switchTab('map')">🗺️ Hartă</button>
         <button class="nav-tab" id="tabReportBtnDesk" onclick="app.switchTab('report')">📋 Raport</button>
       </div>
-
       <button class="toggle-all-stores-btn" id="toggleAllStoresBtnDesk" onclick="app.toggleShowAllStores()">
         <span>👁️</span> <span id="toggleAllStoresLabelDesk">Toate Magazinele</span>
       </button>
       <button class="toggle-profi-btn" id="toggleHideProfiBtnDesk" onclick="app.toggleHideProfi()" title="Ascunde Profi">
         <span>🚫</span> <span id="toggleHideProfiLabelDesk">Fără Profi</span>
       </button>
-
       <div class="header-actions">
         <button class="icon-btn" id="headerLockBtnDesk" title="Pini Blocați" onclick="app.togglePinLock()">🔒</button>
         <button class="icon-btn" id="headerGpsBtnDesk" title="Localizare GPS live" onclick="app.toggleGpsTracking()">📍</button>
@@ -336,10 +293,8 @@
     </div>
   </header>
 
-  <!-- Main Content -->
   <main>
     <section id="mapView" class="view-panel active">
-      <!-- Desktop Sidebar -->
       <aside class="map-sidebar" id="mapSidebar">
         <div class="sidebar-header">
           <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -347,7 +302,9 @@
             <span class="badge badge-primary" id="sidebarProgressBadge">0/20 Vizitate</span>
           </div>
 
-          <div class="filter-scroll-row">
+          <input type="text" id="storeSearchInput" class="search-input" placeholder="🔍 Caută magazin după nume..." onkeyup="app.onSearchInput()" />
+
+          <div class="filter-scroll-row" style="margin-top:8px;">
             <button class="filter-chip active" onclick="app.setStoreFilter('all', this)">Toate</button>
             <button class="filter-chip" onclick="app.setStoreFilter('Mega Image', this)">Mega Image</button>
             <button class="filter-chip" onclick="app.setStoreFilter('Penny', this)">Penny</button>
@@ -358,30 +315,23 @@
 
           <div class="route-info-box" id="sidebarRouteDesc"></div>
           <div style="display: flex; gap: 6px; margin-top: 8px;">
-            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('tur')">🔄 Tur (A2)</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('tur')">🔄 Tur</button>
             <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.reorderRoute('retur')">🔄 Retur</button>
-            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.findNearestStoreToGps()">🎯 Cel mai aproape</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="app.findNearestStoreToGps()">🎯 Apropiat</button>
           </div>
         </div>
-
         <div class="store-list-container" id="storeListContainer"></div>
       </aside>
 
-      <!-- Map Canvas -->
       <div id="map"></div>
-
-      <!-- Toast Alert -->
       <div class="map-toast-alert" id="mapDragToast">
-        <span>📍</span> <span id="mapDragToastText">Poziția magazinului a fost actualizată!</span>
+        <span>📍</span> <span id="mapDragToastText">Mesaj</span>
       </div>
-
-      <!-- Map Overlay Controls -->
       <div class="map-fab-stack">
         <button class="map-action-bubble" id="mapGpsBtn" title="GPS Live" onclick="app.toggleGpsTracking()">📍</button>
         <button class="map-action-bubble" title="Focalizează pe cel mai apropiat" onclick="app.findNearestStoreToGps()">🎯</button>
       </div>
 
-      <!-- Mobile Quick Card -->
       <div class="mobile-quick-card" id="mobileQuickCard">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
           <div>
@@ -394,13 +344,11 @@
             <button class="icon-btn" style="width:28px; height:28px; border-radius:50%; font-size:12px; font-weight:bold;" onclick="app.closeQuickCard()" title="Închide">✕</button>
           </div>
         </div>
-
         <div id="mqcActionsWrapper">
           <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-top: 8px;">
             <button class="btn btn-waze" id="mqcWazeBtn" onclick="app.openActiveInWaze()">🚗 Deschide în Waze</button>
             <button class="btn btn-secondary" onclick="app.goToNextStore()">Următorul ➡️</button>
           </div>
-
           <div style="display: flex; gap: 8px; margin-top: 8px;">
             <button class="btn btn-success" onclick="app.markActiveAsResolved()">✓ Rezolvat</button>
             <button class="btn btn-danger" onclick="app.promptUnresolved()">✕ Nerezolvat</button>
@@ -425,39 +373,16 @@
             <button class="btn btn-danger btn-sm" onclick="app.resetDayProgress()">🔄 Resetare Zi</button>
           </div>
         </div>
-
         <div class="stat-cards-grid">
-          <div class="stat-card">
-            <div class="stat-icon stat-icon-blue">🏪</div>
-            <div class="stat-info"><h4 id="statTotalStores">0</h4><span>Total Magazine</span></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon stat-icon-green">✅</div>
-            <div class="stat-info"><h4 id="statResolvedStores">0</h4><span>Vizite Rezolvate</span></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon stat-icon-red">❌</div>
-            <div class="stat-info"><h4 id="statUnresolvedStores">0</h4><span>Nerezolvate</span></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon stat-icon-amber">⏳</div>
-            <div class="stat-info"><h4 id="statPendingStores">0</h4><span>Rămase de Vizitat</span></div>
-          </div>
+          <div class="stat-card"><div class="stat-icon stat-icon-blue">🏪</div><div class="stat-info"><h4 id="statTotalStores">0</h4><span>Total Magazine</span></div></div>
+          <div class="stat-card"><div class="stat-icon stat-icon-green">✅</div><div class="stat-info"><h4 id="statResolvedStores">0</h4><span>Vizite Rezolvate</span></div></div>
+          <div class="stat-card"><div class="stat-icon stat-icon-red">❌</div><div class="stat-info"><h4 id="statUnresolvedStores">0</h4><span>Nerezolvate</span></div></div>
+          <div class="stat-card"><div class="stat-icon stat-icon-amber">⏳</div><div class="stat-info"><h4 id="statPendingStores">0</h4><span>Rămase de Vizitat</span></div></div>
         </div>
-
         <div class="report-table-card">
           <div class="table-responsive">
             <table class="report-table" id="reportDataTable">
-              <thead>
-                <tr>
-                  <th style="width: 45px;">Nr.</th>
-                  <th>Magazin & Adresă</th>
-                  <th>Ora Vizitei</th>
-                  <th>Status</th>
-                  <th>Secțiune Raft</th>
-                  <th>Produse Înregistrate (Poză, Preț)</th>
-                </tr>
-              </thead>
+              <thead><tr><th style="width: 45px;">Nr.</th><th>Magazin & Adresă</th><th>Ora Vizitei</th><th>Status</th><th>Secțiune Raft</th><th>Produse Înregistrate</th></tr></thead>
               <tbody id="reportBodyRows"></tbody>
             </table>
           </div>
@@ -466,7 +391,6 @@
     </section>
   </main>
 
-  <!-- Bottom Swipeable Dock Bar (Mobile) -->
   <nav class="bottom-dock-bar" id="mobileBottomDock">
     <div class="bottom-dock-scroll">
       <button class="dock-pill-btn active" id="tabMapBtnMob" onclick="app.switchTab('map')"><span>🗺️</span> <span>Hartă</span></button>
@@ -480,13 +404,11 @@
     </div>
   </nav>
 
-  <!-- Messenger Floating FAB -->
   <div class="floating-fab" id="floatingFab" title="Trage oriunde sau apasă pentru Secțiune, Produse & Poze">
     <div style="font-size: 24px; pointer-events: none;">📸</div>
     <div class="fab-badge" id="fabPhotosBadge" style="display: none;">0</div>
   </div>
 
-  <!-- Dynamic Product Form Window -->
   <div class="fab-window" id="fabWindow">
     <div class="fab-window-header" id="fabWindowHeader">
       <h3><span>📝</span> Secțiune Nume & Listă Produse</h3>
@@ -515,7 +437,6 @@
     </div>
   </div>
 
-  <!-- Assign Pin Modal -->
   <div class="modal-overlay" id="assignModalOverlay" style="align-items: center;" onclick="if(event.target === this) app.closeAssignModal()">
     <div class="reason-dialog" style="max-width: 440px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -543,7 +464,6 @@
     </div>
   </div>
 
-  <!-- Action Sheet / Store Modal -->
   <div class="modal-overlay" id="storeModalOverlay" onclick="if(event.target === this) app.closeStoreModal()">
     <div class="action-sheet">
       <div class="sheet-handle"></div>
@@ -573,7 +493,6 @@
     </div>
   </div>
 
-  <!-- Backup & Restore Modal -->
   <div class="modal-overlay" id="backupModalOverlay" style="align-items: center;" onclick="if(event.target === this) app.closeBackupModal()">
     <div class="reason-dialog" style="max-width: 420px;">
       <h3 style="font-size: 16px; font-weight: 700;">💾 Backup & Restaurare Date</h3>
@@ -588,7 +507,6 @@
     </div>
   </div>
 
-  <!-- Reason Modal -->
   <div class="modal-overlay" id="reasonModalOverlay" style="align-items: center;" onclick="if(event.target === this) document.getElementById('reasonModalOverlay').classList.remove('active')">
     <div class="reason-dialog">
       <h3 style="font-size: 16px; font-weight: 700;">Motiv Nerezolvare</h3>
@@ -604,7 +522,6 @@
     </div>
   </div>
 
-  <!-- Zoom Modal -->
   <div class="modal-overlay" id="photoZoomModal" style="align-items: center;" onclick="this.classList.remove('active')">
     <div style="max-width: 90vw; max-height: 90vh; text-align: center;">
       <img id="zoomImg" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
@@ -612,7 +529,20 @@
     </div>
   </div>
 
-  <!-- Leaflet JS -->
+  <!-- PWA Service Worker Inline Setup -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'merch-pro-v2';
+        const urlsToCache = [ './', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap' ];
+        self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))); });
+        self.addEventListener('fetch', event => { event.respondWith(caches.match(event.request).then(response => response || fetch(event.request))); });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW Reg failed:', err));
+    }
+  </script>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- FIREBASE SCRIPTS + APP LOGIC -->
@@ -620,7 +550,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-    // Datele tale Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAWd_QSC7ZsNaowpTItZqV9ha7LqC3dX-w",
       authDomain: "dumanu-munca.firebaseapp.com",
@@ -630,29 +559,144 @@
       appId: "1:684272170348:web:c525efdbdca02fbfe3ef49"
     };
 
-    let firebaseApp = null;
-    let db = null;
+    let firebaseApp = null, db = null;
+    try { firebaseApp = initializeApp(firebaseConfig); db = getFirestore(firebaseApp); } catch (e) { console.warn("Eroare Firebase:", e); }
 
-    try {
-      firebaseApp = initializeApp(firebaseConfig);
-      db = getFirestore(firebaseApp);
-    } catch (e) { console.warn("Eroare la inițializarea Firebase:", e); }
-
+    // ====== TOATE MAGAZINELE ORIGINALE + CELE LIPSĂ ====== 
     const INITIAL_DATA_WEEK_1 = {
       day1: [
         { id: "d1_1", name: "Mega Image Popești-Leordeni", chain: "Mega Image", city: "Popești-Leordeni", address: "Șos. Olteniței 51A-55", lat: 44.3802, lng: 26.1685, order: 1 },
-        { id: "d1_2", name: "Penny Leonida", chain: "Penny", city: "Popești-Leordeni", address: "Șos. Berceni 9", lat: 44.3708, lng: 26.1354, order: 2 },
+        { id: "d1_2", name: "Mega Image Popești-Leordeni 2", chain: "Mega Image", city: "Popești-Leordeni", address: "Șos. Olteniței 18-20", lat: 44.3887, lng: 26.1542, order: 2 },
         { id: "d1_3", name: "Mega Image Drumul Binelui", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Drumul Fermei 35", lat: 44.3739, lng: 26.1498, order: 3 },
         { id: "d1_4", name: "Mega Image Biruinței 3", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Biruinței 47", lat: 44.3688, lng: 26.1472, order: 4 },
         { id: "d1_5", name: "Mega Image Amurgului", chain: "Mega Image", city: "Popești-Leordeni", address: "Str. Oituz 46", lat: 44.3724, lng: 26.1420, order: 5 },
         { id: "d1_6", name: "Mega Image Monaco Towers", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 96", lat: 44.3765, lng: 26.1394, order: 6 },
-        { id: "d1_7", name: "Mega Image Berceni", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 41", lat: 44.3872, lng: 26.1298, order: 7 },
-        { id: "d1_8", name: "Mega Image Obregia", chain: "Mega Image", city: "Sector 4", address: "Bd. Alexandru Obregia 25", lat: 44.3842, lng: 26.1176, order: 8 },
-        { id: "d1_9", name: "Penny Nițu Vasile", chain: "Penny", city: "Sector 4", address: "Str. Nițu Vasile 9", lat: 44.3922, lng: 26.1172, order: 9 },
-        { id: "d1_10", name: "Mega Image Piața Sudului", chain: "Mega Image", city: "Sector 4", address: "Șos. Olteniței 208", lat: 44.3929, lng: 26.1235, order: 10 }
+        { id: "d1_7", name: "Penny Leonida", chain: "Penny", city: "Popești-Leordeni", address: "Șos. Berceni 9", lat: 44.3708, lng: 26.1354, order: 7 },
+        { id: "d1_8", name: "Mega Image Berceni", chain: "Mega Image", city: "Sector 4", address: "Șos. Berceni 41", lat: 44.3872, lng: 26.1298, order: 8 },
+        { id: "d1_9", name: "Mega Image Obregia", chain: "Mega Image", city: "Sector 4", address: "Bd. Alexandru Obregia 25", lat: 44.3842, lng: 26.1176, order: 9 },
+        { id: "d1_10", name: "Penny Nițu Vasile", chain: "Penny", city: "Sector 4", address: "Str. Nițu Vasile 9", lat: 44.3922, lng: 26.1172, order: 10 },
+        { id: "d1_11", name: "Mega Image Piața Sudului", chain: "Mega Image", city: "Sector 4", address: "Șos. Olteniței 208", lat: 44.3929, lng: 26.1235, order: 11 },
+        { id: "d1_12", name: "Mega Image Brâncoveanu", chain: "Mega Image", city: "Sector 4", address: "Bd. C. Brâncoveanu 45", lat: 44.3934, lng: 26.1025, order: 12 },
+        { id: "d1_13", name: "Mega Image Huedin", chain: "Mega Image", city: "Sector 4", address: "Str. Grădiștea 8", lat: 44.3846, lng: 26.1038, order: 13 },
+        { id: "d1_14", name: "Penny Luică", chain: "Penny", city: "Sector 4", address: "Str. Luică 23", lat: 44.3828, lng: 26.0954, order: 14 },
+        { id: "d1_15", name: "Mega Image Progresului", chain: "Mega Image", city: "Sector 4", address: "Șos. Giurgiului 113", lat: 44.3882, lng: 26.0862, order: 15 },
+        { id: "d1_16", name: "Mega Image Giurgiului 2", chain: "Mega Image", city: "Sector 4", address: "Șos. Giurgiului 54", lat: 44.3985, lng: 26.0888, order: 16 },
+        { id: "d1_17", name: "Mega Image City Mall", chain: "Mega Image", city: "Sector 4", address: "Șos. Olteniței 2", lat: 44.4048, lng: 26.0962, order: 17 },
+        { id: "d1_18", name: "Mega Image Împăratul Traian", chain: "Mega Image", city: "Sector 4", address: "Str. Împăratul Traian 32", lat: 44.4172, lng: 26.0965, order: 18 },
+        { id: "d1_19", name: "Mega Image Tineretului", chain: "Mega Image", city: "Sector 4", address: "Bd. Tineretului 1", lat: 44.4140, lng: 26.1072, order: 19 },
+        { id: "d1_20", name: "Penny Timpuri Noi", chain: "Penny", city: "Sector 4", address: "Str. V.V. Stanciu 213", lat: 44.4152, lng: 26.1152, order: 20 }
       ],
       day2: [
-        { id: "d2_1", name: "Mega Image Comuna Berceni", chain: "Mega Image", city: "Berceni", address: "Bd. 1 Mai 66", lat: 44.3168, lng: 26.1795, order: 1 }
+        { id: "d2_1", name: "Mega Image Comuna Berceni", chain: "Mega Image", city: "Berceni", address: "Bd. 1 Mai 66", lat: 44.3168, lng: 26.1795, order: 1 },
+        { id: "d2_2", name: "Penny Berceni", chain: "Penny", city: "Berceni", address: "Str. Luica 62", lat: 44.3125, lng: 26.1830, order: 2 },
+        { id: "d2_3", name: "Penny Vidra", chain: "Penny", city: "Vidra", address: "Str. Principală 91", lat: 44.2755, lng: 26.1550, order: 3 },
+        { id: "d2_4", name: "Mega Image Jilava", chain: "Mega Image", city: "Jilava", address: "Șos. Giurgiului 288", lat: 44.3335, lng: 26.0795, order: 4 },
+        { id: "d2_5", name: "Penny Măgurele", chain: "Penny", city: "Măgurele", address: "Str. Atomiștilor 373", lat: 44.3485, lng: 26.0335, order: 5 },
+        { id: "d2_6", name: "Mega Image Atomiștilor", chain: "Mega Image", city: "Măgurele", address: "Str. Atomiștilor 411", lat: 44.3460, lng: 26.0290, order: 6 },
+        { id: "d2_7", name: "Penny Bragadiru", chain: "Penny", city: "Bragadiru", address: "Șos. Alexandriei 112", lat: 44.3685, lng: 25.9960, order: 7 },
+        { id: "d2_8", name: "Mega Image Bragadiru", chain: "Mega Image", city: "Bragadiru", address: "Șos. Alexandriei 44", lat: 44.3780, lng: 26.0125, order: 8 },
+        { id: "d2_9", name: "Penny Plevnei", chain: "Penny", city: "Bragadiru", address: "Str. Plevnei 11", lat: 44.3820, lng: 26.0090, order: 9 },
+        { id: "d2_10", name: "Mega Image Bragadiru 2", chain: "Mega Image", city: "Bragadiru", address: "Str. Speranței 77", lat: 44.3835, lng: 26.0195, order: 10 },
+        { id: "d2_11", name: "Mega Image Mărgelelor 2", chain: "Mega Image", city: "Bragadiru", address: "Str. Mărgelelor 23", lat: 44.3875, lng: 26.0260, order: 11 },
+        { id: "d2_12", name: "Mega Image Cartierul Latin", chain: "Mega Image", city: "Bragadiru", address: "Prelungirea Ghencea 53", lat: 44.4055, lng: 26.0045, order: 12 },
+        { id: "d2_13", name: "Penny Ghencea", chain: "Penny", city: "Bragadiru", address: "Prelungirea Ghencea 14", lat: 44.4072, lng: 26.0160, order: 13 },
+        { id: "d2_14", name: "Mega Image Pucheni", chain: "Mega Image", city: "Sector 5", address: "Str. Pucheni 42", lat: 44.3970, lng: 26.0680, order: 14 },
+        { id: "d2_15", name: "Penny Sălaj", chain: "Penny", city: "Sector 5", address: "Șos. Sălaj 269", lat: 44.3910, lng: 26.0740, order: 15 },
+        { id: "d2_16", name: "Penny Garun", chain: "Penny", city: "Sector 5", address: "Str. Năsăud 97", lat: 44.4095, lng: 26.0845, order: 16 },
+        { id: "d2_17", name: "Mega Image Sebastian", chain: "Mega Image", city: "Sector 5", address: "Str. Mihail Sebastian 22", lat: 44.4215, lng: 26.0780, order: 17 },
+        { id: "d2_18", name: "Mega Image 13 Septembrie", chain: "Mega Image", city: "Sector 5", address: "Calea 13 Septembrie 13", lat: 44.4265, lng: 26.0865, order: 18 },
+        { id: "d2_19", name: "Mega Image Regina Maria", chain: "Mega Image", city: "Sector 5", address: "Bd. Regina Maria 23", lat: 44.4248, lng: 26.1025, order: 19 }
+      ],
+      day3: [
+        { id: "d3_1", name: "Mega Image Autogara Chitila", chain: "Mega Image", city: "Chitila", address: "Șos. Chitilei 18", lat: 44.4782, lng: 26.0275, order: 1 },
+        { id: "d3_2", name: "Mega Image Chitila 2", chain: "Mega Image", city: "Chitila", address: "Șos. Banatului 68A", lat: 44.5098, lng: 25.9752, order: 2 },
+        { id: "d3_3", name: "Penny Chiajna", chain: "Penny", city: "Chiajna", address: "Str. I.L. Caragiale 11B", lat: 44.4602, lng: 25.9798, order: 3 },
+        { id: "d3_4", name: "Mega Image Chiajna", chain: "Mega Image", city: "Chiajna", address: "Str. Preot Sebe 1A", lat: 44.4585, lng: 25.9745, order: 4 },
+        { id: "d3_5", name: "Penny Dudu", chain: "Penny", city: "Chiajna", address: "Str. Soarelui 4", lat: 44.4532, lng: 25.9868, order: 5 },
+        { id: "d3_6", name: "Mega Image Drumul Bacriului", chain: "Mega Image", city: "Chiajna", address: "Str. Drumul Bacriului 36", lat: 44.4445, lng: 25.9922, order: 6 },
+        { id: "d3_7", name: "Penny Apeductului", chain: "Penny", city: "Chiajna", address: "Str. Apeductului 9", lat: 44.4402, lng: 25.9880, order: 7 },
+        { id: "d3_8", name: "Penny Chiajna Center", chain: "Penny", city: "Chiajna", address: "Str. Serg. Ilie Petre 87", lat: 44.4348, lng: 25.9825, order: 8 },
+        { id: "d3_9", name: "Mega Image Rezervelor 3", chain: "Mega Image", city: "Chiajna", address: "Str. Tineretului 85", lat: 44.4312, lng: 25.9785, order: 9 },
+        { id: "d3_10", name: "Mega Image Ciorogârla", chain: "Mega Image", city: "Ciorogârla", address: "Calea București 136E", lat: 44.4452, lng: 25.8825, order: 10 },
+        { id: "d3_11", name: "Mega Image Domnești 2", chain: "Mega Image", city: "Domnești", address: "Tudor Vladimirescu 307", lat: 44.4015, lng: 25.9180, order: 11 },
+        { id: "d3_12", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 6", address: "Prelungirea Ghencea 32", lat: 44.4125, lng: 26.0210, order: 12 },
+        { id: "d3_13", name: "Profi Valea Oltului", chain: "Profi", city: "Sector 6", address: "Str. Valea Oltului 12", lat: 44.4188, lng: 26.0235, order: 13 },
+        { id: "d3_14", name: "Profi Valea Doftanei", chain: "Profi", city: "Sector 6", address: "Drumul Valea Doftanei 77", lat: 44.4208, lng: 26.0152, order: 14 },
+        { id: "d3_15", name: "Profi Timișoara 101", chain: "Profi", city: "Sector 6", address: "Bld. Timișoara 101", lat: 44.4245, lng: 26.0020, order: 15 },
+        { id: "d3_16", name: "Profi Timișoara 73", chain: "Profi", city: "Sector 6", address: "Bld. Timișoara 73", lat: 44.4248, lng: 26.0185, order: 16 },
+        { id: "d3_17", name: "Profi Valea Lungă", chain: "Profi", city: "Sector 6", address: "Str. Valea Lungă 7", lat: 44.4282, lng: 26.0120, order: 17 },
+        { id: "d3_18", name: "Profi Iuliu Maniu", chain: "Profi", city: "Sector 6", address: "Bld. Iuliu Maniu 109", lat: 44.4342, lng: 26.0145, order: 18 },
+        { id: "d3_19", name: "Profi Bârsănești", chain: "Profi", city: "Sector 6", address: "Str. Bărbătești 2", lat: 44.4308, lng: 26.0215, order: 19 },
+        { id: "d3_20", name: "Profi Brașov", chain: "Profi", city: "Sector 6", address: "Str. Brașov 24", lat: 44.4230, lng: 26.0355, order: 20 }
+      ],
+      day4: [
+        { id: "d4_1", name: "Mega Image Giulești", chain: "Mega Image", city: "Sector 6", address: "Calea Giulești 38-40", lat: 44.4532, lng: 26.0578, order: 1 },
+        { id: "d4_2", name: "Mega Image Piața Crângași", chain: "Mega Image", city: "Sector 6", address: "Calea Crângași 29", lat: 44.4520, lng: 26.0465, order: 2 },
+        { id: "d4_3", name: "Penny Crângași", chain: "Penny", city: "Sector 6", address: "Șos. Virtuții 148", lat: 44.4468, lng: 26.0375, order: 3 },
+        { id: "d4_4", name: "Mega Image Uverturii", chain: "Mega Image", city: "Sector 6", address: "Bd. Uverturii 83", lat: 44.4398, lng: 26.0175, order: 4 },
+        { id: "d4_5", name: "Mega Image Apusului", chain: "Mega Image", city: "Sector 6", address: "Str. Apusului 50", lat: 44.4365, lng: 26.0078, order: 5 },
+        { id: "d4_6", name: "Penny Păcii", chain: "Penny", city: "Sector 6", address: "Bd. Iuliu Maniu 220C", lat: 44.4338, lng: 25.9925, order: 6 },
+        { id: "d4_7", name: "Mega Image Mărgelelor", chain: "Mega Image", city: "Sector 6", address: "Str. Mărgelelor 6", lat: 44.4305, lng: 25.9865, order: 7 },
+        { id: "d4_8", name: "Mega Image Prelungirea Ghencea 89", chain: "Mega Image", city: "Sector 6", address: "Prelungirea Ghencea 89", lat: 44.4098, lng: 26.0025, order: 8 },
+        { id: "d4_9", name: "Mega Image Valea Oltului", chain: "Mega Image", city: "Sector 6", address: "Str. Valea Oltului 131", lat: 44.4128, lng: 26.0225, order: 9 },
+        { id: "d4_10", name: "Mega Image Bd. Timișoara 56", chain: "Mega Image", city: "Sector 6", address: "Bd. Timișoara 56", lat: 44.4252, lng: 26.0125, order: 10 },
+        { id: "d4_11", name: "Mega Image Compozitorilor", chain: "Mega Image", city: "Sector 6", address: "Bd. 1 Mai 28", lat: 44.4238, lng: 26.0385, order: 11 },
+        { id: "d4_12", name: "Mega Image Compozitorilor Sibiu", chain: "Mega Image", city: "Sector 6", address: "Bd. 1 Mai 18", lat: 44.4248, lng: 26.0465, order: 12 },
+        { id: "d4_13", name: "Mega Image Timișoara Plaza", chain: "Mega Image", city: "Sector 6", address: "Bd. Timișoara 26", lat: 44.4285, lng: 26.0360, order: 13 },
+        { id: "d4_14", name: "Mega Image Timișoara 18", chain: "Mega Image", city: "Sector 6", address: "Bd. Timișoara 18", lat: 44.4298, lng: 26.0535, order: 14 }
+      ],
+      day5: [
+        { id: "d5_1", name: "Profi Chiajna Tineretului", chain: "Profi", city: "Chiajna", address: "Str. Tineretului 40", lat: 44.4465, lng: 25.9755, order: 1 },
+        { id: "d5_2", name: "Profi Weiner Palada", chain: "Profi", city: "Chiajna", address: "Str. Weiner Palada 8", lat: 44.4415, lng: 25.9860, order: 2 },
+        { id: "d5_3", name: "Profi Chiajna Ilie Petre", chain: "Profi", city: "Chiajna", address: "Str. Ilie Petre 51", lat: 44.4390, lng: 25.9815, order: 3 },
+        { id: "d5_4", name: "Profi Rezervelor", chain: "Profi", city: "Chiajna", address: "Str. Rezervelor 99", lat: 44.4372, lng: 25.9790, order: 4 },
+        { id: "d5_5", name: "Profi Prelungirea Ghencea", chain: "Profi", city: "Sector 5", address: "Prel. Ghencea 47-49", lat: 44.4085, lng: 26.0085, order: 5 },
+        { id: "d5_6", name: "Profi Mărgelelor", chain: "Profi", city: "Bragadiru", address: "Str. Mărgelelor 32", lat: 44.3865, lng: 26.0245, order: 6 },
+        { id: "d5_7", name: "Profi Speranței", chain: "Profi", city: "Bragadiru", address: "Str. Speranței 69", lat: 44.3830, lng: 26.0185, order: 7 },
+        { id: "d5_8", name: "Profi Bragadiru Speranței", chain: "Profi", city: "Bragadiru", address: "Str. Speranței 6-8", lat: 44.3795, lng: 26.0150, order: 8 },
+        { id: "d5_9", name: "Profi Coralului", chain: "Profi", city: "Bragadiru", address: "Str. Coralului 4", lat: 44.3755, lng: 26.0095, order: 9 },
+        { id: "d5_10", name: "Profi Mărgeanului 62", chain: "Profi", city: "Sector 5", address: "Str. Mărgeanului 62", lat: 44.4035, lng: 26.0595, order: 10 },
+        { id: "d5_11", name: "Profi Mărgeanului 16", chain: "Profi", city: "Sector 5", address: "Str. Mărgeanului 16", lat: 44.4065, lng: 26.0685, order: 11 },
+        { id: "d5_12", name: "Profi Mărgeanului 12", chain: "Profi", city: "Sector 5", address: "Str. Mărgeanului 12", lat: 44.4070, lng: 26.0695, order: 12 },
+        { id: "d5_13", name: "Profi Bârcă", chain: "Profi", city: "Sector 5", address: "Str. Bârcă 2", lat: 44.4105, lng: 26.0650, order: 13 },
+        { id: "d5_14", name: "Profi Sălaj", chain: "Profi", city: "Sector 5", address: "Șos. Sălaj 133", lat: 44.4030, lng: 26.0790, order: 14 },
+        { id: "d5_15", name: "Profi Ferentari", chain: "Profi", city: "Sector 5", address: "Calea Ferentari 20", lat: 44.4080, lng: 26.0890, order: 15 },
+        { id: "d5_16", name: "Profi Rahova", chain: "Profi", city: "Sector 5", address: "Calea Rahovei 22", lat: 44.4185, lng: 26.0875, order: 16 },
+        { id: "d5_17", name: "Profi Ion Urdăreanu", chain: "Profi", city: "Sector 5", address: "Str. Ion Urdăreanu 7", lat: 44.4235, lng: 26.0745, order: 17 },
+        { id: "d5_18", name: "Profi 13 Septembrie", chain: "Profi", city: "Sector 5", address: "Calea 13 Septembrie 111", lat: 44.4245, lng: 26.0795, order: 18 },
+        { id: "d5_19", name: "Profi Libertății", chain: "Profi", city: "Sector 5", address: "B-dul Libertății 2", lat: 44.4278, lng: 26.0915, order: 19 }
+      ],
+      day6: [ // TOATE CELE 30 DE MAGAZINE PROFI CARE LIPSEAU (FĂRĂ DUPLICATE)
+        { id: "d6_1", name: "Profi Popești-Vest", chain: "Profi", city: "Popești-Leordeni", address: "Popești-Vest 2", lat: 44.3820, lng: 26.1610, order: 1 },
+        { id: "d6_2", name: "Profi Drumul Fermei 82", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Fermei 82", lat: 44.3825, lng: 26.1630, order: 2 },
+        { id: "d6_3", name: "Profi Drumul Fermei 36", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Fermei 36", lat: 44.3830, lng: 26.1650, order: 3 },
+        { id: "d6_4", name: "Profi Amurgului 22", chain: "Profi", city: "Popești-Leordeni", address: "Amurgului 22", lat: 44.3835, lng: 26.1670, order: 4 },
+        { id: "d6_5", name: "Profi Drumul Binelui", chain: "Profi", city: "Popești-Leordeni", address: "Drumul Binelui 41B", lat: 44.3840, lng: 26.1690, order: 5 },
+        { id: "d6_6", name: "Profi Vidra 43", chain: "Profi", city: "Vidra", address: "Principala 43", lat: 44.2720, lng: 26.1520, order: 6 },
+        { id: "d6_7", name: "Profi Drumul Jilavei", chain: "Profi", city: "Sector 4", address: "Drumul Jilavei 48-60", lat: 44.3910, lng: 26.1110, order: 7 },
+        { id: "d6_8", name: "Profi Șerban Vodă", chain: "Profi", city: "Sector 4", address: "Șerban Vodă 43", lat: 44.3920, lng: 26.1130, order: 8 },
+        { id: "d6_9", name: "Profi Calea Văcărești", chain: "Profi", city: "Sector 4", address: "Calea Văcărești 176", lat: 44.3930, lng: 26.1150, order: 9 },
+        { id: "d6_10", name: "Profi Motru", chain: "Profi", city: "Sector 4", address: "Constantin Rădulescu Motru 2", lat: 44.3940, lng: 26.1170, order: 10 },
+        { id: "d6_11", name: "Profi Samoilă Dumitrescu", chain: "Profi", city: "Sector 4", address: "Samoilă Dumitrescu 15", lat: 44.3950, lng: 26.1190, order: 11 },
+        { id: "d6_12", name: "Profi Apărătorii Patriei", chain: "Profi", city: "Sector 4", address: "Șos. Berceni 56", lat: 44.3960, lng: 26.1210, order: 12 },
+        { id: "d6_13", name: "Profi Emil Racoviță 22", chain: "Profi", city: "Sector 4", address: "Racoviță 22", lat: 44.3970, lng: 26.1230, order: 13 },
+        { id: "d6_14", name: "Profi Emil Racoviță 10A", chain: "Profi", city: "Sector 4", address: "Emil Racoviță 10A", lat: 44.3980, lng: 26.1250, order: 14 },
+        { id: "d6_15", name: "Profi Berceni 8", chain: "Profi", city: "Sector 4", address: "Șos. Berceni 8", lat: 44.3990, lng: 26.1270, order: 15 },
+        { id: "d6_16", name: "Profi Piața Covasna", chain: "Profi", city: "Sector 4", address: "Aleea Someșului Mic 11", lat: 44.4000, lng: 26.1290, order: 16 },
+        { id: "d6_17", name: "Profi Aluniș", chain: "Profi", city: "Sector 4", address: "Drumul Dealul Aluniș 43", lat: 44.4010, lng: 26.1310, order: 17 },
+        { id: "d6_18", name: "Profi Uioara", chain: "Profi", city: "Sector 4", address: "Uioara 3", lat: 44.4020, lng: 26.1330, order: 18 },
+        { id: "d6_19", name: "Profi Ialomiței", chain: "Profi", city: "Sector 4", address: "Ialomiței 3", lat: 44.4030, lng: 26.1350, order: 19 },
+        { id: "d6_20", name: "Profi Huedin", chain: "Profi", city: "Sector 4", address: "Huedin 19", lat: 44.4040, lng: 26.1370, order: 20 },
+        { id: "d6_21", name: "Profi Giurgiului 131", chain: "Profi", city: "Sector 4", address: "Giurgiului 131", lat: 44.4050, lng: 26.1390, order: 21 },
+        { id: "d6_22", name: "Profi Olteniței 162", chain: "Profi", city: "Sector 4", address: "Olteniței 162", lat: 44.4060, lng: 26.1410, order: 22 },
+        { id: "d6_23", name: "Profi Ghencea 38", chain: "Profi", city: "Sector 6", address: "Bld. Ghencea 38", lat: 44.4320, lng: 26.0220, order: 23 },
+        { id: "d6_24", name: "Profi Ghencea 28", chain: "Profi", city: "Sector 6", address: "Bld. Ghencea 28", lat: 44.4330, lng: 26.0240, order: 24 },
+        { id: "d6_25", name: "Profi Apusului 29", chain: "Profi", city: "Sector 6", address: "Str. Apusului 29", lat: 44.4340, lng: 26.0260, order: 25 },
+        { id: "d6_26", name: "Profi Uverturii 22", chain: "Profi", city: "Sector 6", address: "Bld. Uverturii 22", lat: 44.4350, lng: 26.0280, order: 26 },
+        { id: "d6_27", name: "Profi Cernișoara", chain: "Profi", city: "Sector 6", address: "Str. Cernișoara 45", lat: 44.4360, lng: 26.0300, order: 27 },
+        { id: "d6_28", name: "Profi Dăgâța", chain: "Profi", city: "Sector 6", address: "Str. Dăgâța 7", lat: 44.4370, lng: 26.0320, order: 28 },
+        { id: "d6_29", name: "Profi Dealul Țugulea", chain: "Profi", city: "Sector 6", address: "Str. Dealul Țugulea 3", lat: 44.4380, lng: 26.0340, order: 29 },
+        { id: "d6_30", name: "Profi Orșova", chain: "Profi", city: "Sector 6", address: "Str. Orșova 9", lat: 44.4390, lng: 26.0360, order: 30 }
       ]
     };
 
@@ -664,6 +708,7 @@
         this.currentDayId = localStorage.getItem("merch_active_day") || "day1";
         this.showAllStores = localStorage.getItem("merch_show_all_stores") === "true";
         this.hideProfi = localStorage.getItem("merch_hide_profi") === "true";
+        this.searchQuery = ""; 
         
         this.activeStoreId = null;
         this.assignTargetStore = null;
@@ -689,6 +734,8 @@
         this.isCtrlDragging = false;
         this.ctrlDragSourceStore = null;
         this.ctrlDragTempLine = null;
+        this.toastQueue = []; 
+        this.isToastShowing = false;
       }
 
       async init() {
@@ -706,9 +753,16 @@
         this.setupDraggableFab();
         this.setupClickOutsideHandlers();
         this.setupCtrlKeyListener();
+        this.setupNetworkListener(); 
         this.closeQuickCard();
 
         await this.syncFromFirebase();
+      }
+
+      setupNetworkListener() {
+        window.addEventListener('online', () => { this.setCloudBadge("syncing", "⏳ Revine online..."); this.syncFromFirebase(); });
+        window.addEventListener('offline', () => { this.setCloudBadge("offline", "❌ Ești Offline"); this.showDragToast("Nu ai conexiune. Datele se salvează local!"); });
+        if (!navigator.onLine) this.setCloudBadge("offline", "❌ Ești Offline");
       }
 
       setCloudBadge(status, text) {
@@ -721,47 +775,31 @@
       initDataHierarchy() {
         const masterMap = new Map();
         Object.values(INITIAL_DATA_WEEK_1).forEach(list => {
-          list.forEach(s => {
-            if (!masterMap.has(s.id)) {
-              masterMap.set(s.id, { ...s, defaultLat: s.lat, defaultLng: s.lng });
-            }
-          });
+          list.forEach(s => { if (!masterMap.has(s.id)) masterMap.set(s.id, { ...s, defaultLat: s.lat, defaultLng: s.lng }); });
         });
 
         const savedMaster = localStorage.getItem("merch_master_stores");
-        if (savedMaster) {
-          try {
-            const parsed = JSON.parse(savedMaster);
-            parsed.forEach(s => masterMap.set(s.id, s));
-          } catch(e) {}
-        }
+        if (savedMaster) { try { JSON.parse(savedMaster).forEach(s => masterMap.set(s.id, s)); } catch(e) {} }
         this.masterStores = Array.from(masterMap.values());
 
         const savedCategories = localStorage.getItem("merch_categories_v3");
-        if (savedCategories) {
-          try { this.categories = JSON.parse(savedCategories); } catch(e) { this.categories = null; }
-        }
+        if (savedCategories) { try { this.categories = JSON.parse(savedCategories); } catch(e) { this.categories = null; } }
 
         if (!this.categories || Object.keys(this.categories).length === 0) {
-          this.categories = {
-            cat_week1: {
-              id: "cat_week1", name: "Săptămâna 1",
-              days: {
-                day1: { id: "day1", name: "Ziua 1", stores: [...INITIAL_DATA_WEEK_1.day1] },
-                day2: { id: "day2", name: "Ziua 2", stores: [...INITIAL_DATA_WEEK_1.day2] }
-              }
-            }
-          };
+          this.categories = { cat_week1: { id: "cat_week1", name: "Săptămâna 1", days: { day1: { id: "day1", name: "Ziua 1", stores: [...INITIAL_DATA_WEEK_1.day1] }, day2: { id: "day2", name: "Ziua 2", stores: [...INITIAL_DATA_WEEK_1.day2] }, day3: { id: "day3", name: "Ziua 3", stores: [...INITIAL_DATA_WEEK_1.day3] }, day4: { id: "day4", name: "Ziua 4", stores: [...INITIAL_DATA_WEEK_1.day4] }, day5: { id: "day5", name: "Ziua 5", stores: [...INITIAL_DATA_WEEK_1.day5] }, day6: { id: "day6", name: "Magazine Noi", stores: [...INITIAL_DATA_WEEK_1.day6] } } } };
           this.saveCategoriesLocally();
+        } else {
+            // Dacă ai categorii salvate dar nu ai "Ziua 6" injectată
+            const firstCatId = Object.keys(this.categories)[0];
+            if (firstCatId && !this.categories[firstCatId].days["day6"]) {
+                this.categories[firstCatId].days["day6"] = { id: "day6", name: "Noi (Profi)", stores: [...INITIAL_DATA_WEEK_1.day6] };
+                this.saveCategoriesLocally();
+            }
         }
 
-        if (!this.categories[this.currentCatId]) {
-          this.currentCatId = Object.keys(this.categories)[0];
-        }
+        if (!this.categories[this.currentCatId]) this.currentCatId = Object.keys(this.categories)[0];
         const currentCat = this.categories[this.currentCatId];
-        if (!currentCat.days[this.currentDayId]) {
-          this.currentDayId = Object.keys(currentCat.days)[0] || "day1";
-        }
+        if (!currentCat.days[this.currentDayId]) this.currentDayId = Object.keys(currentCat.days)[0] || "day1";
         this.loadActiveDayLogsAndProducts();
       }
 
@@ -770,25 +808,19 @@
         if (!cat || !cat.days[this.currentDayId]) return [];
         return cat.days[this.currentDayId].stores || [];
       }
-
       set currentStores(newStores) {
-        const cat = this.categories[this.currentCatId];
-        if (cat && cat.days[this.currentDayId]) {
-          cat.days[this.currentDayId].stores = newStores;
+        if (this.categories[this.currentCatId] && this.categories[this.currentCatId].days[this.currentDayId]) {
+          this.categories[this.currentCatId].days[this.currentDayId].stores = newStores;
         }
       }
 
       getAvailableMasterStores() {
         const currentCat = this.categories[this.currentCatId];
         if (!currentCat) return this.masterStores;
-        
         const allocatedToOtherDays = new Set();
         Object.values(currentCat.days).forEach(day => {
-            if (day.id !== this.currentDayId) {
-                (day.stores || []).forEach(s => allocatedToOtherDays.add(s.id));
-            }
+            if (day.id !== this.currentDayId) (day.stores || []).forEach(s => allocatedToOtherDays.add(s.id));
         });
-        
         return this.masterStores.filter(s => !allocatedToOtherDays.has(s.id));
       }
 
@@ -802,34 +834,19 @@
         localStorage.setItem("merch_categories_v3", JSON.stringify(this.categories));
         localStorage.setItem("merch_master_stores", JSON.stringify(this.masterStores));
       }
-
-      saveLogsLocally() {
-        const key = `${this.currentCatId}_${this.currentDayId}`;
-        localStorage.setItem(`merch_logs_${key}`, JSON.stringify(this.storeLogs));
-      }
-
-      saveProductsLocally() {
-        const key = `${this.currentCatId}_${this.currentDayId}`;
-        try { localStorage.setItem(`merch_products_${key}`, JSON.stringify(this.storeProductsData)); } catch(e) {}
-      }
+      saveLogsLocally() { localStorage.setItem(`merch_logs_${this.currentCatId}_${this.currentDayId}`, JSON.stringify(this.storeLogs)); }
+      saveProductsLocally() { try { localStorage.setItem(`merch_products_${this.currentCatId}_${this.currentDayId}`, JSON.stringify(this.storeProductsData)); } catch(e) {} }
 
       saveAll() {
-        this.saveCategoriesLocally();
-        this.saveLogsLocally();
-        this.saveProductsLocally();
-        this.scheduleFirebasePush();
+        this.saveCategoriesLocally(); this.saveLogsLocally(); this.saveProductsLocally();
+        if(navigator.onLine) this.scheduleFirebasePush();
       }
 
       async syncFromFirebase() {
-        if (!this.db) {
-          this.setCloudBadge("offline", "☁️ Local (Fără Firebase)");
-          return;
-        }
+        if (!this.db || !navigator.onLine) return;
         try {
-          this.setCloudBadge("syncing", "⏳ Conectare Firebase...");
-          const docRef = doc(this.db, "merchandiser_data", "main_state");
-          const docSnap = await getDoc(docRef);
-
+          this.setCloudBadge("syncing", "⏳ Conectare...");
+          const docSnap = await getDoc(doc(this.db, "merchandiser_data", "main_state"));
           if (docSnap.exists()) {
             const data = docSnap.data();
             if (data.categories) this.categories = data.categories;
@@ -837,271 +854,118 @@
             if (data.globalLogs) this.storeLogs = data.globalLogs;
             if (data.globalProducts) this.storeProductsData = data.globalProducts;
 
-            this.saveCategoriesLocally();
-            this.saveLogsLocally();
-            this.saveProductsLocally();
-            
-            this.updateHeaderUI();
-            this.renderCategoryMenu();
-            this.renderMapMarkers();
-            this.drawRoutePolyline();
-            this.renderSidebarList();
-            this.renderReport();
-            this.populateFabDropdown();
-            this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
-          } else {
-            await this.pushToFirebase();
-          }
-        } catch (error) {
-          console.warn("Eroare Firebase:", error);
-          this.setCloudBadge("offline", "⚠️ Salvare Locală");
-        }
+            this.saveCategoriesLocally(); this.saveLogsLocally(); this.saveProductsLocally();
+            this.updateHeaderUI(); this.renderCategoryMenu(); this.renderMapMarkers(); this.drawRoutePolyline();
+            this.renderSidebarList(); this.renderReport(); this.populateFabDropdown();
+            this.setCloudBadge("synced", "☁️ Sincronizat");
+          } else await this.pushToFirebase();
+        } catch (error) { this.setCloudBadge("offline", "⚠️ Salvare Locală"); }
       }
 
       scheduleFirebasePush() {
-        if (!this.db) return;
+        if (!this.db || !navigator.onLine) return;
         this.setCloudBadge("syncing", "⏳ Salvare...");
         clearTimeout(this.cloudSyncTimer);
         this.cloudSyncTimer = setTimeout(() => this.pushToFirebase(), 1500);
       }
 
       async pushToFirebase() {
-        if (!this.db) return;
+        if (!this.db || !navigator.onLine) return;
         try {
-          const docRef = doc(this.db, "merchandiser_data", "main_state");
-          await setDoc(docRef, {
-            categories: this.categories,
-            masterStores: this.masterStores,
-            globalLogs: this.storeLogs, 
-            globalProducts: this.storeProductsData, 
-            lastUpdated: new Date().toISOString()
+          await setDoc(doc(this.db, "merchandiser_data", "main_state"), {
+            categories: this.categories, masterStores: this.masterStores,
+            globalLogs: this.storeLogs, globalProducts: this.storeProductsData, lastUpdated: new Date().toISOString()
           });
-          this.setCloudBadge("synced", "☁️ Firebase Sincronizat");
-        } catch (error) {
-          console.warn("Eroare salvare Firebase:", error);
-          this.setCloudBadge("offline", "⚠️ Salvare Locală");
-        }
+          this.setCloudBadge("synced", "☁️ Sincronizat");
+        } catch (error) { this.setCloudBadge("offline", "⚠️ Salvare Locală"); }
       }
 
       toggleShowAllStores() {
         this.showAllStores = !this.showAllStores;
         localStorage.setItem("merch_show_all_stores", this.showAllStores);
-        this.updateShowAllStoresUI();
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
-
-        if (this.showAllStores) {
-          this.showDragToast("👁️ Sunt afișate magazinele disponibile din această săptămână.");
-        } else {
-          this.showDragToast("📍 Se afișează doar traseul din ziua selectată.");
-        }
+        this.updateShowAllStoresUI(); this.renderMapMarkers(); this.drawRoutePolyline();
+        if (this.showAllStores) this.showDragToast("👁️ Sunt afișate magazinele libere din săptămână.");
+        else this.showDragToast("📍 Se afișează doar traseul din ziua selectată.");
       }
 
       updateShowAllStoresUI() {
-        const btnDesk = document.getElementById("toggleAllStoresBtnDesk");
-        const btnMob = document.getElementById("dockAllStoresBtnMob");
-        const labelDesk = document.getElementById("toggleAllStoresLabelDesk");
-        const labelMob = document.getElementById("toggleAllStoresLabelMob");
-
         if (this.showAllStores) {
-          if (btnDesk) { btnDesk.classList.add("active"); labelDesk.textContent = "Toate (ON)"; }
-          if (btnMob) { btnMob.classList.add("active-purple"); labelMob.textContent = "Toate (ON)"; }
+          document.getElementById("toggleAllStoresBtnDesk").classList.add("active"); document.getElementById("toggleAllStoresLabelDesk").textContent = "Toate (ON)";
+          document.getElementById("dockAllStoresBtnMob").classList.add("active-purple"); document.getElementById("toggleAllStoresLabelMob").textContent = "Toate (ON)";
         } else {
-          if (btnDesk) { btnDesk.classList.remove("active"); labelDesk.textContent = "Toate Magazinele"; }
-          if (btnMob) { btnMob.classList.remove("active-purple"); labelMob.textContent = "Toate Magazinele"; }
+          document.getElementById("toggleAllStoresBtnDesk").classList.remove("active"); document.getElementById("toggleAllStoresLabelDesk").textContent = "Toate Magazinele";
+          document.getElementById("dockAllStoresBtnMob").classList.remove("active-purple"); document.getElementById("toggleAllStoresLabelMob").textContent = "Toate Magazinele";
         }
       }
 
       toggleHideProfi() {
         this.hideProfi = !this.hideProfi;
         localStorage.setItem("merch_hide_profi", this.hideProfi);
-        this.updateHideProfiUI();
-        this.renderMapMarkers();
+        this.updateHideProfiUI(); this.renderMapMarkers();
       }
 
       updateHideProfiUI() {
-        const btn = document.getElementById("toggleHideProfiBtnDesk");
-        const label = document.getElementById("toggleHideProfiLabelDesk");
-        if (!btn || !label) return;
-
-        if (this.hideProfi) {
-          btn.classList.add("active");
-          label.textContent = "Fără Profi (ON)";
-        } else {
-          btn.classList.remove("active");
-          label.textContent = "Fără Profi";
-        }
+        if (this.hideProfi) { document.getElementById("toggleHideProfiBtnDesk").classList.add("active"); document.getElementById("toggleHideProfiLabelDesk").textContent = "Fără Profi (ON)"; } 
+        else { document.getElementById("toggleHideProfiBtnDesk").classList.remove("active"); document.getElementById("toggleHideProfiLabelDesk").textContent = "Fără Profi"; }
       }
 
       setupCtrlKeyListener() {
-        window.addEventListener("keydown", (e) => {
-          if (e.key === "Control" || e.key === "Meta") document.body.classList.add("ctrl-pressed");
-        });
-        window.addEventListener("keyup", (e) => {
-          if (e.key === "Control" || e.key === "Meta") document.body.classList.remove("ctrl-pressed");
-        });
+        window.addEventListener("keydown", (e) => { if (e.key === "Control" || e.key === "Meta") document.body.classList.add("ctrl-pressed"); });
+        window.addEventListener("keyup", (e) => { if (e.key === "Control" || e.key === "Meta") document.body.classList.remove("ctrl-pressed"); });
       }
 
-      toggleWeekDropdown(event) {
-        if (event) event.stopPropagation();
-        const menu = document.getElementById("weekDropdownMenu");
-        if (menu) menu.classList.toggle("show");
-      }
-
-      closeWeekDropdown() {
-        const menu = document.getElementById("weekDropdownMenu");
-        if (menu) menu.classList.remove("show");
-      }
+      toggleWeekDropdown(event) { if (event) event.stopPropagation(); document.getElementById("weekDropdownMenu").classList.toggle("show"); }
+      closeWeekDropdown() { document.getElementById("weekDropdownMenu").classList.remove("show"); }
 
       setupClickOutsideHandlers() {
-        document.addEventListener("click", (e) => {
-          const group = document.querySelector(".route-selector-group");
-          if (group && !group.contains(e.target)) this.closeWeekDropdown();
-        });
+        document.addEventListener("click", (e) => { if (!document.querySelector(".route-selector-group").contains(e.target)) this.closeWeekDropdown(); });
       }
 
       renderCategoryMenu() {
         const listContainer = document.getElementById("categoryMenuList");
-        if (!listContainer) return;
         listContainer.innerHTML = "";
-
         Object.values(this.categories).forEach(cat => {
-          const block = document.createElement("div");
-          block.className = "category-block";
-
-          const header = document.createElement("div");
-          header.className = "category-block-header";
-          header.innerHTML = `
-            <span class="category-block-title">${cat.name}</span>
-            <div style="display:flex; gap:4px;">
-              <button class="btn btn-secondary btn-sm" style="padding:2px 6px; font-size:10px;" onclick="event.stopPropagation(); app.promptAddDayToCategory('${cat.id}')">➕ Zi</button>
-              <button class="action-icon-btn delete-btn" title="Șterge categoria" onclick="event.stopPropagation(); app.deleteCategory('${cat.id}')">🗑️</button>
-            </div>
-          `;
+          const block = document.createElement("div"); block.className = "category-block";
+          const header = document.createElement("div"); header.className = "category-block-header";
+          header.innerHTML = `<span class="category-block-title">${cat.name}</span><div style="display:flex; gap:4px;"><button class="btn btn-secondary btn-sm" style="padding:2px 6px; font-size:10px;" onclick="event.stopPropagation(); app.promptAddDayToCategory('${cat.id}')">➕ Zi</button><button class="action-icon-btn delete-btn" title="Șterge" onclick="event.stopPropagation(); app.deleteCategory('${cat.id}')">🗑️</button></div>`;
           block.appendChild(header);
 
-          const daysList = document.createElement("div");
-          daysList.className = "days-grid-list";
-
+          const daysList = document.createElement("div"); daysList.className = "days-grid-list";
           const dayKeys = Object.keys(cat.days || {});
-          if (dayKeys.length === 0) {
-            daysList.innerHTML = `<div style="font-size:11px; color:var(--text-muted); padding:4px;">Fără zile. Apasă ➕ Zi.</div>`;
-          } else {
+          if (dayKeys.length === 0) daysList.innerHTML = `<div style="font-size:11px; color:var(--text-muted); padding:4px;">Fără zile.</div>`;
+          else {
             dayKeys.forEach(dayId => {
-              const day = cat.days[dayId];
-              const isActive = (this.currentCatId === cat.id && this.currentDayId === dayId);
-              const storeCount = (day.stores || []).length;
-
-              const itemBtn = document.createElement("button");
-              itemBtn.className = `week-menu-item ${isActive ? 'active' : ''}`;
-              itemBtn.innerHTML = `
-                <span>📅 ${day.name}</span>
-                <div style="display:flex; align-items:center; gap:4px;">
-                  <span class="badge badge-primary">${storeCount} Mag</span>
-                  <span style="color:var(--danger); font-size:12px;" onclick="event.stopPropagation(); app.deleteDay('${cat.id}', '${dayId}')" title="Șterge ziua">✕</span>
-                </div>
-              `;
-              itemBtn.onclick = () => {
-                this.selectCategoryAndDay(cat.id, dayId);
-                this.closeWeekDropdown();
-              };
+              const day = cat.days[dayId]; const isActive = (this.currentCatId === cat.id && this.currentDayId === dayId);
+              const itemBtn = document.createElement("button"); itemBtn.className = `week-menu-item ${isActive ? 'active' : ''}`;
+              itemBtn.innerHTML = `<span>📅 ${day.name}</span><div style="display:flex; align-items:center; gap:4px;"><span class="badge badge-primary">${(day.stores || []).length} Mag</span><span style="color:var(--danger); font-size:12px;" onclick="event.stopPropagation(); app.deleteDay('${cat.id}', '${dayId}')">✕</span></div>`;
+              itemBtn.onclick = () => { this.selectCategoryAndDay(cat.id, dayId); this.closeWeekDropdown(); };
               daysList.appendChild(itemBtn);
             });
           }
-          block.appendChild(daysList);
-          listContainer.appendChild(block);
+          block.appendChild(daysList); listContainer.appendChild(block);
         });
       }
 
       selectCategoryAndDay(catId, dayId) {
-        this.currentCatId = catId;
-        this.currentDayId = dayId;
-        localStorage.setItem("merch_active_cat", catId);
-        localStorage.setItem("merch_active_day", dayId);
-
-        this.loadActiveDayLogsAndProducts();
-        this.updateHeaderUI();
-        this.renderCategoryMenu();
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
-        this.renderSidebarList();
-        this.renderReport();
-        this.populateFabDropdown();
-        this.closeQuickCard();
+        this.currentCatId = catId; this.currentDayId = dayId;
+        localStorage.setItem("merch_active_cat", catId); localStorage.setItem("merch_active_day", dayId);
+        this.loadActiveDayLogsAndProducts(); this.updateHeaderUI(); this.renderCategoryMenu(); this.renderMapMarkers(); this.drawRoutePolyline(); this.renderSidebarList(); this.renderReport(); this.populateFabDropdown(); this.closeQuickCard();
       }
 
       updateHeaderUI() {
-        const cat = this.categories[this.currentCatId];
-        const day = cat ? cat.days[this.currentDayId] : null;
-        const storeCount = (day && day.stores) ? day.stores.length : 0;
-
+        const cat = this.categories[this.currentCatId]; const day = cat ? cat.days[this.currentDayId] : null; const storeCount = (day && day.stores) ? day.stores.length : 0;
         document.getElementById("headerCategoryLabel").textContent = `📅 ${cat ? cat.name : 'Traseu'}`;
         document.getElementById("activeDayHeaderLabel").textContent = `${day ? day.name : 'Ziua'} (${storeCount})`;
         document.getElementById("sidebarTitle").textContent = `${cat ? cat.name : ''} - ${day ? day.name : ''}`;
         document.getElementById("reportMainHeading").textContent = `📋 Raport - ${cat ? cat.name : ''} (${day ? day.name : ''})`;
-
-        const sidebarDesc = document.getElementById("sidebarRouteDesc");
-        if (sidebarDesc) {
-          sidebarDesc.innerHTML = `
-            <div>🛣️ <strong>Traseu activ:</strong> ${cat ? cat.name : ''} &bull; ${day ? day.name : ''}</div>
-            <div class="route-stats-row"><span>Magazine alocate: ${storeCount}</span><span>Ctrl + Drag pt unire traseu</span></div>
-          `;
-        }
+        document.getElementById("sidebarRouteDesc").innerHTML = `<div>🛣️ <strong>Traseu activ:</strong> ${cat ? cat.name : ''} &bull; ${day ? day.name : ''}</div><div class="route-stats-row"><span>Magazine alocate: ${storeCount}</span><span>Ctrl + Drag pt unire traseu</span></div>`;
       }
 
-      promptAddCategoryOrDay() {
-        const choice = confirm("Apasă OK pentru a crea o CATEGORIE nouă.\nApasă CANCEL pentru a adăuga o ZI NOUĂ în categoria curentă.");
-        if (choice) this.promptAddCategory();
-        else this.promptAddDayToCategory(this.currentCatId);
-      }
-
-      promptAddCategory() {
-        const name = prompt("Introdu numele noii categorii:");
-        if (!name || !name.trim()) return;
-
-        const catId = "cat_" + Date.now();
-        this.categories[catId] = {
-          id: catId, name: name.trim(),
-          days: { day1: { id: "day1", name: "Ziua 1", stores: [] } }
-        };
-        this.saveAll();
-        this.selectCategoryAndDay(catId, "day1");
-      }
-
-      promptAddDayToCategory(catId) {
-        const cat = this.categories[catId];
-        if (!cat) return;
-        const dayName = prompt(`Introdu numele noii zile în "${cat.name}":`);
-        if (!dayName || !dayName.trim()) return;
-
-        const dayId = "day_" + Date.now();
-        if (!cat.days) cat.days = {};
-        cat.days[dayId] = { id: dayId, name: dayName.trim(), stores: [] };
-
-        this.saveAll();
-        this.selectCategoryAndDay(catId, dayId);
-      }
-
-      deleteCategory(catId) {
-        if (Object.keys(this.categories).length <= 1) { alert("Păstrează cel puțin o categorie."); return; }
-        if (confirm(`Ștergi categoria?`)) {
-          delete this.categories[catId];
-          const remId = Object.keys(this.categories)[0];
-          this.saveAll();
-          this.selectCategoryAndDay(remId, Object.keys(this.categories[remId].days)[0]);
-        }
-      }
-
-      deleteDay(catId, dayId) {
-        const cat = this.categories[catId];
-        if (Object.keys(cat.days).length <= 1) { alert("Trebuie să ai minim o zi."); return; }
-        if (confirm(`Ștergi ziua?`)) {
-          delete cat.days[dayId];
-          this.saveAll();
-          if (this.currentDayId === dayId) this.selectCategoryAndDay(catId, Object.keys(cat.days)[0]);
-          else { this.renderCategoryMenu(); this.updateHeaderUI(); }
-        }
-      }
+      promptAddCategoryOrDay() { if (confirm("Apasă OK pentru a crea o CATEGORIE nouă.\nApasă CANCEL pentru a adăuga o ZI NOUĂ.")) this.promptAddCategory(); else this.promptAddDayToCategory(this.currentCatId); }
+      promptAddCategory() { const name = prompt("Introdu numele noii categorii:"); if (!name || !name.trim()) return; const catId = "cat_" + Date.now(); this.categories[catId] = { id: catId, name: name.trim(), days: { day1: { id: "day1", name: "Ziua 1", stores: [] } } }; this.saveAll(); this.selectCategoryAndDay(catId, "day1"); }
+      promptAddDayToCategory(catId) { const cat = this.categories[catId]; if (!cat) return; const dayName = prompt(`Numele noii zile în "${cat.name}":`); if (!dayName || !dayName.trim()) return; const dayId = "day_" + Date.now(); if (!cat.days) cat.days = {}; cat.days[dayId] = { id: dayId, name: dayName.trim(), stores: [] }; this.saveAll(); this.selectCategoryAndDay(catId, dayId); }
+      deleteCategory(catId) { if (Object.keys(this.categories).length <= 1) { alert("Păstrează minim o categorie."); return; } if (confirm(`Ștergi categoria?`)) { delete this.categories[catId]; const remId = Object.keys(this.categories)[0]; this.saveAll(); this.selectCategoryAndDay(remId, Object.keys(this.categories[remId].days)[0]); } }
+      deleteDay(catId, dayId) { const cat = this.categories[catId]; if (Object.keys(cat.days).length <= 1) { alert("Trebuie să ai minim o zi."); return; } if (confirm(`Ștergi ziua?`)) { delete cat.days[dayId]; this.saveAll(); if (this.currentDayId === dayId) this.selectCategoryAndDay(catId, Object.keys(cat.days)[0]); else { this.renderCategoryMenu(); this.updateHeaderUI(); } } }
 
       initMap() {
         const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] });
@@ -1112,203 +976,87 @@
         L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
         L.control.layers({ "🛰️ Google Satelit": googleHybrid, "🗺️ Google Străzi": googleStreets, "🌍 OpenStreetMap": osmStandard }, null, { position: 'topleft' }).addTo(this.map);
 
-        this.map.on('click', () => {
-           this.closeQuickCard();
-        });
-
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
+        this.map.on('click', () => this.closeQuickCard());
+        this.renderMapMarkers(); this.drawRoutePolyline();
       }
 
-      // ==========================================
-      // BUG REZOLVAT: LOGICA CULORII LA PINURI 
-      // ==========================================
       createPinIcon(store, index, isExternal = false) {
-        const log = this.storeLogs[store.id];
-        const isActive = this.activeStoreId === store.id;
-        
-        let colorClass = "pin-pending";
-        let label = (index !== null && index !== undefined) ? (index + 1) : "•";
-
-        // Setează forma/baza pentru cele externe (mov și iconiță magazin)
-        if (isExternal) { 
-            colorClass = "pin-external"; 
-            label = "🏪"; 
-        }
-        
-        // DAR Suprascrie culoarea DACĂ magazinul are un status! 
-        // Astfel, și cele externe/mov se vor face Verzi dacă le bifezi ca Rezolvate.
-        if (log && log.status === "completed") { 
-            colorClass = "pin-completed"; 
-        } else if (log && log.status === "unresolved") { 
-            colorClass = "pin-unresolved"; 
-        } else if (isActive && !isExternal) { 
-            colorClass = "pin-active-pending"; 
-        }
-
-        return L.divIcon({
-          className: 'custom-leaflet-marker',
-          html: `<div class="custom-marker-pin ${colorClass} ${isActive ? "is-active" : ""}"><span>${label}</span></div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 32]
-        });
+        const log = this.storeLogs[store.id]; const isActive = this.activeStoreId === store.id;
+        let colorClass = "pin-pending"; let label = (index !== null && index !== undefined) ? (index + 1) : "•";
+        if (isExternal) { colorClass = "pin-external"; label = "🏪"; }
+        if (log && log.status === "completed") colorClass = "pin-completed"; else if (log && log.status === "unresolved") colorClass = "pin-unresolved"; else if (isActive && !isExternal) colorClass = "pin-active-pending";
+        return L.divIcon({ className: 'custom-leaflet-marker', html: `<div class="custom-marker-pin ${colorClass} ${isActive ? "is-active" : ""}"><span>${label}</span></div>`, iconSize: [32, 32], iconAnchor: [16, 32] });
       }
 
       renderMapMarkers() {
-        Object.values(this.markers).forEach(m => this.map.removeLayer(m));
-        this.markers = {};
-
-        const activeDayStores = this.currentStores;
-        const activeIds = new Set(activeDayStores.map(s => s.id));
-
+        Object.values(this.markers).forEach(m => this.map.removeLayer(m)); this.markers = {};
+        const activeDayStores = this.currentStores; const activeIds = new Set(activeDayStores.map(s => s.id));
         let storesToRender = [];
+
         if (this.showAllStores) {
           storesToRender = this.getAvailableMasterStores(); 
-          if (this.hideProfi) {
-            storesToRender = storesToRender.filter(s => {
-              const isProfi = (s.chain && s.chain.toLowerCase().includes("profi")) || s.name.toLowerCase().includes("profi");
-              return !isProfi || activeIds.has(s.id);
-            });
-          }
-        } else {
-          storesToRender = this.getFilteredStores();
-        }
+          if (this.hideProfi) storesToRender = storesToRender.filter(s => { const isProfi = (s.chain && s.chain.toLowerCase().includes("profi")) || s.name.toLowerCase().includes("profi"); return !isProfi || activeIds.has(s.id); });
+        } else storesToRender = this.getFilteredStores();
 
         storesToRender.forEach((store) => {
-          const isExternal = !activeIds.has(store.id);
-          const originalIndex = activeDayStores.findIndex(s => s.id === store.id);
-          const icon = this.createPinIcon(store, originalIndex >= 0 ? originalIndex : null, isExternal);
+          const isExternal = !activeIds.has(store.id); const originalIndex = activeDayStores.findIndex(s => s.id === store.id);
+          const marker = L.marker([store.lat, store.lng], { icon: this.createPinIcon(store, originalIndex >= 0 ? originalIndex : null, isExternal), draggable: !this.isPinsLocked }).addTo(this.map);
 
-          const marker = L.marker([store.lat, store.lng], {
-            icon: icon, draggable: !this.isPinsLocked
-          }).addTo(this.map);
-
-          marker.on('click', () => {
-            if (this.isCtrlDragging) return;
-            this.setActiveStore(store.id, false);
-          });
-
-          marker.on('mousedown', (e) => {
-            if (e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
-              L.DomEvent.stopPropagation(e);
-              L.DomEvent.preventDefault(e);
-              this.startCtrlRouteDrag(store, e.originalEvent);
-            }
-          });
-
-          marker.on('contextmenu', (e) => {
-            L.DomEvent.preventDefault(e);
-            this.openAssignModal(store);
-          });
+          marker.on('click', () => { if (!this.isCtrlDragging) this.setActiveStore(store.id, false); });
+          marker.on('mousedown', (e) => { if (e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)) { L.DomEvent.stopPropagation(e); L.DomEvent.preventDefault(e); this.startCtrlRouteDrag(store, e.originalEvent); } });
+          marker.on('contextmenu', (e) => { L.DomEvent.preventDefault(e); this.openAssignModal(store); });
 
           let touchTimer = null, touchMoved = false, startPos = null;
-          marker.on('touchstart', (e) => {
-            touchMoved = false;
-            const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null;
-            if (touch) startPos = { x: touch.clientX, y: touch.clientY };
-            touchTimer = setTimeout(() => {
-              if (!touchMoved) {
-                if (navigator.vibrate) navigator.vibrate(60);
-                this.openAssignModal(store);
-              }
-            }, 550);
-          });
-          marker.on('touchmove', (e) => {
-            const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null;
-            if (touch && startPos) {
-              if (Math.hypot(touch.clientX - startPos.x, touch.clientY - startPos.y) > 8) {
-                touchMoved = true;
-                clearTimeout(touchTimer);
-              }
-            }
-          });
+          marker.on('touchstart', (e) => { touchMoved = false; const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null; if (touch) startPos = { x: touch.clientX, y: touch.clientY }; touchTimer = setTimeout(() => { if (!touchMoved) { if (navigator.vibrate) navigator.vibrate(60); this.openAssignModal(store); } }, 550); });
+          marker.on('touchmove', (e) => { const touch = e.originalEvent.touches ? e.originalEvent.touches[0] : null; if (touch && startPos) { if (Math.hypot(touch.clientX - startPos.x, touch.clientY - startPos.y) > 8) { touchMoved = true; clearTimeout(touchTimer); } } });
           marker.on('touchend touchcancel', () => clearTimeout(touchTimer));
 
           marker.on('dragend', (e) => {
             if (this.isCtrlDragging) return;
-            const newPos = e.target.getLatLng();
-            store.lat = parseFloat(newPos.lat.toFixed(6));
-            store.lng = parseFloat(newPos.lng.toFixed(6));
-
-            const mStore = this.masterStores.find(s => s.id === store.id);
-            if (mStore) { mStore.lat = store.lat; mStore.lng = store.lng; }
-
-            this.saveAll();
-            this.drawRoutePolyline();
-            this.showDragToast(`📍 Poziția magazinului a fost salvată!`);
+            store.lat = parseFloat(e.target.getLatLng().lat.toFixed(6)); store.lng = parseFloat(e.target.getLatLng().lng.toFixed(6));
+            const mStore = this.masterStores.find(s => s.id === store.id); if (mStore) { mStore.lat = store.lat; mStore.lng = store.lng; }
+            this.saveAll(); this.drawRoutePolyline(); this.showDragToast(`📍 Poziția magazinului a fost salvată!`);
           });
-
           this.markers[store.id] = marker;
         });
       }
 
       resetStoreCoordinates(storeId) {
-        if (!storeId) return;
         const store = this.masterStores.find(s => s.id === storeId);
         if (store && store.defaultLat && store.defaultLng) {
-            if (confirm(`Ești sigur că vrei să resetezi poziția acestui magazin la coordonatele inițiale?`)) {
-                store.lat = store.defaultLat;
-                store.lng = store.defaultLng;
-                
-                const activeStore = this.currentStores.find(s => s.id === storeId);
-                if (activeStore) {
-                    activeStore.lat = store.defaultLat;
-                    activeStore.lng = store.defaultLng;
-                }
-
-                this.saveAll();
-                this.renderMapMarkers();
-                this.drawRoutePolyline();
-                this.map.panTo([store.lat, store.lng], { animate: true });
-                this.closeStoreModal();
-                this.showDragToast("🔄 Coordonatele au fost resetate la valorile inițiale.");
+            if (confirm(`Resetezi poziția la coordonatele inițiale?`)) {
+                store.lat = store.defaultLat; store.lng = store.defaultLng;
+                const activeStore = this.currentStores.find(s => s.id === storeId); if (activeStore) { activeStore.lat = store.defaultLat; activeStore.lng = store.defaultLng; }
+                this.saveAll(); this.renderMapMarkers(); this.drawRoutePolyline(); this.map.panTo([store.lat, store.lng], { animate: true }); this.closeStoreModal(); this.showDragToast("🔄 Coordonatele resetate.");
             }
-        } else {
-            alert("Nu am găsit coordonatele inițiale pentru acest magazin.");
-        }
+        } else alert("Nu am găsit coordonatele inițiale.");
       }
 
       startCtrlRouteDrag(sourceStore, e) {
         if (this.isCtrlDragging) return;
-        this.isCtrlDragging = true;
-        this.ctrlDragSourceStore = sourceStore;
-        this.map.dragging.disable();
-
+        this.isCtrlDragging = true; this.ctrlDragSourceStore = sourceStore; this.map.dragging.disable();
         const startPt = [sourceStore.lat, sourceStore.lng];
         this.ctrlDragTempLine = L.polyline([startPt, startPt], { color: '#f59e0b', weight: 4, dashArray: '6, 6', opacity: 0.9, zIndexOffset: 3000 }).addTo(this.map);
-        this.showDragToast(`🔗 Trage către magazinul pe care vrei să-l unești după "${sourceStore.name}"!`);
+        this.showDragToast(`🔗 Trage către magazinul pe care vrei să-l unești!`);
 
-        const onMouseMove = (ev) => {
-          if (!this.isCtrlDragging) return;
-          const latLng = this.map.mouseEventToLatLng(ev);
-          if (this.ctrlDragTempLine) this.ctrlDragTempLine.setLatLngs([startPt, [latLng.lat, latLng.lng]]);
-        };
-
+        const onMouseMove = (ev) => { if (this.isCtrlDragging && this.ctrlDragTempLine) { const latLng = this.map.mouseEventToLatLng(ev); this.ctrlDragTempLine.setLatLngs([startPt, [latLng.lat, latLng.lng]]); } };
         const onMouseUp = (ev) => {
-          window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
-          this.map.dragging.enable();
-
+          window.removeEventListener('mousemove', onMouseMove); window.removeEventListener('mouseup', onMouseUp); this.map.dragging.enable();
           if (this.ctrlDragTempLine) { this.map.removeLayer(this.ctrlDragTempLine); this.ctrlDragTempLine = null; }
           this.isCtrlDragging = false;
-
           const targetStore = this.findStoreUnderCursor(ev.clientX, ev.clientY, sourceStore.id);
           if (targetStore) this.connectStoresInRoute(sourceStore, targetStore);
           this.ctrlDragSourceStore = null;
         };
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('mousemove', onMouseMove); window.addEventListener('mouseup', onMouseUp);
       }
 
       findStoreUnderCursor(clientX, clientY, excludeId) {
         let closest = null, minDistancePx = 45;
         const listToCheck = this.showAllStores ? this.getAvailableMasterStores() : this.currentStores;
-        
         listToCheck.forEach(s => {
           if (s.id === excludeId) return;
-          const pt = this.map.latLngToContainerPoint([s.lat, s.lng]);
-          const mapRect = this.map.getContainer().getBoundingClientRect();
+          const pt = this.map.latLngToContainerPoint([s.lat, s.lng]); const mapRect = this.map.getContainer().getBoundingClientRect();
           const dist = Math.hypot(clientX - (mapRect.left + pt.x), clientY - (mapRect.top + pt.y));
           if (dist < minDistancePx) { minDistancePx = dist; closest = s; }
         });
@@ -1319,347 +1067,231 @@
         let stores = [...this.currentStores];
         let srcIdx = stores.findIndex(s => s.id === sourceStore.id);
         if (srcIdx === -1) { stores.push({ ...sourceStore }); srcIdx = stores.length - 1; }
-
         const targetIdx = stores.findIndex(s => s.id === targetStore.id);
         if (targetIdx !== -1) { stores.splice(targetIdx, 1); srcIdx = stores.findIndex(s => s.id === sourceStore.id); }
-
-        stores.splice(srcIdx + 1, 0, { ...targetStore });
-        stores.forEach((s, idx) => { s.order = idx + 1; });
-        this.currentStores = stores;
-
-        this.saveAll();
-        this.updateHeaderUI();
-        this.renderSidebarList();
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
-        this.renderReport();
-        this.showDragToast(`✅ Rută unită: "${sourceStore.name}" ➔ "${targetStore.name}"!`);
+        stores.splice(srcIdx + 1, 0, { ...targetStore }); stores.forEach((s, idx) => { s.order = idx + 1; });
+        this.currentStores = stores; this.saveAll(); this.updateHeaderUI(); this.renderSidebarList(); this.renderMapMarkers(); this.drawRoutePolyline(); this.renderReport(); this.showDragToast(`✅ Rută unită!`);
       }
 
       drawRoutePolyline() {
         if (this.routePolyline) this.map.removeLayer(this.routePolyline);
         const latLngs = this.currentStores.map(s => [s.lat, s.lng]);
-        if (latLngs.length > 1) {
-          this.routePolyline = L.polyline(latLngs, { color: '#2563eb', weight: 4, opacity: 0.75, dashArray: '8, 8' }).addTo(this.map);
-        }
+        if (latLngs.length > 1) this.routePolyline = L.polyline(latLngs, { color: '#2563eb', weight: 4, opacity: 0.75, dashArray: '8, 8' }).addTo(this.map);
       }
 
+      /* TOAST QUEUE SYSTEM */
       showDragToast(msg) {
+        this.toastQueue.push(msg);
+        this.processToastQueue();
+      }
+      processToastQueue() {
+        if (this.isToastShowing || this.toastQueue.length === 0) return;
+        this.isToastShowing = true;
+        const msg = this.toastQueue.shift();
         const toast = document.getElementById("mapDragToast");
         document.getElementById("mapDragToastText").textContent = msg;
         toast.style.display = "flex";
-        setTimeout(() => { toast.style.display = "none"; }, 3500);
+        setTimeout(() => { toast.style.display = "none"; this.isToastShowing = false; this.processToastQueue(); }, 2500);
       }
 
       openAssignModal(store) {
         this.assignTargetStore = store;
         document.getElementById("assignStoreTitle").textContent = store.name;
         document.getElementById("assignStoreAddress").textContent = store.address;
-
-        const catSelect = document.getElementById("assignCatSelect");
-        catSelect.innerHTML = "";
-        Object.values(this.categories).forEach(cat => {
-          const opt = document.createElement("option");
-          opt.value = cat.id; opt.textContent = cat.name;
-          if (cat.id === this.currentCatId) opt.selected = true;
-          catSelect.appendChild(opt);
-        });
-
+        const catSelect = document.getElementById("assignCatSelect"); catSelect.innerHTML = "";
+        Object.values(this.categories).forEach(cat => { const opt = document.createElement("option"); opt.value = cat.id; opt.textContent = cat.name; if (cat.id === this.currentCatId) opt.selected = true; catSelect.appendChild(opt); });
         this.onAssignCategoryChange();
-        const isInCurrent = this.currentStores.some(s => s.id === store.id);
-        document.getElementById("btnRemoveFromCurrentDay").style.display = isInCurrent ? "block" : "none";
+        document.getElementById("btnRemoveFromCurrentDay").style.display = this.currentStores.some(s => s.id === store.id) ? "block" : "none";
         document.getElementById("assignModalOverlay").classList.add("active");
+        document.body.classList.add("modal-open");
       }
 
       onAssignCategoryChange() {
-        const cat = this.categories[document.getElementById("assignCatSelect").value];
-        const daySelect = document.getElementById("assignDaySelect");
-        daySelect.innerHTML = "";
-        if (cat && cat.days) {
-          Object.values(cat.days).forEach(day => {
-            const opt = document.createElement("option");
-            opt.value = day.id; opt.textContent = `${day.name} (${(day.stores || []).length} magazine)`;
-            if (day.id === this.currentDayId && cat.id === this.currentCatId) opt.selected = true;
-            daySelect.appendChild(opt);
-          });
-        }
+        const cat = this.categories[document.getElementById("assignCatSelect").value]; const daySelect = document.getElementById("assignDaySelect"); daySelect.innerHTML = "";
+        if (cat && cat.days) { Object.values(cat.days).forEach(day => { const opt = document.createElement("option"); opt.value = day.id; opt.textContent = `${day.name} (${(day.stores || []).length} mag)`; if (day.id === this.currentDayId && cat.id === this.currentCatId) opt.selected = true; daySelect.appendChild(opt); }); }
       }
 
       confirmAssignStore() {
         if (!this.assignTargetStore) return;
-        const catId = document.getElementById("assignCatSelect").value;
-        const dayId = document.getElementById("assignDaySelect").value;
-        const targetDay = this.categories[catId].days[dayId];
-
+        const catId = document.getElementById("assignCatSelect").value; const dayId = document.getElementById("assignDaySelect").value; const targetDay = this.categories[catId].days[dayId];
         if (!targetDay.stores) targetDay.stores = [];
-        if (targetDay.stores.findIndex(s => s.id === this.assignTargetStore.id) >= 0) {
-          alert(`Magazinul se află deja în ${targetDay.name}!`);
-        } else {
-          this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id);
-          
-          targetDay.stores.push({ ...this.assignTargetStore, order: targetDay.stores.length + 1 });
-          this.saveAll();
-          alert(`✓ Magazinul a fost mutat în -> ${targetDay.name}!`);
-        }
-        this.closeAssignModal();
-        this.updateHeaderUI();
-        this.renderMapMarkers();
-        this.drawRoutePolyline();
-        this.renderSidebarList();
+        if (targetDay.stores.findIndex(s => s.id === this.assignTargetStore.id) >= 0) { alert(`Magazinul se află deja în ${targetDay.name}!`); } 
+        else { this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id); targetDay.stores.push({ ...this.assignTargetStore, order: targetDay.stores.length + 1 }); this.saveAll(); alert(`✓ Magazinul mutat în -> ${targetDay.name}!`); }
+        this.closeAssignModal(); this.updateHeaderUI(); this.renderMapMarkers(); this.drawRoutePolyline(); this.renderSidebarList();
       }
 
       removeStoreFromActiveDay() {
-        if (confirm(`Elimini magazinul din ziua curentă?`)) {
-          this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id);
-          this.saveAll();
-          this.closeAssignModal();
-          this.updateHeaderUI();
-          this.renderMapMarkers();
-          this.drawRoutePolyline();
-          this.renderSidebarList();
-        }
+        if (confirm(`Elimini magazinul din ziua curentă?`)) { this.currentStores = this.currentStores.filter(s => s.id !== this.assignTargetStore.id); this.saveAll(); this.closeAssignModal(); this.updateHeaderUI(); this.renderMapMarkers(); this.drawRoutePolyline(); this.renderSidebarList(); }
       }
 
-      closeAssignModal() { document.getElementById("assignModalOverlay").classList.remove("active"); this.assignTargetStore = null; }
-      openAssignModalForActive() {
-        if (this.activeStoreId) this.openAssignModal(this.masterStores.find(s => s.id === this.activeStoreId));
+      closeAssignModal() { document.getElementById("assignModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); this.assignTargetStore = null; }
+      openAssignModalForActive() { if (this.activeStoreId) this.openAssignModal(this.masterStores.find(s => s.id === this.activeStoreId)); }
+
+      /* SEARCH BAR LOGIC */
+      onSearchInput() {
+        this.searchQuery = document.getElementById("storeSearchInput").value.toLowerCase();
+        this.renderSidebarList();
       }
 
       setStoreFilter(filterType, element) {
         this.currentFilter = filterType;
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
         if (element) element.classList.add('active');
-        this.renderSidebarList();
-        this.renderMapMarkers();
+        this.renderSidebarList(); this.renderMapMarkers();
       }
 
       getFilteredStores() {
         return this.currentStores.filter(store => {
           const log = this.storeLogs[store.id];
-          if (this.currentFilter === "all") return true;
-          if (this.currentFilter === "pending") return !log || (log.status !== "completed" && log.status !== "unresolved");
-          if (this.currentFilter === "completed") return log && log.status === "completed";
-          if (store.chain && store.chain.toLowerCase().includes(this.currentFilter.toLowerCase())) return true;
-          return store.name.toLowerCase().includes(this.currentFilter.toLowerCase());
+          let passFilter = false;
+          if (this.currentFilter === "all") passFilter = true;
+          else if (this.currentFilter === "pending") passFilter = !log || (log.status !== "completed" && log.status !== "unresolved");
+          else if (this.currentFilter === "completed") passFilter = log && log.status === "completed";
+          else if (store.chain && store.chain.toLowerCase().includes(this.currentFilter.toLowerCase())) passFilter = true;
+          else passFilter = store.name.toLowerCase().includes(this.currentFilter.toLowerCase());
+
+          let passSearch = true;
+          if (this.searchQuery) {
+            passSearch = store.name.toLowerCase().includes(this.searchQuery) || store.address.toLowerCase().includes(this.searchQuery);
+          }
+          return passFilter && passSearch;
         });
       }
 
       renderSidebarList() {
         const container = document.getElementById("storeListContainer");
-        if (!container) return;
-        container.innerHTML = "";
-
+        if (!container) return; container.innerHTML = "";
         const storesList = this.getFilteredStores();
+        
         if (storesList.length === 0) {
-          container.innerHTML = `<div style="text-align:center; padding:30px 14px; color:var(--text-muted); font-size:12px;">Activează "Toate Magazinele" și trage cu Ctrl pe PC pt a uni rute.</div>`;
+          container.innerHTML = `<div style="text-align:center; padding:30px 14px; color:var(--text-muted); font-size:12px;">Nu s-au găsit magazine.</div>`;
         }
 
         storesList.forEach((store) => {
           const originalIndex = this.currentStores.findIndex(s => s.id === store.id);
-          const log = this.storeLogs[store.id];
-          const isResolved = log && log.status === "completed";
-          const isUnresolved = log && log.status === "unresolved";
+          const log = this.storeLogs[store.id]; const isResolved = log && log.status === "completed"; const isUnresolved = log && log.status === "unresolved";
 
           const card = document.createElement("div");
           card.className = `store-card ${isResolved ? 'completed' : ''} ${isUnresolved ? 'unresolved' : ''} ${this.activeStoreId === store.id ? 'active' : ''}`;
           card.dataset.id = store.id;
+          
+          // DRAG AND DROP NATIV pentru Listă
+          card.draggable = true;
+          card.addEventListener('dragstart', (e) => this.handleCardDragStart(e, store.id));
+          card.addEventListener('dragover', (e) => this.handleCardDragOver(e, card));
+          card.addEventListener('dragleave', (e) => this.handleCardDragLeave(e, card));
+          card.addEventListener('drop', (e) => this.handleCardDrop(e, store.id, card));
 
           let statusBadge = `<span class="badge badge-gray">Neînceput</span>`;
-          if (isResolved) statusBadge = `<span class="badge badge-success">✓ ${log.time}</span>`;
-          if (isUnresolved) statusBadge = `<span class="badge badge-danger">✕ Problemă</span>`;
+          if (isResolved) statusBadge = `<span class="badge badge-success">✓ ${log.time}</span>`; if (isUnresolved) statusBadge = `<span class="badge badge-danger">✕</span>`;
 
-          card.innerHTML = `
-            <div class="store-card-num">${originalIndex + 1}</div>
-            <div class="store-card-content">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="store-card-title">${store.name}</div>
-                ${statusBadge}
-              </div>
-              <div class="store-card-address">${store.address}</div>
-            </div>
-          `;
+          card.innerHTML = `<div class="store-card-num" title="Trage pentru a reordona">↕</div><div class="store-card-content"><div style="display:flex; justify-content:space-between; align-items:center;"><div class="store-card-title">${originalIndex + 1}. ${store.name}</div>${statusBadge}</div><div class="store-card-address">${store.address}</div></div>`;
           card.onclick = () => this.setActiveStore(store.id, false);
           card.oncontextmenu = (e) => { e.preventDefault(); this.openAssignModal(store); };
           container.appendChild(card);
         });
 
-        const totalResolved = this.currentStores.filter(s => this.storeLogs[s.id] && this.storeLogs[s.id].status === "completed").length;
-        document.getElementById("sidebarProgressBadge").textContent = `${totalResolved}/${this.currentStores.length} Vizitate`;
+        document.getElementById("sidebarProgressBadge").textContent = `${this.currentStores.filter(s => this.storeLogs[s.id] && this.storeLogs[s.id].status === "completed").length}/${this.currentStores.length} Vizitate`;
+      }
+
+      /* LIST DRAG & DROP LOGIC */
+      handleCardDragStart(e, storeId) { e.dataTransfer.setData('text/plain', storeId); e.target.classList.add('dragging'); }
+      handleCardDragOver(e, card) { e.preventDefault(); card.classList.add('drag-over'); }
+      handleCardDragLeave(e, card) { card.classList.remove('drag-over'); }
+      handleCardDrop(e, targetStoreId, card) {
+        e.preventDefault(); card.classList.remove('drag-over'); document.querySelectorAll('.store-card.dragging').forEach(c => c.classList.remove('dragging'));
+        const draggedStoreId = e.dataTransfer.getData('text/plain');
+        if (draggedStoreId === targetStoreId) return;
+        
+        let stores = [...this.currentStores];
+        const fromIdx = stores.findIndex(s => s.id === draggedStoreId);
+        const toIdx = stores.findIndex(s => s.id === targetStoreId);
+        
+        if (fromIdx !== -1 && toIdx !== -1) {
+            const [movedStore] = stores.splice(fromIdx, 1);
+            stores.splice(toIdx, 0, movedStore);
+            this.currentStores = stores;
+            this.saveAll(); this.renderSidebarList(); this.renderMapMarkers(); this.drawRoutePolyline();
+        }
       }
 
       setActiveStore(id, openSheet = false) {
-        this.activeStoreId = id;
-        const store = this.masterStores.find(s => s.id === id);
-        if (!store) return;
-        const index = this.currentStores.findIndex(s => s.id === id);
-        const log = this.storeLogs[id] || { status: "pending" };
+        this.activeStoreId = id; const store = this.masterStores.find(s => s.id === id); if (!store) return;
+        const index = this.currentStores.findIndex(s => s.id === id); const log = this.storeLogs[id] || { status: "pending" };
 
-        this.renderMapMarkers();
-        this.map.panTo([store.lat, store.lng], { animate: true, duration: 0.4 });
-
-        document.getElementById("mqcOrder").textContent = (index >= 0) ? `OPRIREA ${index + 1} DIN ${this.currentStores.length}` : `MAGAZIN EXTERN`;
-        document.getElementById("mqcName").textContent = store.name;
-        document.getElementById("mqcAddress").textContent = store.address;
+        this.renderMapMarkers(); this.map.panTo([store.lat, store.lng], { animate: true, duration: 0.4 });
+        document.getElementById("mqcOrder").textContent = (index >= 0) ? `OPRIREA ${index + 1}` : `MAGAZIN EXTERN`;
+        document.getElementById("mqcName").textContent = store.name; document.getElementById("mqcAddress").textContent = store.address;
         
-        const mqcStatusBadge = document.getElementById("mqcStatusBadge");
-        const quickCard = document.getElementById("mobileQuickCard");
+        const mqcStatusBadge = document.getElementById("mqcStatusBadge"); const quickCard = document.getElementById("mobileQuickCard");
         quickCard.classList.remove("completed", "unresolved");
+        if (log.status === "completed") { mqcStatusBadge.className = "badge badge-success"; mqcStatusBadge.textContent = "Rezolvat"; quickCard.classList.add("completed"); }
+        else if (log.status === "unresolved") { mqcStatusBadge.className = "badge badge-danger"; mqcStatusBadge.textContent = "Nerezolvat"; quickCard.classList.add("unresolved"); }
+        else { mqcStatusBadge.className = "badge badge-gray"; mqcStatusBadge.textContent = "Neînceput"; }
 
-        if (log.status === "completed") { 
-            mqcStatusBadge.className = "badge badge-success"; 
-            mqcStatusBadge.textContent = "Rezolvat"; 
-            quickCard.classList.add("completed"); 
-        }
-        else if (log.status === "unresolved") { 
-            mqcStatusBadge.className = "badge badge-danger"; 
-            mqcStatusBadge.textContent = "Nerezolvat"; 
-            quickCard.classList.add("unresolved"); 
-        }
-        else { 
-            mqcStatusBadge.className = "badge badge-gray"; 
-            mqcStatusBadge.textContent = "Neînceput"; 
-        }
-
-        quickCard.style.display = "block";
-        document.querySelectorAll('.store-card').forEach(card => card.classList.toggle('active', card.dataset.id === id));
-        document.getElementById("fabStoreSelect").value = id;
-        this.renderFabProductsForm();
-
+        quickCard.style.display = "block"; document.querySelectorAll('.store-card').forEach(card => card.classList.toggle('active', card.dataset.id === id));
+        document.getElementById("fabStoreSelect").value = id; this.renderFabProductsForm();
         if (openSheet) this.openStoreModal(store, index >= 0 ? index : 0, log);
       }
 
       closeQuickCard() { document.getElementById("mobileQuickCard").style.display = "none"; }
 
-      openActiveStoreModal() {
-        if (!this.activeStoreId) return;
-        const store = this.masterStores.find(s => s.id === this.activeStoreId);
-        const idx = this.currentStores.findIndex(s => s.id === this.activeStoreId);
-        this.openStoreModal(store, idx >= 0 ? idx : 0, this.storeLogs[this.activeStoreId] || { status: "pending" });
-      }
+      openActiveStoreModal() { if (!this.activeStoreId) return; const store = this.masterStores.find(s => s.id === this.activeStoreId); const idx = this.currentStores.findIndex(s => s.id === this.activeStoreId); this.openStoreModal(store, idx >= 0 ? idx : 0, this.storeLogs[this.activeStoreId] || { status: "pending" }); }
 
       openStoreModal(store, index, log) {
-        document.getElementById("modalOrderBadge").textContent = `Oprirea ${index + 1}`;
-        document.getElementById("modalStoreTitle").textContent = store.name;
-        document.getElementById("modalStoreAddress").textContent = store.address;
-        
-        const badge = document.getElementById("modalStatusBadge");
-        const actionSheet = document.querySelector(".action-sheet");
-        actionSheet.classList.remove("completed", "unresolved");
-
-        if (log.status === "completed") { 
-            badge.className = "badge badge-success"; 
-            badge.textContent = `Rezolvat la ${log.time}`; 
-            actionSheet.classList.add("completed");
-        }
-        else if (log.status === "unresolved") { 
-            badge.className = "badge badge-danger"; 
-            badge.textContent = `Nerezolvat`; 
-            actionSheet.classList.add("unresolved");
-        }
-        else { 
-            badge.className = "badge badge-gray"; 
-            badge.textContent = "Neînceput"; 
-        }
-
-        document.getElementById("storeModalOverlay").classList.add("active");
+        document.getElementById("modalOrderBadge").textContent = `Oprirea ${index + 1}`; document.getElementById("modalStoreTitle").textContent = store.name; document.getElementById("modalStoreAddress").textContent = store.address;
+        const badge = document.getElementById("modalStatusBadge"); const actionSheet = document.querySelector(".action-sheet"); actionSheet.classList.remove("completed", "unresolved");
+        if (log.status === "completed") { badge.className = "badge badge-success"; badge.textContent = `Rezolvat la ${log.time}`; actionSheet.classList.add("completed"); }
+        else if (log.status === "unresolved") { badge.className = "badge badge-danger"; badge.textContent = `Nerezolvat`; actionSheet.classList.add("unresolved"); }
+        else { badge.className = "badge badge-gray"; badge.textContent = "Neînceput"; }
+        document.getElementById("storeModalOverlay").classList.add("active"); document.body.classList.add("modal-open");
       }
-      closeStoreModal() { document.getElementById("storeModalOverlay").classList.remove("active"); }
+      closeStoreModal() { document.getElementById("storeModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); }
 
       togglePinLock() {
-        this.isPinsLocked = !this.isPinsLocked;
-        localStorage.setItem("merch_pins_locked", this.isPinsLocked);
-        this.updatePinLockUI();
-        Object.values(this.markers).forEach(marker => {
-          if (marker.dragging) { if (this.isPinsLocked) marker.dragging.disable(); else marker.dragging.enable(); }
-        });
+        this.isPinsLocked = !this.isPinsLocked; localStorage.setItem("merch_pins_locked", this.isPinsLocked); this.updatePinLockUI();
+        Object.values(this.markers).forEach(marker => { if (marker.dragging) { if (this.isPinsLocked) marker.dragging.disable(); else marker.dragging.enable(); } });
       }
 
       updatePinLockUI() {
         const btnDesk = document.getElementById("headerLockBtnDesk");
-        if (this.isPinsLocked) {
-          if (btnDesk) { btnDesk.innerHTML = "🔒"; btnDesk.classList.remove("unlocked-btn"); }
-          document.getElementById("dockLockIcon").textContent = "🔒";
-          document.getElementById("dockLockText").textContent = "Pini Blocați";
-          document.getElementById("dockLockBtnMob").classList.remove("unlocked-pill");
-        } else {
-          if (btnDesk) { btnDesk.innerHTML = "🔓"; btnDesk.classList.add("unlocked-btn"); }
-          document.getElementById("dockLockIcon").textContent = "🔓";
-          document.getElementById("dockLockText").textContent = "Pini Deblocați";
-          document.getElementById("dockLockBtnMob").classList.add("unlocked-pill");
-        }
+        if (this.isPinsLocked) { if (btnDesk) { btnDesk.innerHTML = "🔒"; btnDesk.classList.remove("unlocked-btn"); } document.getElementById("dockLockIcon").textContent = "🔒"; document.getElementById("dockLockText").textContent = "Pini Blocați"; document.getElementById("dockLockBtnMob").classList.remove("unlocked-pill"); } 
+        else { if (btnDesk) { btnDesk.innerHTML = "🔓"; btnDesk.classList.add("unlocked-btn"); } document.getElementById("dockLockIcon").textContent = "🔓"; document.getElementById("dockLockText").textContent = "Pini Deblocați"; document.getElementById("dockLockBtnMob").classList.add("unlocked-pill"); }
       }
 
-      toggleTheme() {
-        this.theme = this.theme === "light" ? "dark" : "light";
-        localStorage.setItem("merch_theme", this.theme);
-        this.applyTheme(this.theme);
-      }
-      applyTheme(t) {
-        document.documentElement.setAttribute("data-theme", t);
-        document.getElementById("themeToggleBtnDesk").innerHTML = t === "dark" ? "☀️" : "🌙";
-        document.getElementById("dockThemeIcon").textContent = t === "dark" ? "☀️" : "🌙";
-      }
+      toggleTheme() { this.theme = this.theme === "light" ? "dark" : "light"; localStorage.setItem("merch_theme", this.theme); this.applyTheme(this.theme); }
+      applyTheme(t) { document.documentElement.setAttribute("data-theme", t); document.getElementById("themeToggleBtnDesk").innerHTML = t === "dark" ? "☀️" : "🌙"; document.getElementById("dockThemeIcon").textContent = t === "dark" ? "☀️" : "🌙"; }
 
       switchTab(tab) {
         const isMap = tab === "map";
-        document.getElementById("tabMapBtnDesk").classList.toggle("active", isMap);
-        document.getElementById("tabReportBtnDesk").classList.toggle("active", !isMap);
-        document.getElementById("tabMapBtnMob").classList.toggle("active", isMap);
-        document.getElementById("tabReportBtnMob").classList.toggle("active", !isMap);
-        document.getElementById("mapView").classList.toggle("active", isMap);
-        document.getElementById("reportView").classList.toggle("active", !isMap);
+        document.getElementById("tabMapBtnDesk").classList.toggle("active", isMap); document.getElementById("tabReportBtnDesk").classList.toggle("active", !isMap);
+        document.getElementById("tabMapBtnMob").classList.toggle("active", isMap); document.getElementById("tabReportBtnMob").classList.toggle("active", !isMap);
+        document.getElementById("mapView").classList.toggle("active", isMap); document.getElementById("reportView").classList.toggle("active", !isMap);
         if (isMap && this.map) setTimeout(() => this.map.invalidateSize(), 200); else this.renderReport();
       }
 
       toggleGpsTracking() {
-        if (this.userGpsWatchId) {
-          navigator.geolocation.clearWatch(this.userGpsWatchId);
-          this.userGpsWatchId = null;
-          if (this.userGpsMarker) this.map.removeLayer(this.userGpsMarker);
-          if (this.userGpsCircle) this.map.removeLayer(this.userGpsCircle);
-          this.userGpsMarker = null; this.userGpsCircle = null;
-          return;
-        }
+        if (this.userGpsWatchId) { navigator.geolocation.clearWatch(this.userGpsWatchId); this.userGpsWatchId = null; if (this.userGpsMarker) this.map.removeLayer(this.userGpsMarker); if (this.userGpsCircle) this.map.removeLayer(this.userGpsCircle); this.userGpsMarker = null; this.userGpsCircle = null; return; }
         if (!navigator.geolocation) return alert("Dispozitivul nu suportă GPS.");
         this.userGpsWatchId = navigator.geolocation.watchPosition(
           (pos) => {
-            const { latitude, longitude, accuracy } = pos.coords;
-            this.userCoords = { lat: latitude, lng: longitude };
-            if (!this.userGpsMarker) {
-              const dotIcon = L.divIcon({ className: 'custom-gps-icon', html: '<div class="user-gps-dot"></div>', iconSize: [20, 20], iconAnchor: [10, 10] });
-              this.userGpsMarker = L.marker([latitude, longitude], { icon: dotIcon, zIndexOffset: 2000 }).addTo(this.map);
-              this.userGpsCircle = L.circle([latitude, longitude], { radius: accuracy, color: '#2563eb', weight: 1, fillOpacity: 0.15 }).addTo(this.map);
-              this.map.panTo([latitude, longitude]);
-            } else {
-              this.userGpsMarker.setLatLng([latitude, longitude]);
-              this.userGpsCircle.setLatLng([latitude, longitude]);
-              this.userGpsCircle.setRadius(accuracy);
-            }
+            const { latitude, longitude, accuracy } = pos.coords; this.userCoords = { lat: latitude, lng: longitude };
+            if (!this.userGpsMarker) { const dotIcon = L.divIcon({ className: 'custom-gps-icon', html: '<div class="user-gps-dot"></div>', iconSize: [20, 20], iconAnchor: [10, 10] }); this.userGpsMarker = L.marker([latitude, longitude], { icon: dotIcon, zIndexOffset: 2000 }).addTo(this.map); this.userGpsCircle = L.circle([latitude, longitude], { radius: accuracy, color: '#2563eb', weight: 1, fillOpacity: 0.15 }).addTo(this.map); this.map.panTo([latitude, longitude]); } 
+            else { this.userGpsMarker.setLatLng([latitude, longitude]); this.userGpsCircle.setLatLng([latitude, longitude]); this.userGpsCircle.setRadius(accuracy); }
           },
-          (err) => alert("Permite accesul la locație în browser."),
-          { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+          (err) => alert("Permite accesul la locație în browser."), { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
         );
       }
 
       findNearestStoreToGps() {
-        if (!this.userCoords) {
-          if (navigator.geolocation) navigator.geolocation.getCurrentPosition(
-            (pos) => { this.userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; this.locateClosestUnvisitedStore(); },
-            () => alert("Activează mai întâi GPS-ul!")
-          );
-          return;
-        }
+        if (!this.userCoords) { if (navigator.geolocation) navigator.geolocation.getCurrentPosition( (pos) => { this.userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; this.locateClosestUnvisitedStore(); }, () => alert("Activează mai întâi GPS-ul!") ); return; }
         this.locateClosestUnvisitedStore();
       }
       locateClosestUnvisitedStore() {
         const unvisited = this.currentStores.filter(s => !this.storeLogs[s.id] || (this.storeLogs[s.id].status !== "completed" && this.storeLogs[s.id].status !== "unresolved"));
         if (unvisited.length === 0) return alert("🎉 Toate magazinele au fost vizitate!");
-        const haversineDist = (p1, p2) => {
-          const a = Math.sin((p2.lat - p1.lat)*Math.PI/360)**2 + Math.cos(p1.lat*Math.PI/180) * Math.cos(p2.lat*Math.PI/180) * Math.sin((p2.lng - p1.lng)*Math.PI/360)**2;
-          return 2 * 6371 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        };
-        let closest = null, minDist = Infinity;
-        unvisited.forEach(s => { const d = haversineDist(this.userCoords, s); if (d < minDist) { minDist = d; closest = s; } });
+        const haversineDist = (p1, p2) => { const a = Math.sin((p2.lat - p1.lat)*Math.PI/360)**2 + Math.cos(p1.lat*Math.PI/180) * Math.cos(p2.lat*Math.PI/180) * Math.sin((p2.lng - p1.lng)*Math.PI/360)**2; return 2 * 6371 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); };
+        let closest = null, minDist = Infinity; unvisited.forEach(s => { const d = haversineDist(this.userCoords, s); if (d < minDist) { minDist = d; closest = s; } });
         if (closest) { this.setActiveStore(closest.id, false); alert(`🎯 Magazin:\n${closest.name} (~${minDist.toFixed(2)} km)`); }
       }
 
@@ -1672,164 +1304,74 @@
       openActiveInGoogleMaps() { const s = this.masterStores.find(x => x.id === this.activeStoreId); if (s) this.launchNavigation(`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`, `comgooglemaps://?daddr=${s.lat},${s.lng}&directionsmode=driving`); }
       openActiveInAppleMaps() { const s = this.masterStores.find(x => x.id === this.activeStoreId); if (s) this.launchNavigation(`https://maps.apple.com/?daddr=${s.lat},${s.lng}`, `maps://?daddr=${s.lat},${s.lng}&dirflg=d`); }
 
-      goToNextStore() {
-        const idx = this.currentStores.findIndex(s => s.id === this.activeStoreId);
-        if (idx < this.currentStores.length - 1) this.setActiveStore(this.currentStores[idx + 1].id, false);
-      }
+      goToNextStore() { const idx = this.currentStores.findIndex(s => s.id === this.activeStoreId); if (idx < this.currentStores.length - 1) this.setActiveStore(this.currentStores[idx + 1].id, false); }
 
+      /* SMART GUARD - Validare înainte de Rezolvat */
       markActiveAsResolved() {
         if (!this.activeStoreId) return;
+        const data = this.storeProductsData[this.activeStoreId];
+        let hasAuditData = false;
+        if (data && data.items) {
+            hasAuditData = data.items.some(item => item.photoUrl || item.name || item.price);
+        }
+
+        if (!hasAuditData) {
+            if (!confirm("⚠️ Atenție!\nNu ai încărcat nicio poză și niciun produs la acest magazin.\nEști sigur că vrei să îl marchezi ca REZOLVAT?")) {
+                this.openFabForStore(this.activeStoreId); // Deschide forțat formularul foto
+                return;
+            }
+        }
+
         this.storeLogs[this.activeStoreId] = { status: "completed", time: new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }), timestamp: Date.now() };
-        this.saveAll();
-        
-        this.renderMapMarkers(); 
-        this.renderSidebarList(); 
-        this.setActiveStore(this.activeStoreId, false);
+        this.saveAll(); this.renderMapMarkers(); this.renderSidebarList(); this.setActiveStore(this.activeStoreId, false);
       }
 
-      promptUnresolved() {
-        if (!this.activeStoreId) return;
-        document.getElementById("reasonModalOverlay").classList.add("active");
-      }
-
+      promptUnresolved() { if (!this.activeStoreId) return; document.getElementById("reasonModalOverlay").classList.add("active"); document.body.classList.add("modal-open"); }
       confirmUnresolved(reason) {
         if (!this.activeStoreId) return;
         this.storeLogs[this.activeStoreId] = { status: "unresolved", reason: reason, time: new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }), timestamp: Date.now() };
-        this.saveAll();
-        document.getElementById("reasonModalOverlay").classList.remove("active");
-        this.renderMapMarkers(); this.renderSidebarList(); this.setActiveStore(this.activeStoreId, false);
+        this.saveAll(); document.getElementById("reasonModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); this.renderMapMarkers(); this.renderSidebarList(); this.setActiveStore(this.activeStoreId, false);
       }
-
-      reorderRoute(strategy) {
-        if (strategy === "retur") this.currentStores = [...this.currentStores].reverse().map((s, idx) => ({ ...s, order: idx + 1 }));
-        this.saveAll();
-        this.renderSidebarList(); this.renderMapMarkers(); this.drawRoutePolyline();
-      }
+      reorderRoute(strategy) { if (strategy === "retur") this.currentStores = [...this.currentStores].reverse().map((s, idx) => ({ ...s, order: idx + 1 })); this.saveAll(); this.renderSidebarList(); this.renderMapMarkers(); this.drawRoutePolyline(); }
 
       /* FAB / POZE */
       setupDraggableFab() {
-        const fab = document.getElementById("floatingFab");
-        if (!fab) return;
+        const fab = document.getElementById("floatingFab"); if (!fab) return;
         let isDragging = false, startX = 0, startY = 0, initialLeft = 0, initialTop = 0, dragDistance = 0;
-
-        const onStart = (e) => {
-          isDragging = true; dragDistance = 0;
-          startX = e.touches ? e.touches[0].clientX : e.clientX; startY = e.touches ? e.touches[0].clientY : e.clientY;
-          const rect = fab.getBoundingClientRect(); initialLeft = rect.left; initialTop = rect.top;
-          fab.style.transition = "none";
-          document.addEventListener(e.touches ? 'touchmove' : 'mousemove', onMove, { passive: false });
-          document.addEventListener(e.touches ? 'touchend' : 'mouseup', onEnd);
-        };
-        const onMove = (e) => {
-          if (!isDragging) return; e.preventDefault();
-          const dx = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
-          const dy = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
-          dragDistance = Math.hypot(dx, dy);
-          let newLeft = Math.max(10, Math.min(initialLeft + dx, window.innerWidth - fab.offsetWidth - 10));
-          let newTop = Math.max(90, Math.min(initialTop + dy, window.innerHeight - fab.offsetHeight - 85));
-          fab.style.left = `${newLeft}px`; fab.style.top = `${newTop}px`; fab.style.bottom = "auto"; fab.style.right = "auto";
-        };
-        const onEnd = () => {
-          if (!isDragging) return; isDragging = false;
-          fab.style.transition = "transform 0.15s ease-out, box-shadow 0.15s";
-          document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onEnd);
-          document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onEnd);
-          if (dragDistance < 8) this.toggleFabWindow();
-        };
+        const onStart = (e) => { isDragging = true; dragDistance = 0; startX = e.touches ? e.touches[0].clientX : e.clientX; startY = e.touches ? e.touches[0].clientY : e.clientY; const rect = fab.getBoundingClientRect(); initialLeft = rect.left; initialTop = rect.top; fab.style.transition = "none"; document.addEventListener(e.touches ? 'touchmove' : 'mousemove', onMove, { passive: false }); document.addEventListener(e.touches ? 'touchend' : 'mouseup', onEnd); };
+        const onMove = (e) => { if (!isDragging) return; e.preventDefault(); const dx = (e.touches ? e.touches[0].clientX : e.clientX) - startX; const dy = (e.touches ? e.touches[0].clientY : e.clientY) - startY; dragDistance = Math.hypot(dx, dy); let newLeft = Math.max(10, Math.min(initialLeft + dx, window.innerWidth - fab.offsetWidth - 10)); let newTop = Math.max(90, Math.min(initialTop + dy, window.innerHeight - fab.offsetHeight - 85)); fab.style.left = `${newLeft}px`; fab.style.top = `${newTop}px`; fab.style.bottom = "auto"; fab.style.right = "auto"; };
+        const onEnd = () => { if (!isDragging) return; isDragging = false; fab.style.transition = "transform 0.15s ease-out, box-shadow 0.15s"; document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onEnd); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onEnd); if (dragDistance < 8) this.toggleFabWindow(); };
         fab.addEventListener('touchstart', onStart, { passive: false }); fab.addEventListener('mousedown', onStart);
       }
 
-      toggleFabWindow() {
-        const win = document.getElementById("fabWindow"); win.classList.toggle("active");
-        if (win.classList.contains("active")) {
-          this.populateFabDropdown();
-          if (this.activeStoreId) document.getElementById("fabStoreSelect").value = this.activeStoreId;
-          this.renderFabProductsForm();
-        }
-      }
-      closeFabWindow() { document.getElementById("fabWindow").classList.remove("active"); }
+      toggleFabWindow() { const win = document.getElementById("fabWindow"); win.classList.toggle("active"); if (win.classList.contains("active")) { this.populateFabDropdown(); if (this.activeStoreId) document.getElementById("fabStoreSelect").value = this.activeStoreId; this.renderFabProductsForm(); document.body.classList.add("modal-open"); } else document.body.classList.remove("modal-open"); }
+      closeFabWindow() { document.getElementById("fabWindow").classList.remove("active"); document.body.classList.remove("modal-open"); }
 
-      openFabForStore(storeId) {
-        this.activeStoreId = storeId;
-        document.getElementById("fabWindow").classList.add("active");
-        this.populateFabDropdown();
-        document.getElementById("fabStoreSelect").value = storeId;
-        this.renderFabProductsForm();
-      }
-
-      populateFabDropdown() {
-        const select = document.getElementById("fabStoreSelect");
-        select.innerHTML = "";
-        this.currentStores.forEach((s, idx) => {
-          const opt = document.createElement("option"); opt.value = s.id; opt.textContent = `${idx + 1}. ${s.name}`; select.appendChild(opt);
-        });
-      }
-
-      onFabStoreChange() {
-        this.setActiveStore(document.getElementById("fabStoreSelect").value, false);
-        this.renderFabProductsForm();
-      }
-
-      getOrCreateStoreData(storeId) {
-        if (!this.storeProductsData[storeId]) this.storeProductsData[storeId] = { sectionName: "Raft Principal", items: [{ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" }] };
-        return this.storeProductsData[storeId];
-      }
-
-      onSectionNameChange() {
-        this.getOrCreateStoreData(document.getElementById("fabStoreSelect").value || this.activeStoreId).sectionName = document.getElementById("fabSectionName").value;
-        this.saveAll();
-      }
+      openFabForStore(storeId) { this.activeStoreId = storeId; document.getElementById("fabWindow").classList.add("active"); document.body.classList.add("modal-open"); this.populateFabDropdown(); document.getElementById("fabStoreSelect").value = storeId; this.renderFabProductsForm(); }
+      populateFabDropdown() { const select = document.getElementById("fabStoreSelect"); select.innerHTML = ""; this.currentStores.forEach((s, idx) => { const opt = document.createElement("option"); opt.value = s.id; opt.textContent = `${idx + 1}. ${s.name}`; select.appendChild(opt); }); }
+      onFabStoreChange() { this.setActiveStore(document.getElementById("fabStoreSelect").value, false); this.renderFabProductsForm(); }
+      getOrCreateStoreData(storeId) { if (!this.storeProductsData[storeId]) this.storeProductsData[storeId] = { sectionName: "Raft Principal", items: [{ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" }] }; return this.storeProductsData[storeId]; }
+      onSectionNameChange() { this.getOrCreateStoreData(document.getElementById("fabStoreSelect").value || this.activeStoreId).sectionName = document.getElementById("fabSectionName").value; this.saveAll(); }
 
       renderFabProductsForm() {
-        const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId;
-        if (!storeId) return;
-        const data = this.getOrCreateStoreData(storeId);
-        document.getElementById("fabSectionName").value = data.sectionName || "";
-        
-        const listContainer = document.getElementById("fabProductsList");
-        listContainer.innerHTML = "";
+        const storeId = document.getElementById("fabStoreSelect").value || this.activeStoreId; if (!storeId) return;
+        const data = this.getOrCreateStoreData(storeId); document.getElementById("fabSectionName").value = data.sectionName || "";
+        const listContainer = document.getElementById("fabProductsList"); listContainer.innerHTML = "";
         data.items.forEach((item, idx) => {
           const row = document.createElement("div"); row.className = "product-row-item";
           const photoHtml = item.photoUrl ? `<img src="${item.photoUrl}" onclick="event.stopPropagation(); app.zoomPhoto('${item.photoUrl}')" />` : `<span class="thumb-placeholder">📷</span>`;
-          row.innerHTML = `
-            <div class="product-index-badge">${idx + 1}</div>
-            <div class="product-thumb-container" onclick="app.triggerProductPhotoUpload('${storeId}', '${item.id}')">${photoHtml}</div>
-            <div class="product-fields-col">
-              <input type="text" class="product-input-name" placeholder="Denumire Produs" value="${item.name}" oninput="app.updateProductField('${storeId}', '${item.id}', 'name', this.value)" />
-              <div style="display:flex; align-items:center; gap:4px;"><input type="number" step="0.01" class="product-input-price" placeholder="Preț" value="${item.price}" oninput="app.updateProductField('${storeId}', '${item.id}', 'price', this.value)" /><span>RON</span></div>
-            </div>
-            <div class="product-actions-col">
-              <button class="action-icon-btn delete-btn" onclick="app.deleteProductRow('${storeId}', '${item.id}')">🗑️</button>
-            </div>
-          `;
+          row.innerHTML = `<div class="product-index-badge">${idx + 1}</div><div class="product-thumb-container" onclick="app.triggerProductPhotoUpload('${storeId}', '${item.id}')">${photoHtml}</div><div class="product-fields-col"><input type="text" class="product-input-name" placeholder="Denumire Produs" value="${item.name}" oninput="app.updateProductField('${storeId}', '${item.id}', 'name', this.value)" /><div style="display:flex; align-items:center; gap:4px;"><input type="number" step="0.01" class="product-input-price" placeholder="Preț" value="${item.price}" oninput="app.updateProductField('${storeId}', '${item.id}', 'price', this.value)" /><span>RON</span></div></div><div class="product-actions-col"><button class="action-icon-btn delete-btn" onclick="app.deleteProductRow('${storeId}', '${item.id}')">🗑️</button></div>`;
           listContainer.appendChild(row);
         });
-        document.getElementById("fabProductCountLabel").textContent = `${data.items.length} produse`;
-        this.updateTotalPhotosBadge();
+        document.getElementById("fabProductCountLabel").textContent = `${data.items.length} produse`; this.updateTotalPhotosBadge();
       }
 
-      addNewProductRow() {
-        this.getOrCreateStoreData(document.getElementById("fabStoreSelect").value || this.activeStoreId).items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" });
-        this.saveAll(); this.renderFabProductsForm();
-      }
+      addNewProductRow() { this.getOrCreateStoreData(document.getElementById("fabStoreSelect").value || this.activeStoreId).items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" }); this.saveAll(); this.renderFabProductsForm(); }
+      updateProductField(storeId, itemId, field, value) { const item = this.getOrCreateStoreData(storeId).items.find(it => it.id === itemId); if (item) { item[field] = value; this.saveAll(); } }
+      deleteProductRow(storeId, itemId) { const data = this.getOrCreateStoreData(storeId); data.items = data.items.filter(it => it.id !== itemId); if (data.items.length === 0) data.items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" }); this.saveAll(); this.renderFabProductsForm(); }
+      triggerProductPhotoUpload(storeId, productId) { this.activePhotoUploadTarget = { storeId, productId }; document.getElementById("fabProductPhotoInput").click(); }
 
-      updateProductField(storeId, itemId, field, value) {
-        const item = this.getOrCreateStoreData(storeId).items.find(it => it.id === itemId);
-        if (item) { item[field] = value; this.saveAll(); }
-      }
-
-      deleteProductRow(storeId, itemId) {
-        const data = this.getOrCreateStoreData(storeId);
-        data.items = data.items.filter(it => it.id !== itemId);
-        if (data.items.length === 0) data.items.push({ id: "p_" + Date.now(), name: "", price: "", photoUrl: "" });
-        this.saveAll(); this.renderFabProductsForm();
-      }
-
-      triggerProductPhotoUpload(storeId, productId) {
-        this.activePhotoUploadTarget = { storeId, productId };
-        document.getElementById("fabProductPhotoInput").click();
-      }
-
+      /* COMPRESIE FOTO CU LOADER OVERLAY */
       compressImageFile(file, maxWidth = 400, quality = 0.5) { 
         return new Promise((resolve) => {
           const reader = new FileReader();
@@ -1838,12 +1380,8 @@
             img.onload = () => {
               const canvas = document.createElement("canvas");
               let width = img.width, height = img.height;
-              if (width > maxWidth || height > maxWidth) {
-                if (width > height) { height = Math.round((height * maxWidth) / width); width = maxWidth; } 
-                else { width = Math.round((width * maxWidth) / height); height = maxWidth; }
-              }
-              canvas.width = width; canvas.height = height;
-              canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+              if (width > maxWidth || height > maxWidth) { if (width > height) { height = Math.round((height * maxWidth) / width); width = maxWidth; } else { width = Math.round((width * maxWidth) / height); height = maxWidth; } }
+              canvas.width = width; canvas.height = height; canvas.getContext("2d").drawImage(img, 0, 0, width, height);
               resolve(canvas.toDataURL("image/jpeg", quality));
             };
             img.src = e.target.result;
@@ -1853,117 +1391,45 @@
       }
 
       async handleProductPhotoSelected(event) {
-        const file = event.target.files[0];
-        if (!file || !this.activePhotoUploadTarget) return;
-        const { storeId, productId } = this.activePhotoUploadTarget;
-        const compressedBase64 = await this.compressImageFile(file);
-        const item = this.getOrCreateStoreData(storeId).items.find(it => it.id === productId);
-        if (item) { item.photoUrl = compressedBase64; this.saveAll(); this.renderFabProductsForm(); }
-        event.target.value = "";
+        const file = event.target.files[0]; if (!file || !this.activePhotoUploadTarget) return;
+        
+        document.getElementById("globalLoader").style.display = "flex"; // Arată spinnerul
+        
+        // Timeout mic pentru a lăsa UI-ul să randeze spinnerul înainte de a bloca threadul cu compresia
+        setTimeout(async () => {
+            const { storeId, productId } = this.activePhotoUploadTarget;
+            const compressedBase64 = await this.compressImageFile(file);
+            const item = this.getOrCreateStoreData(storeId).items.find(it => it.id === productId);
+            if (item) { item.photoUrl = compressedBase64; this.saveAll(); this.renderFabProductsForm(); }
+            event.target.value = "";
+            document.getElementById("globalLoader").style.display = "none"; // Ascunde spinnerul
+        }, 50);
       }
 
-      updateTotalPhotosBadge() {
-        let count = 0;
-        Object.values(this.storeProductsData).forEach(data => { if (data && data.items) data.items.forEach(it => { if (it.photoUrl) count++; }); });
-        const badge = document.getElementById("fabPhotosBadge");
-        if (badge) { badge.style.display = count > 0 ? "flex" : "none"; badge.textContent = count; }
-      }
-
-      zoomPhoto(src) { document.getElementById("zoomImg").src = src; document.getElementById("photoZoomModal").classList.add("active"); }
+      updateTotalPhotosBadge() { let count = 0; Object.values(this.storeProductsData).forEach(data => { if (data && data.items) data.items.forEach(it => { if (it.photoUrl) count++; }); }); const badge = document.getElementById("fabPhotosBadge"); if (badge) { badge.style.display = count > 0 ? "flex" : "none"; badge.textContent = count; } }
+      zoomPhoto(src) { document.getElementById("zoomImg").src = src; document.getElementById("photoZoomModal").classList.add("active"); document.body.classList.add("modal-open"); }
 
       /* RAPOARTE */
       renderReport() {
-        const tbody = document.getElementById("reportBodyRows");
-        if (!tbody) return; tbody.innerHTML = "";
+        const tbody = document.getElementById("reportBodyRows"); if (!tbody) return; tbody.innerHTML = "";
         let resolved = 0, unresolved = 0, pending = 0;
-
         this.currentStores.forEach((store, idx) => {
-          const log = this.storeLogs[store.id];
-          const data = this.storeProductsData[store.id] || { sectionName: "-", items: [] };
-
+          const log = this.storeLogs[store.id]; const data = this.storeProductsData[store.id] || { sectionName: "-", items: [] };
           let statusText = `<span class="badge badge-gray">Neînceput</span>`, timeText = "-";
-          if (log) {
-            if (log.status === "completed") { resolved++; statusText = `<span class="badge badge-success">✓ Rezolvat</span>`; timeText = log.time || "-"; } 
-            else if (log.status === "unresolved") { unresolved++; statusText = `<span class="badge badge-danger">✕ Nerezolvat</span>`; timeText = log.time || "-"; }
-          } else pending++;
-
+          if (log) { if (log.status === "completed") { resolved++; statusText = `<span class="badge badge-success">✓ Rezolvat</span>`; timeText = log.time || "-"; } else if (log.status === "unresolved") { unresolved++; statusText = `<span class="badge badge-danger">✕ Nerezolvat</span>`; timeText = log.time || "-"; } } else pending++;
           const validItems = data.items.filter(it => it.name || it.price || it.photoUrl);
-          let productsHtml = validItems.length > 0 ? `<div style="display:flex; flex-direction:column; gap:6px;">` + validItems.map((it, i) => `
-            <div style="display:flex; align-items:center; gap:8px; background:var(--gray-50); padding:4px 8px; border-radius:6px;">
-              <span style="font-weight:800; color:var(--primary); font-size:11px;">#${i+1}</span>
-              ${it.photoUrl ? `<img src="${it.photoUrl}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="app.zoomPhoto('${it.photoUrl}')" />` : ''}
-              <div style="flex:1;"><strong>${it.name || 'Produs'}</strong>${it.price ? `<span style="color:var(--success); font-weight:700; margin-left:6px;">${it.price} RON</span>` : ''}</div>
-            </div>`).join("") + `</div>` : "-";
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td><strong>${idx + 1}</strong></td><td><strong>${store.name}</strong><br/><span style="font-size:11px; color:var(--text-muted);">${store.address}</span></td><td>${timeText}</td><td>${statusText}</td><td><strong>${data.sectionName || '-'}</strong></td><td>${productsHtml}</td>`;
-          tbody.appendChild(tr);
+          let productsHtml = validItems.length > 0 ? `<div style="display:flex; flex-direction:column; gap:6px;">` + validItems.map((it, i) => `<div style="display:flex; align-items:center; gap:8px; background:var(--gray-50); padding:4px 8px; border-radius:6px;"><span style="font-weight:800; color:var(--primary); font-size:11px;">#${i+1}</span>${it.photoUrl ? `<img src="${it.photoUrl}" style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="app.zoomPhoto('${it.photoUrl}')" />` : ''}<div style="flex:1;"><strong>${it.name || 'Produs'}</strong>${it.price ? `<span style="color:var(--success); font-weight:700; margin-left:6px;">${it.price} RON</span>` : ''}</div></div>`).join("") + `</div>` : "-";
+          const tr = document.createElement("tr"); tr.innerHTML = `<td><strong>${idx + 1}</strong></td><td><strong>${store.name}</strong><br/><span style="font-size:11px; color:var(--text-muted);">${store.address}</span></td><td>${timeText}</td><td>${statusText}</td><td><strong>${data.sectionName || '-'}</strong></td><td>${productsHtml}</td>`; tbody.appendChild(tr);
         });
-
-        document.getElementById("statTotalStores").textContent = this.currentStores.length;
-        document.getElementById("statResolvedStores").textContent = resolved;
-        document.getElementById("statUnresolvedStores").textContent = unresolved;
-        document.getElementById("statPendingStores").textContent = pending;
+        document.getElementById("statTotalStores").textContent = this.currentStores.length; document.getElementById("statResolvedStores").textContent = resolved; document.getElementById("statUnresolvedStores").textContent = unresolved; document.getElementById("statPendingStores").textContent = pending;
       }
-
-      copyWhatsAppReport() {
-        let text = `📊 *RAPORT MERCHANDISER*\n📅 Data: ${new Date().toLocaleDateString('ro-RO')}\n\n`;
-        let resolved = 0, unresolved = 0;
-        this.currentStores.forEach((store, idx) => {
-          const log = this.storeLogs[store.id];
-          if (log && log.status === "completed") { resolved++; text += `✅ *${idx + 1}. ${store.name}* (${log.time})\n`; } 
-          else if (log && log.status === "unresolved") { unresolved++; text += `❌ *${idx + 1}. ${store.name}* (${log.reason || 'Problemă'})\n`; } 
-          else { text += `⏳ *${idx + 1}. ${store.name}* - În așteptare\n`; }
-        });
-        text += `\n📈 *Sumar:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.currentStores.length - resolved - unresolved} Rămase`;
-        navigator.clipboard.writeText(text).then(() => alert(`✓ Raportul copiat în Clipboard!`));
-      }
-
-      exportCSV() {
-        let csv = "\uFEFFNr,Magazin,Adresa,Ora Vizita,Status,Sectiune,Produse\n";
-        this.currentStores.forEach((store, idx) => {
-          const log = this.storeLogs[store.id] || {};
-          const status = log.status === "completed" ? "Rezolvat" : (log.status === "unresolved" ? "Nerezolvat" : "Neinceput");
-          const data = this.storeProductsData[store.id] || { sectionName: "", items: [] };
-          const productsStr = data.items.filter(it => it.name || it.price).map((it, i) => `${i+1}. ${it.name} (${it.price} RON)`).join(" | ").replace(/"/g, '""');
-          csv += `"${idx + 1}","${store.name}","${store.address}","${log.time || ''}","${status}","${data.sectionName || ''}","${productsStr}"\n`;
-        });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
-        link.download = `Raport_${new Date().toISOString().slice(0,10)}.csv`; link.click();
-      }
-
-      openBackupModal() { document.getElementById("backupModalOverlay").classList.add("active"); }
-      closeBackupModal() { document.getElementById("backupModalOverlay").classList.remove("active"); }
-
-      exportFullBackup() {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(new Blob([JSON.stringify({ exportDate: new Date().toISOString(), categories: this.categories, masterStores: this.masterStores, logs: this.storeLogs, products: this.storeProductsData }, null, 2)], { type: "application/json" }));
-        link.download = `Backup_Merchandiser_${new Date().toISOString().slice(0,10)}.json`; link.click();
-      }
-
-      importBackupFile(event) {
-        if (!event.target.files[0]) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const data = JSON.parse(e.target.result);
-            if (data.categories) this.categories = data.categories;
-            if (data.masterStores) this.masterStores = data.masterStores;
-            if (data.logs) this.storeLogs = data.logs;
-            if (data.products) this.storeProductsData = data.products;
-            this.saveAll();
-            alert("✓ Datele au fost restaurate!"); location.reload();
-          } catch(err) { alert("Fișier JSON invalid."); }
-        };
-        reader.readAsText(event.target.files[0]);
-      }
-
-      resetDayProgress() {
-        if (confirm(`⚠️ Resetezi progresul (poze, prețuri, status) pentru această zi?`)) {
-          this.currentStores.forEach(s => { delete this.storeLogs[s.id]; delete this.storeProductsData[s.id]; });
-          this.saveAll(); location.reload();
-        }
-      }
+      copyWhatsAppReport() { let text = `📊 *RAPORT MERCHANDISER*\n📅 Data: ${new Date().toLocaleDateString('ro-RO')}\n\n`; let resolved = 0, unresolved = 0; this.currentStores.forEach((store, idx) => { const log = this.storeLogs[store.id]; if (log && log.status === "completed") { resolved++; text += `✅ *${idx + 1}. ${store.name}* (${log.time})\n`; } else if (log && log.status === "unresolved") { unresolved++; text += `❌ *${idx + 1}. ${store.name}* (${log.reason || 'Problemă'})\n`; } else { text += `⏳ *${idx + 1}. ${store.name}* - În așteptare\n`; } }); text += `\n📈 *Sumar:* ${resolved} Rezolvate | ${unresolved} Nerezolvate | ${this.currentStores.length - resolved - unresolved} Rămase`; navigator.clipboard.writeText(text).then(() => alert(`✓ Raportul copiat în Clipboard!`)); }
+      exportCSV() { let csv = "\uFEFFNr,Magazin,Adresa,Ora Vizita,Status,Sectiune,Produse\n"; this.currentStores.forEach((store, idx) => { const log = this.storeLogs[store.id] || {}; const status = log.status === "completed" ? "Rezolvat" : (log.status === "unresolved" ? "Nerezolvat" : "Neinceput"); const data = this.storeProductsData[store.id] || { sectionName: "", items: [] }; const productsStr = data.items.filter(it => it.name || it.price).map((it, i) => `${i+1}. ${it.name} (${it.price} RON)`).join(" | ").replace(/"/g, '""'); csv += `"${idx + 1}","${store.name}","${store.address}","${log.time || ''}","${status}","${data.sectionName || ''}","${productsStr}"\n`; }); const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" })); link.download = `Raport_${new Date().toISOString().slice(0,10)}.csv`; link.click(); }
+      openBackupModal() { document.getElementById("backupModalOverlay").classList.add("active"); document.body.classList.add("modal-open"); }
+      closeBackupModal() { document.getElementById("backupModalOverlay").classList.remove("active"); document.body.classList.remove("modal-open"); }
+      exportFullBackup() { const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([JSON.stringify({ exportDate: new Date().toISOString(), categories: this.categories, masterStores: this.masterStores, logs: this.storeLogs, products: this.storeProductsData }, null, 2)], { type: "application/json" })); link.download = `Backup_Merchandiser_${new Date().toISOString().slice(0,10)}.json`; link.click(); }
+      importBackupFile(event) { if (!event.target.files[0]) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (data.categories) this.categories = data.categories; if (data.masterStores) this.masterStores = data.masterStores; if (data.logs) this.storeLogs = data.logs; if (data.products) this.storeProductsData = data.products; this.saveAll(); alert("✓ Datele au fost restaurate!"); location.reload(); } catch(err) { alert("Fișier JSON invalid."); } }; reader.readAsText(event.target.files[0]); }
+      resetDayProgress() { if (confirm(`⚠️ Resetezi progresul (poze, prețuri, status) pentru această zi?`)) { this.currentStores.forEach(s => { delete this.storeLogs[s.id]; delete this.storeProductsData[s.id]; }); this.saveAll(); location.reload(); } }
     }
 
     window.app = new MerchandiserApp();
